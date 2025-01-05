@@ -287,7 +287,7 @@ export const ProductCard = ({
   const prefixPathTrimmed = prefixPath
     ? prefixPath.trim().replace(/\/+$/, '')
     : '';
-  const path = `${prefixPathTrimmed}/${product.handle}`;
+  const path = `${prefixPathTrimmed}/recipes/${product.handle}`;
 
   // Ref for radio inputs to control image previews
   const radioRef = React.useRef<(HTMLInputElement | null)[]>([]);

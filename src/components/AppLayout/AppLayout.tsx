@@ -67,6 +67,7 @@ const AppLayout: FC<AppLayoutProps> = ({ children, isDocs, path, footer }) => {
           as="main"
           minW="210px"
           h="max(100%, 100vh)"
+          //bgImage={'url(/content/f3.png)'}
           minH="100vh">
             {/* {path === "/" && <GridPattern
               position="absolute"

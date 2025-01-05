@@ -27,6 +27,9 @@ import { useContactModal } from '../../services/contact';
 import { UncontrolledMdxField } from 'jaen-fields-mdx';
 import SvgMdxEditor from '../mdx-editor/SvgMdxEditor';
 
+import MountainSVG from '../MountainSvg';
+import { ParallaxHero } from '../ParallaxHero';
+
 interface ScrollArrowsProps {
   isVisible: boolean;
 }
@@ -62,6 +65,57 @@ const ScrollArrows: React.FC<ScrollArrowsProps> = ({ isVisible }) => {
   );
 };
 
+export function SynthwaveSVG() {
+  return (
+    <chakra.svg
+      position="absolute"
+      top={0}
+      left={0}
+      // Make the SVG fill its container width, with responsive height
+      width="100%"
+      height="auto"
+      overflow="visible"
+      // Define the coordinate system for the SVG
+      viewBox="0 0 400 300"
+      // Helps maintain aspect ratio when scaling
+      preserveAspectRatio="xMidYMid meet"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <foreignObject
+        // Match the viewBox dimensions for a 1:1 scale of embedded content
+        x="0"
+        y="0"
+        width="400"
+        height="300"
+      >
+        {/*
+          IMPORTANT: Use the XHTML namespace on your container 
+          so that <img> and <video> render correctly inside <foreignObject>.
+        */}
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          <img
+            src="/content/synthwave/flaser.png"
+            alt="DarkMountainIMG"
+            style={{ marginBottom: "-6px", display: "block" }}
+          />
+          <video
+            autoPlay
+            muted
+            loop
+            width="100%"
+            height="auto"
+            style={{ display: "block" }}
+          >
+            <source src="/content/synthwave/synthwave.mov" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </foreignObject>
+    </chakra.svg>
+  );
+}
+
+
 const Hero: FC = () => {
   const navOffset = useNavOffset();
 
@@ -81,7 +135,66 @@ const Hero: FC = () => {
   const ComponentFade = useBreakpointValue({ base: VStack, md: FadeIn });
 
   return (
-    <Box as="header" backgroundColor='#dee9ec'>
+<ParallaxHero noScroll={false} />
+
+  );
+  return (
+    <Box as="header" h={"2000px"}>
+      <ParallaxHero noScroll={false} />
+      <AspectRatio ratio={16 / 9} h={'85vh'} w={'100%'}>
+        <Box position="relative">
+          {/* <Image position="absolute" bottom={-48} left={0} src="/content/synthwave/pink_mountain.png" alt="DarkMountainIMG" />
+          <Image position="absolute" bottom={-48} left={0} src="/content/synthwave/purple_mountain.png" alt="DarkMountainIMG" />
+          <Image position="absolute" bottom={-48} left={0} src="/content/synthwave/dark_mountain.png" alt="DarkMountainIMG" /> */}
+          {/* <MountainSVG
+            position="absolute"
+            left={0}
+            w={"100%"}
+            seed={98765}
+            startHeight={508}
+            minMountainHeight={56}
+            maxMountainHeight={512}
+            maxOffsetHeight={64}
+            airGap={0}
+            width={1920}
+            minOffsetWidth={32}
+            maxOffsetWidth={96}
+            baseColour="#400542"
+          />
+          <MountainSVG
+            position="absolute"
+            w={"100%"}
+            seed={765}
+            startHeight={508}
+            minMountainHeight={56}
+            maxMountainHeight={512}
+            maxOffsetHeight={64}
+            airGap={100}
+            width={1920}
+            minOffsetWidth={32}
+            maxOffsetWidth={96}
+            baseColour="#26072a"
+          />
+          <MountainSVG
+            position="absolute"
+            w={"100%"}
+            seed={9765}
+            startHeight={508}
+            minMountainHeight={56}
+            maxMountainHeight={512}
+            maxOffsetHeight={64}
+            airGap={200}
+            width={1920}
+            minOffsetWidth={32}
+            maxOffsetWidth={96}
+            baseColour="#1e0521"
+          /> */}
+
+          <SynthwaveSVG />
+
+          <Image position="absolute" bottom={0} left={0} src="/content/synthwave/shinobu.png" alt="DarkMountainIMG" />
+        </Box>
+      </AspectRatio>
       <Grid
         as={Container}
         maxW="6xl"

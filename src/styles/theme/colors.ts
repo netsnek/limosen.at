@@ -1,17 +1,17 @@
 const themeColors = {
   //* Use theme instead of brand (brand is too dark sometimes)
   brand: {
-    50: '#f4f7fb',
-    100: '#e8eef6',
-    200: '#ccddeb',
-    300: '#a0c1d9',
-    400: '#6da0c3',
-    500: '#4a83ad',
-    600: '#386991',
-    700: '#2f5475',
-    800: '#2a4962',
-    900: '#273e53',
-    950: '#1a2837',
+    50: '#fdf4ff',
+    100: '#f9e8ff',
+    200: '#f3d0fe',
+    300: '#edabfc',
+    400: '#e379f9',
+    500: '#d345f0',
+    600: '#ba25d4',
+    700: '#9d1bb0',
+    800: '#7f188c',
+    900: '#18011a',
+    950: '#47044e',
   },
   theme: {
     50: '#fff5d3',

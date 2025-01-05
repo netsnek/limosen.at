@@ -2,6 +2,7 @@ import {
   Text,
   Box,
   Flex,
+  Image,
   HStack,
   useDisclosure,
   IconButton,
@@ -90,7 +91,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
       minH={isOpen ? '600px' : '100px'}
       transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
       //borderBottomRadius={'2xl'}
-      backgroundColor='#dee9ec'
+      //backgroundColor='blackAlpha.700'
     >
       <Box
         pos="relative"
@@ -308,11 +309,12 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
           >
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
-                <Logo height="100%" />
+                {/* <Logo height="100%" color="#9d1bb0" /> */}
+                <Image height="100%" src="/content/jennyfontlogo.png" />
               </LinkOverlay>
             </LinkBox>
             <Flex alignItems="center" flex="1" justifyContent="flex-end">
-              <Button
+              {/* <Button
                 variant="ghost"
                 ml={1}
                 filter="drop-shadow(1px 2px 2px rgb(0 0 0 / 0.1))"
@@ -379,7 +381,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 display={{ base: 'none', lg: 'block' }}
               >
                 Blog
-              </Button>
+              </Button> */}
               <SearchMenu
                 display={{ base: 'none', lg: 'block' }}
                 ml={4}
@@ -417,7 +419,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 </Button> */}
               <IconButton
                 variant="ghost"
-                display={{ base: 'block', lg: 'none' }}
+                // display={{ base: 'block', lg: 'none' }}
                 ml={4}
                 icon={
                   <HamburgerMenuIcon
@@ -462,7 +464,8 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
           >
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
-                <Logo height="100%" color="white" />
+                {/* <Logo height="100%" color="white" /> */}
+                <Image height="100%" src="/content/jennyfontlogo.png" />
               </LinkOverlay>
             </LinkBox>
             <Flex alignItems="center" flex="1" justifyContent="flex-end">
@@ -476,11 +479,10 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                   borderColor: 'brand.500',
                   bg: { base: 'white', md: 'transparent' }
                 }}
-                mx={0}
                 ml={4}
               />
               <Button
-                ml={4}
+                ml={2}
                 _hover={{
                   bg: 'brand.500'
                 }}
@@ -512,7 +514,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 </Button> */}
               <IconButton
                 variant="ghost"
-                display={{ base: 'block', lg: 'none' }}
+                // display={{ base: 'block', lg: 'none' }}
                 ml={4}
                 _hover={{
                   bg: 'brand.500'
