@@ -48,6 +48,16 @@ export const query = graphql`
         children {
           ...JaenPageData
         }
+        childPages {
+          ...JaenPageChildrenData
+          sections {
+            fieldName
+            items {
+              id
+              jaenFields
+            }
+          }
+        }
       }
     }
   }
