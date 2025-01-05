@@ -22,7 +22,7 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         remote: {
-          repository: 'netsnek/liba'
+          repository: 'netsnek/lycheeprincess'
         },
         zitadel: {
           organizationId: '278641258304378483',
