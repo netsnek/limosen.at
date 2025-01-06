@@ -431,7 +431,7 @@ export const ProductCard = ({
           <Box flex="1" mt={isMobile ? '0' : '4'}>
             {/* Display product tags (other than 'Neu') */}
             <Text fontSize="sm" noOfLines={1}>
-              {tags.filter((tag) => tag !== 'Neu').join(', ')}
+              {tags.filter((tag) => tag !== 'Neu').join(', ')}&nbsp;
             </Text>
 
             {/* Product title */}
