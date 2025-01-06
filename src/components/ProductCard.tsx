@@ -445,9 +445,18 @@ export const ProductCard = ({
             </Text>
 
             {/* Product price */}
-            {priceFormatted && (
-              <Text fontSize="lg" fontWeight="semibold" color="agt.red">
-                {priceFormatted}
+            {priceFormatted ? (
+              <>
+                <Text fontSize="lg" fontWeight="semibold" color="agt.red" mt="4">
+                  {priceFormatted}
+                </Text>
+                <Text fontSize="xs" color="gray.600">
+                  {product.taxable ? 'inkl.' : 'exkl.'} Ust.
+                </Text>
+              </>
+            ) : (
+              <Text fontSize="lg" fontWeight="semibold" color="agt.red" mt="4">
+                Gratis
               </Text>
             )}
           </Box>
