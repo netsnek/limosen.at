@@ -215,16 +215,16 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
           >
             {/* Office information here */}
             <Text color="white" fontWeight="bold" fontSize="lg" pb="4">
-              Im Herzen von Klagenfurt
+              Im Herzen von Wien
             </Text>
             {/* <Text color="white" fontSize="md">
               Hauptquartier
             </Text> */}
             <Text color="gray.400" fontSize="md">
-              Sterneckstraße 23/20
+              Löwengasse 28/22
             </Text>
             <Text color="gray.400" fontSize="md">
-              9020 Klagenfurt, Österreich
+              1030 Wien, Österreich
             </Text>
           </Box>
           <Box
@@ -310,7 +310,10 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
                 {/* <Logo height="100%" color="#9d1bb0" /> */}
-                <Image height="100%" src="/content/jennyfontlogo.png" />
+                <Image height="100%" src="/content/nadinefontlogo.png" />
+                {/* <Text py="5" fontSize="4xl" fontWeight="bold" color="#9d1bb0">
+                  Nadine Hauswirth
+                </Text> */}
               </LinkOverlay>
             </LinkBox>
             <Flex alignItems="center" flex="1" justifyContent="flex-end">
@@ -465,7 +468,10 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
                 {/* <Logo height="100%" color="white" /> */}
-                <Image height="100%" src="/content/jennyfontlogo.png" />
+                <Image height="100%" src="/content/nadinefontlogo.png" filter={"invert(1)"} />
+                {/* <Text py="5" fontSize="4xl" fontWeight="bold" color="#ffffff">
+                  Nadine Hauswirth
+                </Text> */}
               </LinkOverlay>
             </LinkBox>
             <Flex alignItems="center" flex="1" justifyContent="flex-end">

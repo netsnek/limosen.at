@@ -3,6 +3,7 @@ import {
   Image,
   Container,
   Flex,
+  Text,
   GridItem,
   HStack,
   SimpleGrid,
@@ -12,30 +13,32 @@ import {
   Link,
   LinkBox,
   LinkOverlay
-} from '@chakra-ui/react'
-import { useMemo, FC } from 'react'
+} from '@chakra-ui/react';
+import { useMemo, FC } from 'react';
 
-import MountainSVG from '../MountainSvg'
-import SynthwaveSVG from './SynthwaveSVG'
+import MountainSVG from '../MountainSvg';
+import SynthwaveSVG from './SynthwaveSVG';
 
-import { useScrollSync } from '../../hooks/use-scroll-sync'
-import * as style from './style'
-import { useRecipePages } from '../../hooks/use-recipe-pages'
-import { useJaenProducts } from '../../hooks/use-products'
-import ProductIndex from '../ProductIndex'
-import { usePage } from 'jaen'
+import { useScrollSync } from '../../hooks/use-scroll-sync';
+import * as style from './style';
+import { useRecipePages } from '../../hooks/use-recipe-pages';
+import { useJaenProducts } from '../../hooks/use-products';
+import ProductIndex from '../ProductIndex';
+import { usePage } from 'jaen';
+import Services from '../sections/Services';
+import ServicesDetails from '../sections/ServiceDetails';
 
 export interface ParallaxHeroProps {
-  noScroll?: boolean
+  noScroll?: boolean;
 }
 
 // 1) Define your “scrolling potential” in PX (child bigger by this much)
-const SCROLLING_POTENTIAL_PX = 500
+const SCROLLING_POTENTIAL_PX = 500;
 
 // Example props for your slider
 interface INewsSlidesProps {
-  productIndex?: any
-  showNewsTitle?: boolean
+  productIndex?: any;
+  showNewsTitle?: boolean;
 }
 
 const RecipeSlider: FC<INewsSlidesProps> = ({
@@ -71,8 +74,8 @@ const RecipeSlider: FC<INewsSlidesProps> = ({
 };
 
 export const ParallaxHero: FC<ParallaxHeroProps> = ({ noScroll }) => {
-  const { ref, scrollTop } = useScrollSync(0)
-  const CONTAINER_MAX_WIDTH = '87.5rem'
+  const { ref, scrollTop } = useScrollSync(0);
+  const CONTAINER_MAX_WIDTH = '87.5rem';
   const productIndex = useRecipePages();
 
   return (
@@ -104,11 +107,7 @@ export const ParallaxHero: FC<ParallaxHeroProps> = ({ noScroll }) => {
             maxOffsetWidth={96}
             baseColour="#400542"
           /> */}
-          <SynthwaveSVG
-            position={'absolute'}
-            top={'100'}
-            left={'0'}
-          />
+          <SynthwaveSVG position={'absolute'} top={'100'} left={'0'} />
         </Box>
 
         <Box className="parallax__layer parallax__layer__1">
@@ -161,89 +160,36 @@ export const ParallaxHero: FC<ParallaxHeroProps> = ({ noScroll }) => {
               flexDirection="column"
               alignItems="center"
               justifyContent="center"
-              // 1) When hovering anywhere over this LinkBox,
-              //    we underline the .hoverUnderline element.
               sx={{
                 '&:hover .hoverUnderline': {
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              {/* 2) LinkOverlay is the "anchor" to /blog.
-                  The Image and the BLOG text are children of it. */}
-              <LinkOverlay href="/blog" _hover={{ textDecoration: 'none' }}>
-                {/* --- The floating logo --- */}
-                <Image
-                  mb={4}
-                  width="150px"
-                  src="/content/twichlogo.png"
-                  alt="DarkMountainIMG"
-                  sx={{
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0)' },
-                      '50%': { transform: 'translateY(-10px)' },
-                    },
-                    animation: 'float 4s ease-in-out infinite',
-                    transition: 'transform 0.5s ease-in-out',
-                    '&:hover': {
-                      animation: 'none',
-                      transform: 'translateY(-10px)',
-                    },
-                    '&:not(:hover)': {
-                      animation: 'float 4s ease-in-out infinite 0.5s',
-                      transform: 'translateY(0)',
-                    },
-                  }}
-                />
-
-                {/* --- The bold “BLOG” text --- */}
-                <Box
-                  className="hoverUnderline"
-                  fontWeight="bold"
-                  textDecoration="none"
-                  _hover={{ textDecoration: 'none' }}
-                  display={'none'}
-                >
-                  BLOG
-                </Box>
-              </LinkOverlay>
-            </LinkBox>
-
-            <LinkBox
-              as="article"
-              position="relative"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              sx={{
-                '&:hover .hoverUnderline': {
-                  textDecoration: 'underline',
-                },
+                  textDecoration: 'underline'
+                }
               }}
             >
               <LinkOverlay href="/blog" _hover={{ textDecoration: 'none' }}>
                 <Image
                   mb={4}
                   height="300px"
-                  px={16}
-                  src="/content/LogoJenny.png"
+                  mx={16}
+                  mt={16}
+                  borderRadius={'20%'}
+                  src="/content/Nadine.jpeg"
                   alt="DarkMountainIMG"
                   sx={{
                     '@keyframes float': {
                       '0%, 100%': { transform: 'translateY(0)' },
-                      '50%': { transform: 'translateY(-10px)' },
+                      '50%': { transform: 'translateY(-10px)' }
                     },
                     animation: 'float 4s ease-in-out infinite',
                     transition: 'transform 0.5s ease-in-out',
                     '&:hover': {
                       animation: 'none',
-                      transform: 'translateY(-10px)',
+                      transform: 'translateY(-10px)'
                     },
                     '&:not(:hover)': {
                       animation: 'float 4s ease-in-out infinite 0.5s',
-                      transform: 'translateY(0)',
-                    },
+                      transform: 'translateY(0)'
+                    }
                   }}
                 />
                 <Box
@@ -258,57 +204,70 @@ export const ParallaxHero: FC<ParallaxHeroProps> = ({ noScroll }) => {
               </LinkOverlay>
             </LinkBox>
 
-            <LinkBox
-              as="article"
-              position="relative"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
+            <Box
+              w={'50%'}
+              maxW={CONTAINER_MAX_WIDTH}
+              px={4}
+              py={8}
+              bg={'white'}
+              borderRadius="20%"
+              boxShadow="lg"
+              zIndex={1}
               sx={{
-                '&:hover .hoverUnderline': {
-                  textDecoration: 'underline',
+                '@keyframes float': {
+                  '0%, 100%': { transform: 'translateY(0)' },
+                  '50%': { transform: 'translateY(-10px)' }
                 },
+                animation: 'float 4s ease-in-out infinite',
+                transition: 'transform 0.5s ease-in-out',
+                '&:hover': {
+                  animation: 'none',
+                  transform: 'translateY(-10px)'
+                },
+                '&:not(:hover)': {
+                  animation: 'float 4s ease-in-out infinite 0.5s',
+                  transform: 'translateY(0)'
+                }
               }}
             >
-              <LinkOverlay href="/blog" _hover={{ textDecoration: 'none' }}>
-                <Image
-                  mb={4}
-                  width="150px"
-                  src="/content/tiktok.png"
-                  alt="DarkMountainIMG"
-                  sx={{
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0)' },
-                      '50%': { transform: 'translateY(-10px)' },
-                    },
-                    animation: 'float 4s ease-in-out infinite',
-                    transition: 'transform 0.5s ease-in-out',
-                    '&:hover': {
-                      animation: 'none',
-                      transform: 'translateY(-10px)',
-                    },
-                    '&:not(:hover)': {
-                      animation: 'float 4s ease-in-out infinite 0.5s',
-                      transform: 'translateY(0)',
-                    },
-                  }}
-                />
-                <Box
-                  className="hoverUnderline"
+              <Text
+                fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}
+                fontWeight="bold"
+                textAlign="center"
+                color="black"
+                mb={4}
+              >
+                Dem Verstand auf der Spur
+              </Text>
+              <Text
+                fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
+                color="black"
+                mb={8}
+              >
+                Nadine Hauswirth, BA. Pth Psychotherapeutin in Ausbildung unter
+                Supervision und Psychoanalyse in Wien, Behandlung von
+                Prokrastination, Depression, Ängsten, Zwängen, Verzweiflung,
+                Problemen in der Beziehung, psychosomatische Beschwerden.
+              </Text>
+              {/* <Flex justifyContent="center">
+                <Link
+                  href="/blog"
+                  fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
+                  color="teal.500"
                   fontWeight="bold"
-                  textDecoration="none"
-                  _hover={{ textDecoration: 'none' }}
-                  display={'none'}
+                  _hover={{ textDecoration: 'underline' }}
                 >
-                  BLOG
-                </Box>
-              </LinkOverlay>
-            </LinkBox>
+                  Visit Our Blog
+                </Link>
+              </Flex> */}
+            </Box>
           </Box>
         </Box>
 
-        <Box className="parallax__layer parallax__layer__3" pointerEvents={"none"}>
+        <Box
+          className="parallax__layer parallax__layer__3"
+          pointerEvents={'none'}
+        >
           {/* This layer is blank in your code */}
         </Box>
 
@@ -330,20 +289,36 @@ export const ParallaxHero: FC<ParallaxHeroProps> = ({ noScroll }) => {
             mb={`-${SCROLLING_POTENTIAL_PX}px`}
             position="relative"
           >
-            <Image src="/content/synthwave/shinobu4.png" alt="DarkMountainIMG" />
+            <Box opacity={0}>
+              <Image
+                src="/content/synthwave/shinobu4.png"
+                alt="DarkMountainIMG"
+              />
+            </Box>
 
             <Box
               bg="#18011a"
               //bg={"white"}
-              h={"100%"}
+              h={'100%'}
             >
-              <Container maxW={'7xl'} my="0">
-                <RecipeSlider productIndex={productIndex} />
+              <Box h="20"></Box>
+              <Container
+                maxW={'5xl'}
+                mt="0"
+                py="8"
+                px={8}
+                bg={'white'}
+                borderRadius={'xl'}
+              >
+                {/* <RecipeSlider productIndex={productIndex} /> */}
+                <Services />
+                <ServicesDetails />
               </Container>
+              <Box h="20"></Box>
             </Box>
           </Box>
         </Box>
       </Box>
     </>
-  )
-}
+  );
+};

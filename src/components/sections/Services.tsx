@@ -29,8 +29,8 @@ const Services = () => {
         fontWeight="bold"
         textAlign="left"
         name="ContentSectionHeadingServices"
-        defaultValue="Wir verwirklichen in Wochen,<br/>
-  <span style='color:var(--chakra-colors-brand-500)'>nicht Monaten.</span>"
+        defaultValue="Ich beschäftige mich mit der,<br/>
+  <span style='color:var(--chakra-colors-brand-500)'>Theory of mind (ToM).</span>"
       />
       <Grid templateColumns={{base: '1fr', lg: '1fr 1fr'}} gap={10}>
         <GridItem colSpan={1}>
@@ -52,10 +52,10 @@ const Services = () => {
               borderRadius="md"
             />
             <Text mt={4} fontSize="xl" fontWeight="bold">
-              Beratung
+              Therapie
             </Text>
             <Text mt={2} fontSize="md" color="gray.500">
-              Wir beraten Sie in allen Fragen rund um die Digitalisierung.
+              Ich berate insbesondere Menschen im Autismus-Spektrum bei sozialen, emotionalen und prokrastinationsbedingten Herausforderungen.
             </Text>
           </Box>
         </GridItem>
@@ -78,10 +78,10 @@ const Services = () => {
               borderRadius="md"
             />
             <Text mt={4} fontSize="xl" fontWeight="bold">
-              Entwicklung
+              Forschung
             </Text>
             <Text mt={2} fontSize="md" color="gray.500">
-              Wir entwickeln individuelle Softwarelösungen für Ihr Unternehmen.
+              Ich entwickle Testverfahren zur Messung der Theory of Mind (ToM) in KI-Systemen und konzipiere gezielte Übungsszenarien für Menschen im Autismus-Spektrum, um ihre ToM-Fähigkeiten systematisch zu fördern und zu verbessern.
             </Text>
           </Box>
         </GridItem>

@@ -26,9 +26,7 @@ const Services = () => {
         fontWeight="bold"
         textAlign="left"
         name="SectionHeadingServiceDetails1"
-        defaultValue="Wir unterstützen<br/>
-  <span style='color:var(--chakra-colors-brand-500)'>Ihr Unternehmen</span><br/>
-  im digitalen Zeitalter<span style='color:var(--chakra-colors-brand-500)'>.</span>"
+        defaultValue='Ich unterstütze<br/><span style="color:var(--chakra-colors-brand-500)">High-Functioning-Autisten</span><br/> bei alltäglichen Herausforderungen<span style="color:var(--chakra-colors-brand-500)">.</span>'
       />
 
       <Container maxW="container.xl" mt="16">
@@ -58,7 +56,7 @@ const Services = () => {
             {/* For each ListItem you can create a custom component or structure here */}
             <Box mb="6">
               <Heading as="h4" size="md">
-                UX-Konzeption
+                Social Signals
               </Heading>
               <Text mt="2">
                 Durch den Einsatz moderner UX-Methoden gestalten wir
@@ -67,7 +65,7 @@ const Services = () => {
             </Box>
             <Box mb="6">
               <Heading as="h4" size="md">
-                Web development
+                Mimik und Körpewrsprache deuten
               </Heading>
               <Text mt="2">
                 Wir kreieren moderne Websites und Webanwendungen, die exakt auf
@@ -76,7 +74,7 @@ const Services = () => {
             </Box>
             <Box mb="6">
               <Heading as="h4" size="md">
-                Backend development
+                Raum lesen
               </Heading>
               <Text mt="2">
                 Unsere maßgeschneiderten Backend-Lösungen werden speziell auf
@@ -89,7 +87,7 @@ const Services = () => {
             </Box>
             <Box mb="6">
               <Heading as="h4" size="md">
-                Content management
+                Sammeleigenschaften
               </Heading>
               <Text mt="2">
                 Mit{' '}
@@ -103,7 +101,7 @@ const Services = () => {
           </Box>
         </Flex>
       </Container>
-      <Field.Text
+      {/* <Field.Text
         mt={{ base: '24', sm: '32', lg: '40' }}
         mb="8"
         as={Heading}
@@ -155,7 +153,7 @@ const Services = () => {
   measure b[2] -> ans[2];
   measure b[3] -> ans[3];
   measure cout[0] -> ans[4];`}
-      />
+      /> */}
     </Box>
   );
 };
