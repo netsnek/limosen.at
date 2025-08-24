@@ -65,55 +65,55 @@ const ScrollArrows: React.FC<ScrollArrowsProps> = ({ isVisible }) => {
   );
 };
 
-export function SynthwaveSVG() {
-  return (
-    <chakra.svg
-      position="absolute"
-      top={0}
-      left={0}
-      // Make the SVG fill its container width, with responsive height
-      width="100%"
-      height="auto"
-      overflow="visible"
-      // Define the coordinate system for the SVG
-      viewBox="0 0 400 300"
-      // Helps maintain aspect ratio when scaling
-      preserveAspectRatio="xMidYMid meet"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <foreignObject
-        // Match the viewBox dimensions for a 1:1 scale of embedded content
-        x="0"
-        y="0"
-        width="400"
-        height="300"
-      >
-        {/*
-          IMPORTANT: Use the XHTML namespace on your container 
-          so that <img> and <video> render correctly inside <foreignObject>.
-        */}
-        <div xmlns="http://www.w3.org/1999/xhtml">
-          <img
-            src="/content/synthwave/flaser.png"
-            alt="DarkMountainIMG"
-            style={{ marginBottom: "-6px", display: "block" }}
-          />
-          <video
-            autoPlay
-            muted
-            loop
-            width="100%"
-            height="auto"
-            style={{ display: "block" }}
-          >
-            <source src="/content/synthwave/synthwave.mov" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </foreignObject>
-    </chakra.svg>
-  );
-}
+// export function SynthwaveSVG() {
+//   return (
+//     <chakra.svg
+//       position="absolute"
+//       top={0}
+//       left={0}
+//       // Make the SVG fill its container width, with responsive height
+//       width="100%"
+//       height="auto"
+//       overflow="visible"
+//       // Define the coordinate system for the SVG
+//       viewBox="0 0 400 300"
+//       // Helps maintain aspect ratio when scaling
+//       preserveAspectRatio="xMidYMid meet"
+//       xmlns="http://www.w3.org/2000/svg"
+//     >
+//       <foreignObject
+//         // Match the viewBox dimensions for a 1:1 scale of embedded content
+//         x="0"
+//         y="0"
+//         width="400"
+//         height="300"
+//       >
+//         {/*
+//           IMPORTANT: Use the XHTML namespace on your container 
+//           so that <img> and <video> render correctly inside <foreignObject>.
+//         */}
+//         <div xmlns="http://www.w3.org/1999/xhtml">
+//           <img
+//             src="/content/synthwave/flaser.png"
+//             alt="DarkMountainIMG"
+//             style={{ marginBottom: "-6px", display: "block" }}
+//           />
+//           <video
+//             autoPlay
+//             muted
+//             loop
+//             width="100%"
+//             height="auto"
+//             style={{ display: "block" }}
+//           >
+//             <source src="/content/synthwave/synthwave.mov" type="video/mp4" />
+//             Your browser does not support the video tag.
+//           </video>
+//         </div>
+//       </foreignObject>
+//     </chakra.svg>
+//   );
+// }
 
 
 const Hero: FC = () => {
@@ -135,8 +135,7 @@ const Hero: FC = () => {
   const ComponentFade = useBreakpointValue({ base: VStack, md: FadeIn });
 
   return (
-<ParallaxHero noScroll={false} />
-
+    <ParallaxHero noScroll={false} />
   );
   return (
     <Box as="header" h={"2000px"}>

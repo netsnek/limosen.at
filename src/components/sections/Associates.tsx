@@ -1,170 +1,140 @@
+// Associates.tsx
+import { FC } from 'react';
 import {
-  Link,
-  Image,
+  Box,
+  Container,
   Heading,
+  Tag,
+  Text,
+  Image,
   LinkBox,
   LinkOverlay,
-  GridItem,
-  Grid,
-  AspectRatio,
-  chakra
-} from '@chakra-ui/react'
-import {Field} from 'jaen'
+  useBreakpointValue,
+  chakra,
+} from '@chakra-ui/react';
+import { keyframes } from '@emotion/react';
+import Marquee from 'react-fast-marquee';
+import { Field } from 'jaen';
 
-const Associates = () => {
-  // Sample list of your links and icons, assuming you will replace these with your actual data
-  const associates = [
-    {
-      href: 'https://cronit.io/',
-      name: 'cronit',
-      logo: '/images/associates/cronit.svg'
-    },
-    // {
-    //   href: 'https://kanbon.at/',
-    //   name: 'Kanbon',
-    //   logo: '/images/clients/kanbon.svg'
-    // },
-    {
-      href: 'https://pra.st/',
-      name: 'Kanbon',
-      logo: '/images/associates/simon_prast.jpg'
-    },
-    {
-      href: 'https://fhkit.at/',
-      name: 'Florian Herbert Kleber IT',
-      logo: '/images/associates/fhkit.svg'
-    },
-    {
-      href: 'https://neurons.at/',
-      name: 'Neurons',
-      logo: '/images/associates/neurons.svg'
-    },
-    {
-      href: 'https://github.com/XenoVerve',
-      name: 'XenoVerve',
-      logo: '/images/associates/xenoverve.png'
-    },
-    {
-      href: 'https://firmen.wko.at/christian-aichner/k%C3%A4rnten/?firmaid=c904523d-dce4-4b26-90bf-aff015ce4f73',
-      name: 'Werbeagentur Christian Aichner',
-      logo: '/images/associates/aichner.svg'
-    }
-  ]
+const BRAND = { accent: '#7f188c' };
 
-  return (
-    <Grid
-      as="section"
-      position="relative"
-      borderRadius="2xl"
-      bgColor="#0A0A0A"
-      borderTop="1px solid"
-      borderColor="brand.500"
-      templateColumns={{base: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)'}}
-      gap={{base: 4, sm: 8}}
-      mt={{ base: '24', sm: '32', lg: '40' }}
-      p="16"
-      w="full"
-      maxW="full"
-      color="white"
-      alignItems={'center'}>
-      <GridItem
-        mb={4}
-        pos="relative"
-        display="flex"
-        colSpan={{base: 2, sm: 3, md: 6}}
-        flexDir={'column'}
-        justifyContent={'center'}
-        alignItems={'center'}>
-        {/* <ImportantArrow pos="absolute" top="-150%" right="-10%" h="300%" /> */}
-        <LinkBox
-          w={{base: "70%", sm: "50%", md: "25%"}}
-          h="auto"
-          bg="white"
-          p={2}
-          borderRadius="2xl"
-          overflow="hidden"
-          transition="bg 0.2s"
-          _hover={{bg: 'brand.500'}}>
-          <LinkOverlay
-            href={'https://www.wko.at/oe/aussenwirtschaft'}
-            isExternal>
-            <AspectRatio ratio={4 / 3}>
-              {/* Assuming you have a way to dynamically select your icon component */}
-              <Image
-                src={'/images/austria-a-aussenwirtschaft-austria.png'}
-                alt={'Austria'}
-                w="full"
-                h="full"
-                sx={{
-                  objectFit: 'contain !important'
-                }}
-              />
-            </AspectRatio>
-          </LinkOverlay>
-        </LinkBox>
-        <Heading as="h2" size="xl" mt={4} textAlign="center" fontWeight="500">
-          {/* Software in Österreich */}
-          {/* Softwareentwicklung in Österreich */}
-          {/* Österreichische Qualitätssoftware */}
-          {/* Softwareentwicklung in Österreich */}
-          Wir entwickeln für Sie in Österreich
-          <chakra.span color="brand.500">.</chakra.span>
-        </Heading>
-      </GridItem>
-      {associates.map((associate, index) => (
-        <LinkBox
-          key={index}
-          w="auto"
-          h="auto"
-          bg="white"
-          p={2}
-          borderRadius="2xl"
-          overflow="hidden"
-          transition="bg 0.2s"
-          _hover={{bg: 'brand.500'}}>
-          <LinkOverlay href={associate.href} isExternal>
-            <AspectRatio ratio={4 / 3}>
-              {/* Assuming you have a way to dynamically select your icon component */}
-              <Image
-                src={associate.logo}
-                alt={associate.name}
-                w="full"
-                h="full"
-                sx={{
-                  objectFit: 'contain !important'
-                }}
-              />
-            </AspectRatio>
-          </LinkOverlay>
-        </LinkBox>
-      ))}
-      {/* Den Wrapper um den Link mit GridItem oder einer ähnlichen Komponente und setze colSpan auf 3 */}
-      <GridItem display="flex" colSpan={{base: 2, sm: 3, md: 6}} justifyContent="center">
-        <Link
-          href="/projects"
-          variant="hover-theme"
-          //textDecor={"underline"}
-          opacity={0.7}
-          textAlign="center">
-          {/* <Field.Text
-                name="FooterLinkAllCustomers"
-                defaultValue="Sie sind in guter Gesellschaft"
-                fontSize="xl"
-                //fontWeight="500"
-              /> */}
-          <Field.Text
-            name="FooterLinkAllCustomers"
-            // defaultValue="Werden Sie Teil unseres Netzwerks"
-            // I need something that makes clear that these are not customers but partners
-            // And that they are Austrian
-            defaultValue="Experten aus unserem Netzwerk"
-            fontSize="xl"
-            //fontWeight="500"
-          />
-        </Link>
-      </GridItem>
-    </Grid>
-  )
+const glow = keyframes`
+  0% { box-shadow: 0 0 0 rgba(127,24,140,0.0); }
+  100% { box-shadow: 0 0 24px rgba(127,24,140,0.35); }
+`;
+
+// Associates (Partner:innen)
+interface Associate {
+  href: string;
+  name: string;
+  logo: string;
 }
 
-export default Associates
+const associates: Associate[] = [
+  { href: 'https://pra.st/', name: 'Simon Prast', logo: '/images/associates/simon_prast.jpg' },
+  { href: 'https://fhkit.at/', name: 'Florian Herbert Kleber IT', logo: '/images/associates/fhkit.svg' },
+  { href: 'https://netsnek.com/', name: 'Netsnek e. U.', logo: '/images/associates/netsnek_logo.svg' },
+  // { href: 'https://neurons.at/', name: 'Neurons', logo: '/images/associates/neurons.svg' },
+];
+
+const Associates: FC = () => {
+  const itemSize = useBreakpointValue({ base: '200px', md: '230px' });
+  const marqueeSpeed = useBreakpointValue({ base: 40, md: 60 });
+
+  const headingFont =
+    "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
+
+  return (
+    <Box as="section" bg="white" color="black" py={{ base: 10, md: 16 }}>
+      <Container maxW="7xl">
+        {/* Tag + Headline im gleichen Stil, konsequent "ich" */}
+        <Tag
+          size="lg"
+          borderRadius="full"
+          px={4}
+          py={2}
+          bg={`${BRAND.accent}1A`}
+          color={BRAND.accent}
+          fontWeight="800"
+          letterSpacing="0.06em"
+          textTransform="uppercase"
+          border="1px solid"
+          borderColor={`${BRAND.accent}66`}
+          animation={`${glow} 2.2s ease-in-out infinite alternate`}
+        >
+          Netzwerk für Change Coaching
+        </Tag>
+
+        <Heading
+          as="h2"
+          mt={4}
+          fontFamily={headingFont}
+          fontSize={{ base: '2xl', md: '3xl' }}
+          lineHeight="1.2"
+          fontWeight="900"
+        >
+          Ich kooperiere mit Expert:innen in Österreich
+          <chakra.span color={BRAND.accent}>.</chakra.span>
+        </Heading>
+
+        <Text mt={3} color="blackAlpha.800">
+          Für mein <strong>Change Coaching</strong> binde ich – je nach Thema – passende
+          Fachkompetenz ein (z.&nbsp;B. technische Consultants, IT/KI-Automatisierung, Design &amp; Content).
+          So bekommst du genau die Unterstützung, die dein Wandel braucht.
+        </Text>
+
+        {/* Logos als Marquee – ohne Overlay, clean & konsistent */}
+        <Box mt={{ base: 8, md: 12 }}>
+          <Marquee gradient={false} pauseOnHover speed={marqueeSpeed ?? 50}>
+            <Box display="flex" columnGap={{ base: 6, md: 8 }}>
+              {associates.map((a, i) => (
+                <LinkBox
+                  key={`${a.name}-${i}`}
+                  aria-label={a.name}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  width={itemSize}
+                  height={itemSize}
+                  bg="white"
+                  border="1px solid"
+                  borderColor="blackAlpha.200"
+                  borderRadius="2xl"
+                  boxShadow="0 12px 40px rgba(0,0,0,0.12)"
+                  px={4}
+                  py={4}
+                  mx={{ base: 2, md: 4 }}
+                  transition="transform 0.2s ease, box-shadow 0.2s ease"
+                  _hover={{
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 18px 56px rgba(0,0,0,0.16)',
+                  }}
+                >
+                  <LinkOverlay href={a.href} isExternal />
+                  <Image
+                    src={a.logo}
+                    alt={a.name}
+                    w="100%"
+                    h="100%"
+                    objectFit="contain"
+                  />
+                </LinkBox>
+              ))}
+            </Box>
+          </Marquee>
+        </Box>
+
+        {/* CMS-editierbarer Footer-Text */}
+        {/* <Box mt={{ base: 8, md: 12 }} textAlign="center">
+          <Field.Text
+            name="FooterLinkAllCustomers"
+            defaultValue="Expert:innen aus meinem Netzwerk"
+            fontSize="xl"
+          />
+        </Box> */}
+      </Container>
+    </Box>
+  );
+};
+
+export default Associates;

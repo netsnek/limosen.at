@@ -310,7 +310,8 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
                 {/* <Logo height="100%" color="#9d1bb0" /> */}
-                <Image height="100%" src="/content/nadinefontlogo.png" />
+                <Logo height="100%" color="#7f188c" />
+                {/* <Image height="100%" src="/content/nadinefontlogo2.png" /> */}
                 {/* <Text py="5" fontSize="4xl" fontWeight="bold" color="#9d1bb0">
                   Nadine Hauswirth
                 </Text> */}
@@ -390,7 +391,8 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 ml={4}
                 boxSizing={'border-box'}
                 borderWidth={{ base: 0, lg: 2 }}
-                color={{ base: 'white', md: 'brand.700' }}
+                borderColor='#7f188c'
+                color={{ base: '#7f188c', md: '#7f188c' }}
                 fontWeight={'semibold'}
                 opacity="0.7"
                 _hover={{
@@ -405,6 +407,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 onClick={handleOnContactClick}
                 fontSize="sm"
                 fontWeight="semibold"
+                bg="#7f188c"
                 color="white"
                 display={{ base: 'none', lg: 'block' }}
               >
@@ -432,7 +435,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                       // ...hamburgerIconProps,
                       //boxSize: '6',
                       //boxSize: '100%',
-                      backgroundColor: isOpen ? 'white' : 'brand.700'
+                      backgroundColor: isOpen ? 'white' : '#7f188c'
                     }}
                   />
                 }
@@ -467,8 +470,8 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
           >
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
-                {/* <Logo height="100%" color="white" /> */}
-                <Image height="100%" src="/content/nadinefontlogo.png" filter={"invert(1)"} />
+                <Logo height="100%" color="white" />
+                {/* <Image height="100%" src="/content/nadinefontlogo2.png" filter={"invert(1)"} /> */}
                 {/* <Text py="5" fontSize="4xl" fontWeight="bold" color="#ffffff">
                   Nadine Hauswirth
                 </Text> */}

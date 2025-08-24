@@ -21,6 +21,9 @@ const parallaxMake = (
     // scale: how large the layer is (front layers are bigger, back layers smaller)
     // multiplying by speedFactor lets you increase or decrease the distance
     styles[`.parallax__layer__${i}`] = {
+      // if layer 0 top -100% to cover the viewport
+      // otherwise, top 0 to stack them vertically
+      top: i === 0 ? '-150%' : '0',
       transform: `translateZ(${-100 * x * speedFactor}px) scale(${x + 1})`,
       transformOrigin: 'center'
     }

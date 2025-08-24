@@ -180,7 +180,7 @@ const Footer: FC = () => {
           <Flex mt={20} wrap={{base: 'wrap', sm: 'nowrap'}}>
             <Box>
               <Flex alignItems={'center'}>
-                <Image height="100px" src="/content/nadinefontlogo.png" filter={"invert(1)"} />
+                <Logo color="white" h="100px" />
               </Flex>
             </Box>
             <Spacer minW={{base: '5rem', lg: '25%'}} />
