@@ -80,7 +80,7 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
             {/* Gekürzt & angepasst: Satz entfernt und neuer Satz ergänzt */}
             <Text mt={4} fontSize={{ base: 'md', md: 'lg' }} lineHeight="1.7" color="blackAlpha.800">
               Die Schweigepflicht gilt bei mir <chakra.span fontWeight="700">vom ersten bis zum letzten gewechselten Wort</chakra.span> – unabhängig davon, ob wir persönlich, telefonisch oder schriftlich kommunizieren. Ich lebe sie sowohl in der Psychotherapie als auch im Coaching.{' '}
-              <chakra.span fontWeight="700">Weil Vertraulichkeit ist die Grundlage für jede gute Zusammenarbeit.</chakra.span>
+              <chakra.span fontWeight="700">Weil Vertrauen ist die Grundlage für jede gute Zusammenarbeit.</chakra.span>
             </Text>
 
             <List mt={6} spacing={2}>
