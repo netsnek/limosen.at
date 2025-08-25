@@ -141,7 +141,7 @@ const FAQ: FC<FAQProps> = ({
   )
 
   return (
-    <Box as="section" id={id} bg="white" color="black" py={{ base: 10, md: 16 }}>
+    <Box as="section" id={id} bg="white" color="black" pt={{ base: 10, md: 16 }}>
       <Container maxW="7xl">
         {/* Tag im ChangeCoaching-Stil */}
         <Tag

@@ -3,7 +3,7 @@ import React from 'react'
 import { Box, chakra } from '@chakra-ui/react'
 
 export const Logo = (props: any) => {
-  const color = props.color || '#273E53'
+  const color = props.color || '#000'
 
   return (
     <chakra.svg

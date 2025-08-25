@@ -113,7 +113,7 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
                   color="white"
                   _hover={{ filter: 'brightness(1.1)' }}
                   as="a"
-                  href="#kontakt"
+                  href="?contact"
                   fontWeight="900"
                 >
                   Kostenloses Erstgespräch
@@ -125,7 +125,7 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
                   color="black"
                   _hover={{ bg: 'blackAlpha.50' }}
                   as="a"
-                  href="#services"
+                  href="/docs"
                   fontWeight="800"
                 >
                   Mehr erfahren

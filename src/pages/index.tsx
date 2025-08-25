@@ -123,9 +123,15 @@ const Section = (noScroll?: boolean) => css`
   ${parallaxMake(7, 1)}
 
   @keyframes scrollarrows {
-    0% { opacity: 0; }
-    50% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 `;
 
@@ -186,12 +192,14 @@ const IndexPage: React.FC<PageProps> = () => {
         css={Section()}
         ref={ref}
         /* Define navbar height var responsively (12vh base, 15vh md+) */
-        sx={{
-          '--navbar-vh': '12vh',
-          '@media (min-width: 48em)': {
-            '--navbar-vh': '15vh'
-          }
-        } as React.CSSProperties}
+        sx={
+          {
+            '--navbar-vh': '12vh',
+            '@media (min-width: 48em)': {
+              '--navbar-vh': '15vh'
+            }
+          } as React.CSSProperties
+        }
       >
         {/* BACKDROP LAYER */}
         <Box
@@ -552,23 +560,43 @@ const IndexPage: React.FC<PageProps> = () => {
                       <HStack spacing={3} pl={{ base: 0, md: 2 }}>
                         <Link href="#" isExternal aria-label="TikTok">
                           <VisuallyHidden>TikTok</VisuallyHidden>
-                          <Box as={FaTiktok} boxSize="22px" color="whiteAlpha.900" />
+                          <Box
+                            as={FaTiktok}
+                            boxSize="22px"
+                            color="whiteAlpha.900"
+                          />
                         </Link>
                         <Link href="#" isExternal aria-label="LinkedIn">
                           <VisuallyHidden>LinkedIn</VisuallyHidden>
-                          <Box as={FaLinkedin} boxSize="22px" color="whiteAlpha.900" />
+                          <Box
+                            as={FaLinkedin}
+                            boxSize="22px"
+                            color="whiteAlpha.900"
+                          />
                         </Link>
                         <Link href="#" isExternal aria-label="Instagram">
                           <VisuallyHidden>Instagram</VisuallyHidden>
-                          <Box as={FaInstagram} boxSize="22px" color="whiteAlpha.900" />
+                          <Box
+                            as={FaInstagram}
+                            boxSize="22px"
+                            color="whiteAlpha.900"
+                          />
                         </Link>
                         <Link href="#" isExternal aria-label="Facebook">
                           <VisuallyHidden>Facebook</VisuallyHidden>
-                          <Box as={FaFacebook} boxSize="22px" color="whiteAlpha.900" />
+                          <Box
+                            as={FaFacebook}
+                            boxSize="22px"
+                            color="whiteAlpha.900"
+                          />
                         </Link>
                         <Link href="#" isExternal aria-label="GitHub">
                           <VisuallyHidden>GitHub</VisuallyHidden>
-                          <Box as={FaGithub} boxSize="22px" color="whiteAlpha.900" />
+                          <Box
+                            as={FaGithub}
+                            boxSize="22px"
+                            color="whiteAlpha.900"
+                          />
                         </Link>
                       </HStack>
                     </HStack>
@@ -588,22 +616,52 @@ const IndexPage: React.FC<PageProps> = () => {
                 >
                   <defs>
                     <linearGradient id="g-accent" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stopColor={BRAND.accent} stopOpacity="0.45" />
+                      <stop
+                        offset="0"
+                        stopColor={BRAND.accent}
+                        stopOpacity="0.45"
+                      />
                       <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
                     </linearGradient>
-                    <filter id="blur40" x="-20%" y="-20%" width="140%" height="140%">
+                    <filter
+                      id="blur40"
+                      x="-20%"
+                      y="-20%"
+                      width="140%"
+                      height="140%"
+                    >
                       <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
                     </filter>
                   </defs>
 
-                  <circle cx="140" cy="90" r="220" fill="url(#g-accent)" filter="url(#blur40)" />
-                  <circle cx="680" cy="180" r="180" fill="url(#g-accent)" filter="url(#blur40)" />
-                  <circle cx="480" cy="520" r="220" fill="url(#g-accent)" filter="url(#blur40)" />
+                  <circle
+                    cx="140"
+                    cy="90"
+                    r="220"
+                    fill="url(#g-accent)"
+                    filter="url(#blur40)"
+                  />
+                  <circle
+                    cx="680"
+                    cy="180"
+                    r="180"
+                    fill="url(#g-accent)"
+                    filter="url(#blur40)"
+                  />
+                  <circle
+                    cx="480"
+                    cy="520"
+                    r="220"
+                    fill="url(#g-accent)"
+                    filter="url(#blur40)"
+                  />
 
                   {[140, 220, 300, 380, 460].map((y, i) => (
                     <path
                       key={y}
-                      d={`M0 ${y} Q 150 ${y - 20}, 300 ${y} T 600 ${y} T 900 ${y}`}
+                      d={`M0 ${y} Q 150 ${
+                        y - 20
+                      }, 300 ${y} T 600 ${y} T 900 ${y}`}
                       fill="none"
                       stroke={`rgba(255,255,255,${0.1 + i * 0.05})`}
                       strokeWidth="1"
@@ -621,7 +679,7 @@ const IndexPage: React.FC<PageProps> = () => {
         <Box className="parallax__layer parallax__layer__6">
           <Box position="relative">
             <Box h="100%" mt={{ base: 8, md: 16 }}>
-              <Box py="20" bg="white">
+              <Box pt="20" bg="white">
                 <AchivementCounter
                   items={[
                     { label: 'Jahre', value: 5, suffix: '+' },
@@ -637,18 +695,17 @@ const IndexPage: React.FC<PageProps> = () => {
                 <Associates />
                 <BlogSlider blogIndex={blogIndex} />
                 <FAQ />
-
-                <GoogleMaps
-                  objectFit="cover"
-                  h="full"
-                  w="100%"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2658.943210509323!2d16.39061507721271!3d48.20770977125128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476d0712a8ac8f77%3A0xefb15b7a09edac54!2sL%C3%B6wengasse%2028%2F22%2C%201030%20Wien!5e0!3m2!1sen!2sat!4v1748983411247!5m2!1sen!2sat"
-                />
               </Box>
             </Box>
           </Box>
         </Box>
       </Box>
+      <GoogleMaps
+        objectFit="cover"
+        h="full"
+        w="100%"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2658.943210509323!2d16.39061507721271!3d48.20770977125128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476d0712a8ac8f77%3A0xefb15b7a09edac54!2sL%C3%B6wengasse%2028%2F22%2C%201030%20Wien!5e0!3m2!1sen!2sat!4v1748983411247!5m2!1sen!2sat"
+      />
     </>
   );
 };

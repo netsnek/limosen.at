@@ -310,7 +310,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
             <LinkBox height="100%" flex="2" mr="4" display="flex">
               <LinkOverlay href="/" color="white">
                 {/* <Logo height="100%" color="#9d1bb0" /> */}
-                <Logo height="100%" color="#7f188c" />
+                <Logo height="100%" />
                 {/* <Image height="100%" src="/content/nadinefontlogo2.png" /> */}
                 {/* <Text py="5" fontSize="4xl" fontWeight="bold" color="#9d1bb0">
                   Nadine Hauswirth
@@ -387,7 +387,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
                 Blog
               </Button> */}
               <SearchMenu
-                display={{ base: 'none', lg: 'block' }}
+                display={{ base: 'block', lg: 'block' }}
                 ml={4}
                 boxSizing={'border-box'}
                 borderWidth={{ base: 0, lg: 2 }}
