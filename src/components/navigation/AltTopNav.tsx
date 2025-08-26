@@ -145,7 +145,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
               color: 'brand.500'
             }}
           >
-            <LinkOverlay href="/docs">Über mich</LinkOverlay>
+            <LinkOverlay href="/#change-coaching">Coaching</LinkOverlay>
           </LinkBox>
           <LinkBox
             gridArea="team"
@@ -163,7 +163,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
               color: 'brand.500'
             }}
           >
-            <LinkOverlay href="/docs">Kurse & Webinare</LinkOverlay>
+            <LinkOverlay href="/#psychotherapie">Psychotherapie</LinkOverlay>
           </LinkBox>
           <LinkBox
             gridArea="portfolio"
@@ -181,7 +181,7 @@ const AltTopNav: FC<IAltTopNavProps> = ({ path, hamburgerIconProps }) => {
               color: 'brand.500'
             }}
           >
-            <LinkOverlay href="/recipes/">Rezepte</LinkOverlay>
+            <LinkOverlay href="/#preise">Preise</LinkOverlay>
           </LinkBox>
           <LinkBox
             gridArea="blog"

@@ -5,22 +5,19 @@ import {
   Container,
   Heading,
   Text,
-  HStack,
   Tag,
-  Button,
   Skeleton,
   chakra,
-  Link as ChakraLink
+  useBreakpointValue
 } from '@chakra-ui/react'
 import {keyframes} from '@emotion/react'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 
-import {ProductCard} from '../ProductCard' // reusing your existing card
-import {usePage} from 'jaen'
-import {useJaenBlogs} from '../../hooks/use-blog-pages' // <-- the hook we created
-import { BlogCard } from '../BlogCard'
+import {usePage, Field} from 'jaen'
+import {useJaenBlogs} from '../../hooks/use-blog-pages'
+import {BlogCard} from '../BlogCard'
 
 const BRAND = {accent: '#7f188c'}
 const glow = keyframes`
@@ -52,41 +49,51 @@ const BlogSlider: FC<BlogSliderProps> = ({
   // pull CMS media for resolving media node ids
   const cmsMediaPage = usePage({id: 'JaenPage /cms/media/', injectMedia: true})
 
-  // 🔌 use Jaen → to ProductCard-compatible blog items
+  // 🔌 use Jaen → to BlogCard-compatible blog items
   const {posts, featuredPosts} = useJaenBlogs(blogIndex, cmsMediaPage, {
-    limit: 12 // adjust if you want more items in the slider
+    limit: 12
   })
 
-  // choose data source for the slider
   const items = featuredOnly ? featuredPosts : posts
 
   const [loading, setLoading] = useState(true)
   useEffect(() => setLoading(false), [])
 
-  // react-slick settings
-  const slidesToShowBase = 4
+  // Mobile UX: dots on, arrows off; Desktop: arrows on when useful.
+  const isMobile = useBreakpointValue({base: true, md: false}) ?? true
+  const showArrows = !isMobile && (items?.length || 0) > 1
+  const showDots = true
+
+  // react-slick settings (mobile-first)
   const settings = useMemo(
     () => ({
-      dots: true,
-      arrows: true,
-      infinite: (items?.length || 0) > slidesToShowBase,
+      dots: showDots,
+      arrows: showArrows,
+      infinite: (items?.length || 0) > 4,
       speed: 500,
-      slidesToShow: slidesToShowBase,
+      slidesToShow: 4,
       slidesToScroll: 1,
-      adaptiveHeight: true,
+      swipeToSlide: true,
+      touchThreshold: 12,
+      adaptiveHeight: false,
+      lazyLoad: 'ondemand' as const,
       responsive: [
-        {breakpoint: 1024, settings: {slidesToShow: 4}},
-        {breakpoint: 900, settings: {slidesToShow: 3}},
-        {breakpoint: 640, settings: {slidesToShow: 1}}
+        { breakpoint: 1280, settings: { slidesToShow: 4 } },
+        { breakpoint: 1024, settings: { slidesToShow: 3 } },
+        { breakpoint: 768,  settings: { slidesToShow: 2, arrows: false } },
+        {
+          breakpoint: 640,
+          settings: { slidesToShow: 1, arrows: false, centerMode: true, centerPadding: '16px' }
+        }
       ],
       nextArrow: <Arrow dir="right" />,
       prevArrow: <Arrow dir="left" />
     }),
-    [items?.length]
+    [items?.length, showArrows, showDots]
   )
 
   return (
-    <Box as="section" id={id} bg="white" color="black" py={{base: 10, md: 16}}>
+    <Box as="section" id={id} bg="white" color="black" py={{base: 8, md: 16}}>
       <Container maxW="7xl">
         <Tag
           size="lg"
@@ -105,66 +112,54 @@ const BlogSlider: FC<BlogSliderProps> = ({
           Blog
         </Tag>
 
+        {/* Editable headline via Jaen Field.Text */}
         <Heading
           as="h2"
           mt={4}
           fontFamily={headingFont}
-          fontSize={{base: '2xl', md: '3xl'}}
+          fontSize={{base: 'xl', sm: '2xl', md: '3xl'}}
           lineHeight="1.2"
           fontWeight="900"
         >
-          {title}
+          <Field.Text
+            as={chakra.span}
+            display="inline"
+            name="BlogSliderHeadline"
+            defaultValue={title}
+          />
           <chakra.span color={ACCENT}>.</chakra.span>
         </Heading>
 
-        <Skeleton isLoaded={!loading} mt={{base: 6, md: 8}}>
+        <Skeleton isLoaded={!loading} mt={{base: 5, md: 8}}>
           {items?.length ? (
             <Box
               position="relative"
               sx={{
-                '.slick-slide > div': {px: 2},
-                '.slick-list': {mx: {base: -2, md: -3}}
+                '.slick-slide > div': {px: {base: 1.5, md: 2.5}, height: '100%'},
+                '.slick-list': {mx: {base: -1.5, md: -2.5}, overflow: 'hidden'},
+                '.slick-track': {display: 'flex', alignItems: 'stretch'},
+                '.slick-slide': {height: 'auto'},
+                '.slick-dots': {bottom: '-32px'},
+                '.slick-dots li button:before': {fontSize: '10px', color: `${ACCENT}99`, opacity: 1},
+                '.slick-dots li.slick-active button:before': {color: ACCENT, opacity: 1}
               }}
             >
               <Slider {...settings}>
                 {items.map((post: any, i: number) => (
-                  <Box key={(post.handle || post.id) + i} my={4}>
-                    {/* post is already ProductCard-compatible via useJaenBlogs */}
-                    <BlogCard blog={post} borderline={false} bcolor={ACCENT} />
+                  <Box key={(post.handle || post.id) + i} my={{base: 2, md: 4}} h="100%">
+                    <Box h="100%">
+                      <BlogCard blog={post} borderline={false} bcolor={ACCENT} />
+                    </Box>
                   </Box>
                 ))}
               </Slider>
             </Box>
           ) : (
-            <Text color="blackAlpha.700">Keine Blogbeiträge gefunden.</Text>
+            <Text color="blackAlpha.700" mt={2}>
+              Keine Blogbeiträge gefunden.
+            </Text>
           )}
         </Skeleton>
-
-        <HStack spacing={3} pt={{base: 8, md: 10}}>
-          <Button
-            as={ChakraLink}
-            href="/blog"
-            borderRadius="full"
-            bg={ACCENT}
-            color="white"
-            _hover={{filter: 'brightness(1.1)'}}
-            fontWeight="900"
-          >
-            Zum Blog
-          </Button>
-          <Button
-            as={ChakraLink}
-            href="/newsletter"
-            variant="outline"
-            borderRadius="full"
-            borderColor="blackAlpha.400"
-            color="black"
-            _hover={{bg: 'blackAlpha.50'}}
-            fontWeight="800"
-          >
-            Newsletter abonnieren
-          </Button>
-        </HStack>
       </Container>
     </Box>
   )
@@ -189,10 +184,11 @@ const Arrow: FC<{dir: 'left' | 'right'; onClick?: () => void}> = ({dir, onClick}
     borderRadius="full"
     w="36px"
     h="36px"
-    display="grid"
+    display={{base: 'none', md: 'grid'}}
     placeItems="center"
     _hover={{boxShadow: '0 12px 36px rgba(0,0,0,0.16)'}}
     cursor="pointer"
+    onClick={onClick}
   >
     <chakra.span fontWeight="900" fontSize="lg" lineHeight="1">
       {dir === 'left' ? '‹' : '›'}

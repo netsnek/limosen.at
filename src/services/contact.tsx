@@ -1,89 +1,78 @@
-import { useToast } from "@chakra-ui/react";
-import { sendTemplateMail } from "gatsby-jaen-mailpress";
-import React, { useMemo } from "react";
-import { RouteComponentProps } from "@reach/router";
-import { asEnumKey, doNotConvertToString } from "snek-query";
-import {
-  ContactFormValues,
-  ContactModal,
-} from "../components/ContactModal/ContactModal";
-import { useAuth } from 'jaen';
-import { useQueryRouter } from "../hooks/use-query-router";
-import { navigate } from "gatsby";
+// contact.tsx
+import React, { useMemo } from "react"
+import { useToast } from "@chakra-ui/react"
+import { sendTemplateMail } from "gatsby-jaen-mailpress"
+import { useLocation } from "@reach/router"
+import { ContactFormValues, ContactModal } from "../components/ContactModal/ContactModal"
+import { useAuth } from "jaen"
+import { useQueryRouter } from "../hooks/use-query-router"
 
 export interface ContactModalContextProps {
-  onOpen: (args?: { meta?: Record<string, any> }) => void;
-  onClose: () => void;
+  onOpen: (args?: { meta?: Record<string, any> }) => void
+  onClose: () => void
 }
 
 export const ContactModalContext =
   React.createContext<ContactModalContextProps>({
     onOpen: () => {},
     onClose: () => {},
-  });
+  })
 
 export const useContactModal = () => {
-  if (!ContactModalContext) {
-    throw new Error(
-      "useContactModal must be used within a ContactModalProvider"
-    );
+  const context = React.useContext(ContactModalContext)
+  if (!context) {
+    throw new Error("useContactModal must be used within a ContactModalProvider")
   }
-
-  return React.useContext(ContactModalContext);
-};
-
-export interface ContactModalDrawerProps {
-  children: React.ReactNode;
-  location: {
-    pathname: string;
-    search: string;
-  };
+  return context
 }
 
-export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({
-  location,
-  children,
-}) => {
-  const { isCalled, paramValue } = useQueryRouter(location, "contact");
+export interface ContactModalDrawerProps {
+  children: React.ReactNode
+}
 
-  const [meta, setMeta] = React.useState<Record<string, any> | null>(null);
-  const [isOpen, setIsOpen] = React.useState(false);
+export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ children }) => {
+  // Use the current location from @reach/router.
+  const location = useLocation()
+  const { isCalled, paramValue } = useQueryRouter(location, "contact")
 
+  const [meta, setMeta] = React.useState<Record<string, any> | null>(null)
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  // When the query parameter is present, open the modal.
   React.useEffect(() => {
     if (isCalled) {
-      setIsOpen(true);
-      //alert(paramValue)
+      setIsOpen(true)
     }
-  }, [isCalled]);
+  }, [isCalled])
 
-  const toast = useToast();
-
-  const authentication = useAuth();
+  const toast = useToast()
+  const authentication = useAuth()
 
   const onOpen: ContactModalContextProps["onOpen"] = (args) => {
     const updatedMeta = {
       ...meta,
       url: window.location.href,
-    };
+      ...args?.meta,
+    }
+    setMeta(updatedMeta)
+    setIsOpen(true)
+  }
 
-    setMeta(updatedMeta);
-    setIsOpen(true);
-  };
   const onClose = () => {
-    //navigate(location.pathname);
+    // Remove the "contact" query parameter from the URL without reloading the page.
+    const url = new URL(window.location.href)
+    url.searchParams.delete("contact")
+    window.history.replaceState({}, '', url.toString())
 
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
 
   const onSubmit = async (data: ContactFormValues): Promise<void> => {
-
-    console.log(data, meta);
-
-    const { ok, message, errors } = await sendTemplateMail(
+    const { errors } = await sendTemplateMail(
       '68d4c136-7d75-40cc-ba74-079a0dca4044', // replace with your actual template ID
       {
         envelope: {
-          replyTo: data.email
+          replyTo: data.email,
         },
         values: {
           firstName: data.firstName,
@@ -91,38 +80,19 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({
           email: data.email,
           phone: data.phone || '',
           message: data.message,
-          invokedOnUrl: meta?.url
-        }
+          invokedOnUrl: meta?.url,
+        },
       }
-    );
-
-    // const [_, errors] = await sq.mutate(m =>
-    //   m.sendTemplateMail({
-    //     envelope: {
-    //       replyTo: data.email
-    //     },
-
-    //     id: '68d4c136-7d75-40cc-ba74-079a0dca4044',
-    //     values: {
-    //       firstName: data.firstName,
-    //       lastName: data.lastName,
-    //       email: data.email,
-    //       phone: data.phone,
-    //       message: data.message,
-    //       invokedOnUrl: meta?.url
-    //     }
-    //   })
-    // )
+    )
 
     if (errors) {
-      // Deutsch
       toast({
         title: "Fehler",
         description: "Es ist ein Fehler aufgetreten.",
         status: "error",
         duration: 5000,
         isClosable: true,
-      });
+      })
     } else {
       toast({
         title: "Erfolg",
@@ -130,33 +100,30 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({
         status: "success",
         duration: 5000,
         isClosable: true,
-      });
-
-      onClose();
+      })
+      onClose()
     }
-  };
+  }
 
   const fixedValues = useMemo(() => {
     if (!authentication.user) {
-      return undefined;
+      return undefined
     }
-
     return {
       firstName: authentication.user.profile?.given_name,
       lastName: authentication.user.profile?.family_name,
       email: authentication.user.profile?.email,
-    };
-  }, [authentication.user]);
+    }
+  }, [authentication.user])
 
   const defaultValues = useMemo(() => {
     if (!isCalled) {
-      return undefined;
+      return undefined
     }
-
     return {
       message: paramValue,
-    };
-  }, [isCalled, paramValue]);
+    }
+  }, [isCalled, paramValue])
 
   return (
     <ContactModalContext.Provider value={{ onOpen, onClose }}>
@@ -169,5 +136,5 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({
         defaultValues={defaultValues}
       />
     </ContactModalContext.Provider>
-  );
-};
+  )
+}

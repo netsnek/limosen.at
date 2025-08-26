@@ -15,7 +15,7 @@ export interface UseBlogPagesOptions {
  */
 export const useBlogPages = (options?: UseBlogPagesOptions) => {
   const index = useJaenPageIndex({
-    jaenPageId: 'JaenPage /recipes/'
+    jaenPageId: 'JaenPage /docs/'
   })
 
   const {jaenPage} = usePageContext()

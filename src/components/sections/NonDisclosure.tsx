@@ -103,7 +103,7 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
                 color="white"
                 _hover={{ filter: 'brightness(1.1)' }}
                 as="a"
-                href="#kontakt"
+                href="?contact"
                 fontWeight="900"
               >
                 Erstgespräch vereinbaren
