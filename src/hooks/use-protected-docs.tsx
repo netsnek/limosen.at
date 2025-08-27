@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import { navigate } from 'gatsby'
-import { useAuth, checkUserRoles } from 'jaen'
+import { useAuth /*, checkUserRoles*/ } from 'jaen'
 import { useToast, Spinner, Center } from '@chakra-ui/react'
 
 /**
- * Protect /docs/magisterarbeit/* for jaen:admin users only.
+ * Protect /docs/magisterarbeit/* for authenticated users only.
  * Blocks rendering until check is done.
  */
 export const useProtectedDocs = () => {
   const auth = useAuth()
-  const { signinRedirect } = auth
   const toast = useToast()
   const [isChecking, setIsChecking] = useState(true)
 
@@ -20,12 +19,21 @@ export const useProtectedDocs = () => {
 
     if (path.startsWith('/docs/magisterarbeit')) {
       if (!auth.isAuthenticated) {
-        signinRedirect()
+        toast({
+          title: 'Nicht eingeloggt',
+          description: 'Bitte melden Sie sich an, um diese Seite zu sehen.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true
+        })
+
+        void navigate('/login')
         return
       }
 
+      // 🔒 later: role check
+      /*
       const isAdmin = checkUserRoles(auth.user, ['jaen:admin'])
-
       if (!isAdmin) {
         toast({
           title: 'Zugriff verweigert',
@@ -34,14 +42,14 @@ export const useProtectedDocs = () => {
           duration: 5000,
           isClosable: true
         })
-
         void navigate('/')
         return
       }
+      */
     }
 
     setIsChecking(false)
-  }, [auth.isAuthenticated, auth.user, signinRedirect, toast])
+  }, [auth.isAuthenticated, auth.user, toast])
 
   return { isChecking }
 }
