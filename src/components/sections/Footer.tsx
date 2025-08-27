@@ -48,40 +48,36 @@ const Footer: FC = () => {
       //   href: 'https://t.me/kleberbaum'
       // },
       {
-        label: 'Angebot',
-        href: '/recipes'
+        label: 'Coaching',
+        href: '/#change-coaching'
       },
       {
-        label: 'Rezepte',
-        href: '/recipes'
+        label: 'Psychotherapie',
+        href: '/#psychotherapie'
+      },
+      {
+        label: 'Preise',
+        href: '/#preise'
       },
       {
         label: 'Blog',
         href: '/docs'
-      },
-      {
-        label: 'Meine Beratung',
-        href: '/#meine_beratung'
-      },
-      {
-        label: 'Kurse & Webinare',
-        href: '/imprint'
       },
       // {
       //   label: 'Mitgliederbereich',
       //   href: '/imprint'
       // },
       {
-        label: 'FAQs',
-        href: '/meine_kunden'
+        label: 'FAQ',
+        href: '/#faq'
       },
       {
         label: 'Über mich',
-        href: '/mushroom'
+        href: '/#blog-slider'
       },
       {
         label: 'Kontakt',
-        href: '/imprint'
+        href: '/?contact'
       },
       {
         label: 'Impressum',
@@ -112,15 +108,11 @@ const Footer: FC = () => {
     ],
     [
       {
-        label: 'Empfehlungen',
+        label: 'Expert:innen',
         isTitle: true
       },
       {
-        label: 'Marthese',
-        href: 'https://www.tenutalemandorlai.it'
-      },
-      {
-        label: 'Florian',
+        label: 'Netsnek',
         href: 'https://netsnek.com'
       },
     ]

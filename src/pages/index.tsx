@@ -719,7 +719,7 @@ const IndexPage: React.FC<PageProps> = () => {
                 <Psychotherapy accentColor="#7f188c" />
                 <NonDisclosure accentColor="#7f188c" />
                 <Prices accentColor="#7f188c" />
-                <Associates />
+                {/* <Associates /> */}
                 <BlogSlider blogIndex={blogIndex} />
                 <FAQ />
               </Box>
