@@ -1,5 +1,13 @@
 import { PageConfig } from 'jaen';
-import { Box, Flex, Stack, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Center,
+  Flex,
+  Spinner,
+  Stack,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 import { PageProps, graphql } from 'gatsby';
 import * as React from 'react';
 import TableOfContent from '../components/navigation/TableOfContent';
@@ -9,6 +17,7 @@ import Links from '../components/Links';
 import RightNav from '../components/navigation/RightNav';
 import MainBottomNav from '../components/navigation/MainBottomNav';
 import { useTOCContext } from '../contexts/toc';
+import { useProtectedDocs } from '../hooks/use-protected-docs';
 
 // Example links - these would probably be fetched from a CMS or other data source
 const links = [
@@ -24,6 +33,16 @@ const links = [
 
 const DocPage: React.FC<PageProps> = props => {
   const toc = useTOCContext();
+  const { isChecking } = useProtectedDocs();
+
+  if (isChecking) {
+    // Show loader instead of content until auth is verified
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
 
   return <MdxEditor onMdast={toc.setValue} />;
 };
