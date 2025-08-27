@@ -15,6 +15,7 @@ import {
   chakra
 } from '@chakra-ui/react'
 import { keyframes } from '@emotion/react'
+import { Field } from 'jaen'
 
 const BRAND = {
   base: '#18011a',
@@ -34,7 +35,7 @@ export interface FAQProps {
   title?: string
 }
 
-type QA = { q: string; a: ReactNode }
+type QA = { q: ReactNode; a: ReactNode }
 
 const FAQ: FC<FAQProps> = ({
   id = 'faq',
@@ -49,91 +50,83 @@ const FAQ: FC<FAQProps> = ({
   const items: QA[] = useMemo(
     () => [
       {
-        q: 'Worin liegt der Unterschied zwischen Coaching und Psychotherapie?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_1"
+            defaultValue="Worin liegt der Unterschied zwischen Coaching und Psychotherapie?"
+          />
+        ),
         a: (
-          <>
-            <Text mb={3}>
-              <strong>Coaching</strong> richtet sich an nicht-krankhafte Anliegen:
-              Leistung, Fokus, Entscheidungen, Rollenwechsel, Umgang mit Technik
-              (z. B. KI-Leistungsdruck) oder Work-/Tech-Life-Balance. Ziel ist
-              Klarheit, Ergebnisfokus und Verhaltenstraining im Alltag.
-            </Text>
-            <Text>
-              <strong>Psychotherapie</strong> setze ich ein, wenn Symptome
-              <em> Krankheitswert</em> haben (z. B. Ängste, Depression,
-              Zwangssymptome, psychosomatische Beschwerden, anhaltende Krisen).
-              Hier arbeite ich tiefenpsychologisch fundiert an unbewussten
-              Dynamiken, Beziehungsmustern und einer nachhaltigen Erweiterung
-              deines Handlungsspielraums.
-            </Text>
-          </>
+          <Field.Text as={chakra.span} name="FAQ_1_A" defaultValue="<b>Coaching</b> richtet sich an nicht-krankhafte Anliegen: Leistung, Fokus, Entscheidungen, Rollenwechsel, Umgang mit Technik (z. B. KI-Leistungsdruck) oder Work-/Tech-Life-Balance. Ziel ist Klarheit, Ergebnisfokus und Verhaltenstraining im Alltag.<br/><br/><b>Psychotherapie</b> setze ich ein, wenn Symptome <em>Krankheitswert</em> haben (z. B. Ängste, Depression, Zwangssymptome, psychosomatische Beschwerden, anhaltende Krisen). Hier arbeite ich tiefenpsychologisch fundiert an unbewussten Dynamiken, Beziehungsmustern und einer nachhaltigen Erweiterung deines Handlungsspielraums."/>
         )
       },
       {
-        q: 'Wann empfehle ich Coaching – und wann Psychotherapie?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_2"
+            defaultValue="Wann empfehle ich Coaching – und wann Psychotherapie?"
+          />
+        ),
         a: (
-          <>
-            <Text mb={2}>
-              <strong>Coaching</strong>: Du bist grundsätzlich psychisch stabil,
-              möchtest aber schneller, strukturiert und gezielt an Zielen arbeiten
-              – z. B. mit KI-Tools souverän umgehen, Impostor-Gefühle einordnen oder
-              digitale Routinen (Digital Detox) etablieren.
-            </Text>
-            <Text>
-              <strong>Psychotherapie</strong>: Wenn dich Symptome deutlich
-              einschränken (Schlaf, Appetit, Stimmung, Ängste, Zwänge,
-              psychosomatische Beschwerden) oder Konflikte immer wiederkehren.
-              Ich kläre das mit dir im Erstgespräch und empfehle den passenden
-              Rahmen.
-            </Text>
-          </>
+          <Field.Text as={chakra.span} name="FAQ_2_A" defaultValue="<b>Coaching</b>: Du bist grundsätzlich psychisch stabil, möchtest aber schneller, strukturiert und gezielt an Zielen arbeiten – z. B. mit KI-Tools souverän umgehen, Impostor-Gefühle einordnen oder digitale Routinen (Digital Detox) etablieren.<br/><br/><b>Psychotherapie</b>: Wenn dich Symptome deutlich einschränken (Schlaf, Appetit, Stimmung, Ängste, Zwänge, psychosomatische Beschwerden) oder Konflikte immer wiederkehren. Ich kläre das mit dir im Erstgespräch und empfehle den passenden Rahmen."/>
         )
       },
       {
-        q: 'Wie oft finden die Sitzungen statt?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_3"
+            defaultValue="Wie oft finden die Sitzungen statt?"
+          />
+        ),
         a: (
-          <>
-            <Text mb={2}>
-              <strong>Coaching</strong>: flexibel – meist alle 1–3 Wochen, je nach
-              Ziel und Tempo.
-            </Text>
-            <Text>
-              <strong>Psychotherapie</strong>: in der Regel 1–2× pro Woche (bei
-              Psychoanalyse auch häufiger). Kontinuität ist hier Teil der
-              Wirksamkeit.
-            </Text>
-          </>
+          <Field.Text as={chakra.span} name="FAQ_3_A1_Bold1" defaultValue="<b>Coaching</b>: flexibel – meist alle 1–3 Wochen, je nach Ziel und Tempo.<br/><br/><b>Psychotherapie</b>: in der Regel 1–2× pro Woche (bei Psychoanalyse auch häufiger). Kontinuität ist hier Teil der Wirksamkeit."/>
         )
       },
       {
-        q: 'Gilt die Schweigepflicht auch im Coaching?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_4"
+            defaultValue="Gilt die Schweigepflicht auch im Coaching?"
+          />
+        ),
         a: (
-          <Text>
-            Ja. <strong>Schweigepflicht</strong> ist für mich Standard – in der
-            <em> Psychotherapie ebenso wie im Coaching</em>. Diese Vertraulichkeit
-            schafft den sicheren Rahmen, der mich von vielen Coaches abhebt: Du
-            kannst offen sprechen, ohne dass Inhalte nach außen gelangen.
-          </Text>
+          <Field.Text as={chakra.span} name="FAQ_4_A" defaultValue="Ja. <b>Schweigepflicht</b> ist für mich Standard – in der <em>>Psychotherapie ebenso wie im Coaching</em>. Diese Vertraulichkeit schafft den sicheren Rahmen, der mich von vielen Coaches abhebt: Du kannst offen sprechen, ohne dass Inhalte nach außen gelangen."/>
         )
       },
       {
-        q: 'Einzel oder Gruppe – was biete ich an?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_5"
+            defaultValue="Einzel oder Gruppe – was biete ich an?"
+          />
+        ),
         a: (
-          <Text>
-            Ich arbeite im <strong>Einzel-Setting</strong> und biete auch{' '}
-            <strong>Gruppen</strong> an. Für bestimmte Themen (z. B. Prokrastination
-            oder Digital Detox) kann Gruppe sehr wirksam sein.
-          </Text>
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_5_A"
+            defaultValue="Ich arbeite im <b>Einzel-Setting</b> und biete auch <b>Gruppen</b> an. Für bestimmte Themen (z. B. Prokrastination oder Digital Detox) kann Gruppe sehr wirksam sein."
+          />
         )
       },
       {
-        q: 'Was passiert im kostenlosen Erstgespräch?',
+        q: (
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_Q_6"
+            defaultValue="Was passiert im kostenlosen Erstgespräch?"
+          />
+        ),
         a: (
-          <Text>
-            Wir klären dein Anliegen, Ziele und ob <em>Coaching</em> oder{' '}
-            <em>Psychotherapie</em> sinnvoll ist. Du erhältst eine Empfehlung zum
-            Rahmen (Frequenz, Vorgehen) – transparent und ohne Verpflichtung.
-          </Text>
+          <Field.Text
+            as={chakra.span}
+            name="FAQ_6_A"
+            defaultValue="Wir klären dein Anliegen, Ziele und ob Coaching oder Psychotherapie sinnvoll ist. Du erhältst eine Empfehlung zum Rahmen (Frequenz, Vorgehen) – transparent und ohne Verpflichtung."
+          />
         )
       }
     ],
@@ -158,7 +151,7 @@ const FAQ: FC<FAQProps> = ({
           borderColor={`${ACCENT}66`}
           animation={`${glow} 2.2s ease-in-out infinite alternate`}
         >
-          FAQ
+          <Field.Text as={chakra.span} name="FAQTag" defaultValue="FAQ" />
         </Tag>
 
         <Heading
@@ -169,7 +162,7 @@ const FAQ: FC<FAQProps> = ({
           lineHeight="1.2"
           fontWeight="900"
         >
-          {title}
+          <Field.Text as={chakra.span} name="FAQHeading" defaultValue={title} />
           <chakra.span color={ACCENT}>.</chakra.span>
         </Heading>
 
@@ -183,7 +176,6 @@ const FAQ: FC<FAQProps> = ({
                 borderRadius="2xl"
                 boxShadow="0 12px 40px rgba(0,0,0,0.12)"
                 overflow="hidden"
-                // remove Chakra's default border between items
                 _notLast={{ mb: 4 }}
               >
                 <h3>
@@ -219,12 +211,13 @@ const FAQ: FC<FAQProps> = ({
               </AccordionItem>
             ))}
           </Accordion>
-
           {/* kleiner Hinweis zur Orientierung */}
           <Text fontSize="sm" color="blackAlpha.700" mt={2}>
-            Hinweis: Coaching ist <em>keine</em> Psychotherapie und ersetzt bei
-            krankheitswertigen Symptomen keine Behandlung. Im Zweifel kläre ich im
-            Erstgespräch mit dir, welcher Rahmen passt.
+            <Field.Text
+              as={chakra.span}
+              name="FAQ_Note_Prefix"
+              defaultValue="Hinweis: Coaching ist <em>keine</em> Psychotherapie und ersetzt bei krankheitswertigen Symptomen keine Behandlung. Im Zweifel kläre ich im Erstgespräch mit dir, welcher Rahmen passt."
+            />
           </Text>
         </VStack>
       </Container>

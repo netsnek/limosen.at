@@ -13,6 +13,7 @@ import {
   usePrefersReducedMotion
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
+import { Field } from 'jaen';
 
 // -----------------------------
 // Shared brand (override via props)
@@ -46,13 +47,15 @@ const glow = keyframes`
 // -----------------------------
 // Number logic (unchanged)
 // -----------------------------
-const AnimatedNumber: FC<{ value: number; start: boolean; duration?: number }> = ({
-  value,
-  start,
-  duration = 1400
-}) => {
+const AnimatedNumber: FC<{
+  value: number;
+  start: boolean;
+  duration?: number;
+}> = ({ value, start, duration = 1400 }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [display, setDisplay] = useState<number>(prefersReducedMotion || start ? value : 0);
+  const [display, setDisplay] = useState<number>(
+    prefersReducedMotion || start ? value : 0
+  );
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -82,7 +85,11 @@ const AnimatedNumber: FC<{ value: number; start: boolean; duration?: number }> =
 };
 
 // Beam-Fenster synchron zur Count-Dauer
-const useCountingWindow = (start: boolean, duration: number, prefersReducedMotion: boolean) => {
+const useCountingWindow = (
+  start: boolean,
+  duration: number,
+  prefersReducedMotion: boolean
+) => {
   const [active, setActive] = useState(false);
   useEffect(() => {
     if (prefersReducedMotion || !start) {
@@ -97,12 +104,19 @@ const useCountingWindow = (start: boolean, duration: number, prefersReducedMotio
 };
 
 // Vollflächiger violetter Balken + L→R Shimmer
-const ChargeBar: FC<{ active: boolean; accent: string; height?: string | number }> = ({
-  active,
-  accent,
-  height = '6px'
-}) => (
-  <Box mt={4} position="relative" h={height} borderRadius="full" overflow="hidden" bg={accent}>
+const ChargeBar: FC<{
+  active: boolean;
+  accent: string;
+  height?: string | number;
+}> = ({ active, accent, height = '6px' }) => (
+  <Box
+    mt={4}
+    position="relative"
+    h={height}
+    borderRadius="full"
+    overflow="hidden"
+    bg={accent}
+  >
     {/* dezenter Gloss */}
     <Box
       position="absolute"
@@ -187,7 +201,11 @@ const CounterCard: FC<{
           fontSize={{ base: '4xl', md: '5xl' }}
           sx={{ fontVariantNumeric: 'tabular-nums' }}
         >
-          <AnimatedNumber value={item.value} start={start} duration={durationMs} />
+          <AnimatedNumber
+            value={item.value}
+            start={start}
+            duration={durationMs}
+          />
           {item.suffix ? (
             <chakra.span
               ml="1"
@@ -213,7 +231,6 @@ const CounterCard: FC<{
 // -----------------------------
 const AchivementCounter: FC<AchivementCounterProps> = ({
   items,
-  title = 'Langjährige Erfahrung mit Therapie und Coaching',
   tagText = 'Erfahrung & Wirkung',
   durationMs = 1400,
   id = 'achievement-counter',
@@ -223,6 +240,8 @@ const AchivementCounter: FC<AchivementCounterProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [start, setStart] = useState(false);
   const hasStartedRef = useRef(false);
+  const headingFont =
+    "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
 
   useEffect(() => {
     const el = containerRef.current;
@@ -267,29 +286,34 @@ const AchivementCounter: FC<AchivementCounterProps> = ({
         borderColor={`${BRAND.accent}66`}
         animation={`${glow} 2.2s ease-in-out infinite alternate`}
       >
-        {tagText}
+        <Field.Text
+          as={chakra.span}
+          name="AchivementCounterTag"
+          defaultValue="Change Coaching"
+        />
       </Tag>
-
       {/* Headline – gleiche Typo/Spacing wie in ChangeCoaching */}
       <Heading
         as="h2"
         mt={4}
-        textAlign="left"
-        fontWeight="900"
-        letterSpacing="-0.01em"
+        fontFamily={headingFont}
         fontSize={{ base: '2xl', md: '3xl' }}
         lineHeight="1.2"
-        color="black"
+        fontWeight="900"
       >
-        {title}
+        <Field.Text
+          as={chakra.span}
+          name="AchivementCounterHeadline"
+          defaultValue="Langjährige Erfahrung mit Therapie und Coaching"
+        />
+        <chakra.span color={BRAND.accent}>.</chakra.span>
       </Heading>
-
       <SimpleGrid
         mt={{ base: 8, md: 12 }}
         columns={{ base: 1, sm: 3 }}
         spacing={{ base: 8, md: 12 }}
       >
-        {items.map((it) => (
+        {items.map(it => (
           <CounterCard
             key={it.label}
             item={it}

@@ -6,7 +6,6 @@ import {
   SimpleGrid,
   Heading,
   Text,
-  Image,
   HStack,
   VStack,
   Button,
@@ -17,6 +16,7 @@ import {
   chakra
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
+import { Field } from 'jaen';
 
 // Optional: gleiche Brandfarben wie im Hero verwenden
 const BRAND = {
@@ -46,14 +46,29 @@ const FeatureItem: FC<{ children: React.ReactNode }> = ({ children }) => (
   </ListItem>
 );
 
-const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accentColor }) => {
+const ChangeCoaching: FC<ChangeCoachingProps> = ({
+  id = 'change-coaching',
+  accentColor
+}) => {
   const ACCENT = accentColor ?? BRAND.accent;
+  const headingFont =
+    "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
 
   return (
-    <Box as="section" id={id} bg="white" color="black" py={{ base: 10, md: 16 }}>
+    <Box
+      as="section"
+      id={id}
+      bg="white"
+      color="black"
+      py={{ base: 10, md: 16 }}
+    >
       <Container maxW="7xl">
         {/* Intro-Zeile */}
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 12 }} alignItems="center">
+        <SimpleGrid
+          columns={{ base: 1, md: 2 }}
+          spacing={{ base: 8, md: 12 }}
+          alignItems="center"
+        >
           <Box order={{ base: 2, md: 1 }}>
             <Tag
               size="lg"
@@ -69,43 +84,98 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
               borderColor={`${ACCENT}66`}
               animation={`${glow} 2.2s ease-in-out infinite alternate`}
             >
-              Change Coaching
+              <Field.Text
+                as={chakra.span}
+                name="ChangeCoachingTag"
+                defaultValue="Change Coaching"
+              />
             </Tag>
-
             <Heading
               as="h2"
               mt={4}
+              fontFamily={headingFont}
               fontSize={{ base: '2xl', md: '3xl' }}
               lineHeight="1.2"
               fontWeight="900"
             >
-              Wandel meistern – nicht nur mithalten
+              <Field.Text
+                as={chakra.span}
+                name="ChangeCoachingHeadline"
+                defaultValue="Wandel meistern – nicht nur mithalten"
+              />
+              <chakra.span color={BRAND.accent}>.</chakra.span>
             </Heading>
-
-            <Text mt={4} fontSize={{ base: 'md', md: 'lg' }} lineHeight="1.7" color="blackAlpha.800">
-              Die Welt wird immer komplexer und Arbeit zunehmend abstrakt. Auch gesunde Menschen
-              erleben heute enorme psychische Belastungen. Ich helfe dir, mit dem Leistungsdruck
-              des 21. Jahrhunderts umzugehen – und begleite dich bei{" "}
-              <chakra.span fontWeight="700">Herausforderungen</chakra.span> und{" "}
-              <chakra.span fontWeight="700">Möglichkeiten</chakra.span>. In Kooperation mit
-              technischen Consultants schaffen wir Klarheit rund um KI, Tools &amp; Prozesse.
+            <Text
+              mt={4}
+              fontSize={{ base: 'md', md: 'lg' }}
+              lineHeight="1.7"
+              color="blackAlpha.800"
+            >
+              <Field.Text
+                as={chakra.span}
+                name="ChangeIntro"
+                defaultValue="Die Welt wird immer komplexer und Arbeit zunehmend abstrakt. Auch gesunde Menschen erleben heute enorme psychische Belastungen. Ich helfe dir, mit dem Leistungsdruck des 21. Jahrhunderts umzugehen – und begleite dich bei <b>Herausforderungen</b> und <b>Möglichkeiten</b>. In Kooperation mit technischen Consultants schaffen wir Klarheit rund um KI, Tools & Prozesse."
+              />
             </Text>
-
             <VStack align="stretch" spacing={4} mt={6}>
               <Box>
                 <Heading as="h3" fontSize="lg" fontWeight="800" mb={2}>
-                  Meine Spezialitäten
+                  <Field.Text
+                    as={chakra.span}
+                    name="ChangeSpecialsHeading"
+                    defaultValue="Meine Spezialitäten"
+                  />
                 </Heading>
-                <List spacing={2} columnGap={8} display="grid" gridTemplateColumns={{ base: '1fr', sm: '1fr 1fr' }}>
-                  <FeatureItem>KI-Leistungsdruck</FeatureItem>
-                  <FeatureItem>Technophobie</FeatureItem>
-                  <FeatureItem>Tech-Life-Balance</FeatureItem>
-                  <FeatureItem>Social-Media-Sucht</FeatureItem>
-                  <FeatureItem>Impostor-Syndrom</FeatureItem>
-                  <FeatureItem>Digital Detox</FeatureItem>
+                <List
+                  spacing={2}
+                  columnGap={8}
+                  display="grid"
+                  gridTemplateColumns={{ base: '1fr', sm: '1fr 1fr' }}
+                >
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat1"
+                      defaultValue="KI-Leistungsdruck"
+                    />
+                  </FeatureItem>
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat2"
+                      defaultValue="Technophobie"
+                    />
+                  </FeatureItem>
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat3"
+                      defaultValue="Tech-Life-Balance"
+                    />
+                  </FeatureItem>
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat4"
+                      defaultValue="Social-Media-Sucht"
+                    />
+                  </FeatureItem>
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat5"
+                      defaultValue="Impostor-Syndrom"
+                    />
+                  </FeatureItem>
+                  <FeatureItem>
+                    <Field.Text
+                      as={chakra.span}
+                      name="ChangeFeat6"
+                      defaultValue="Digital Detox"
+                    />
+                  </FeatureItem>
                 </List>
               </Box>
-
               <HStack spacing={3} pt={1}>
                 <Button
                   borderRadius="full"
@@ -116,7 +186,11 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
                   href="?contact"
                   fontWeight="900"
                 >
-                  Kostenloses Erstgespräch
+                  <Field.Text
+                    as={chakra.span}
+                    name="ChangeCTA1Label"
+                    defaultValue="Kostenloses Erstgespräch"
+                  />
                 </Button>
                 <Button
                   variant="outline"
@@ -128,13 +202,16 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
                   href="/docs"
                   fontWeight="800"
                 >
-                  Mehr erfahren
+                  <Field.Text
+                    as={chakra.span}
+                    name="ChangeCTA2Label"
+                    defaultValue="Mehr erfahren"
+                  />
                 </Button>
               </HStack>
             </VStack>
           </Box>
-
-          {/* Bild – frei austauschbar; aktuell Unsplash-Motiv */}
+          {/* Bild – frei austauschbar; jetzt als Jaen Field.Image */}
           <Box
             order={{ base: 1, md: 2 }}
             position="relative"
@@ -143,14 +220,17 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({ id = 'change-coaching', accen
             border="1px solid"
             borderColor="blackAlpha.200"
             boxShadow="0 12px 40px rgba(0,0,0,0.12)"
+            minH={{ base: '260px', md: '420px' }}
           >
-            <Image
-              src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop"
-              alt="Change Coaching – Klarheit im Wandel"
-              objectFit="cover"
-              w="100%"
-              h={{ base: '260px', md: '100%' }}
-            />
+            {/* Fill container with editable image */}
+            <Box position="absolute" inset={0}>
+              <Field.Image
+                name="ChangeCoachingImage"
+                defaultValue="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop"
+                alt="Change Coaching – Klarheit im Wandel"
+                objectFit="cover"
+              />
+            </Box>
             <Box
               position="absolute"
               inset={0}

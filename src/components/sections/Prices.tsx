@@ -1,5 +1,5 @@
 // Prices.tsx
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import {
   Box,
   Container,
@@ -14,6 +14,7 @@ import {
   chakra
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
+import { Field } from 'jaen';
 
 // Gleiche Brandfarben wie in den anderen Sections
 const BRAND = {
@@ -34,12 +35,18 @@ export interface PricesProps {
   headingFont?: string; // gleiche Überschrift-Font wie bei den anderen Sections
 }
 
-const Row: FC<{ label: string; price: string; duration: string }> = ({ label, price, duration }) => (
+const Row: FC<{ label: ReactNode; price: ReactNode; duration: ReactNode }> = ({
+  label,
+  price,
+  duration
+}) => (
   <HStack justify="space-between" align="center" py={2}>
     <Text fontWeight="700">{label}</Text>
     <HStack spacing={3}>
       <Text fontWeight="900">{price}</Text>
-      <Text color="blackAlpha.700" fontWeight="600">à {duration}</Text>
+      <Text color="blackAlpha.700" fontWeight="600">
+        à {duration}
+      </Text>
     </HStack>
   </HStack>
 );
@@ -52,7 +59,13 @@ const Prices: FC<PricesProps> = ({
   const ACCENT = accentColor ?? BRAND.accent;
 
   return (
-    <Box as="section" id={id} bg="white" color="black" py={{ base: 10, md: 16 }}>
+    <Box
+      as="section"
+      id={id}
+      bg="white"
+      color="black"
+      py={{ base: 10, md: 16 }}
+    >
       <Container maxW="7xl">
         {/* Intro / Titel */}
         <Tag
@@ -69,22 +82,29 @@ const Prices: FC<PricesProps> = ({
           borderColor={`${ACCENT}66`}
           animation={`${glow} 2.2s ease-in-out infinite alternate`}
         >
-          Preise
+          <Field.Text as={chakra.span} name="PricesTag" defaultValue="Preise" />
         </Tag>
-
         <Heading
           as="h2"
           mt={4}
+          fontFamily={headingFont}
           fontSize={{ base: '2xl', md: '3xl' }}
           lineHeight="1.2"
           fontWeight="900"
-          fontFamily={headingFont}
         >
-          Transparente Kosten – Coaching &amp; Psychotherapie
+          <Field.Text
+            as={chakra.span}
+            name="PricesHeading"
+            defaultValue="Transparente Kosten – Coaching &amp; Psychotherapie"
+          />
+          <chakra.span color={ACCENT}>.</chakra.span>
         </Heading>
-
         {/* Preis-Karten */}
-        <SimpleGrid mt={{ base: 8, md: 12 }} columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 12 }}>
+        <SimpleGrid
+          mt={{ base: 8, md: 12 }}
+          columns={{ base: 1, md: 2 }}
+          spacing={{ base: 8, md: 12 }}
+        >
           {/* Coaching */}
           <Box
             position="relative"
@@ -95,27 +115,99 @@ const Prices: FC<PricesProps> = ({
             boxShadow="0 12px 40px rgba(0,0,0,0.12)"
             bg="white"
           >
-            {/* dezentes Accent-Overlay oben rechts – wie die Bild-Boxen */}
-            {/* <Box
-              position="absolute"
-              inset={0}
-              bgGradient={`linear(to-tr, transparent 60%, ${ACCENT}33 100%)`}
-              pointerEvents="none"
-            /> */}
             <Box position="relative" zIndex={1} p={{ base: 5, md: 6 }}>
-              <Heading as="h3" fontSize={{ base: 'lg', md: 'xl' }} fontWeight="900" mb={2}>
-                Coaching
+              <Heading
+                as="h3"
+                fontSize={{ base: 'lg', md: 'xl' }}
+                fontWeight="900"
+                mb={2}
+              >
+                <Field.Text
+                  as={chakra.span}
+                  name="PricesCoachingTitle"
+                  defaultValue="Coaching"
+                />
               </Heading>
               <Text color="blackAlpha.700" mb={4}>
-                Einzel- und Gruppensettings – ziel- und ressourcenorientiert.
+                <Field.Text
+                  as={chakra.span}
+                  name="PricesCoachingDesc"
+                  defaultValue="Einzel- und Gruppensettings – ziel- und ressourcenorientiert."
+                />
               </Text>
 
               <VStack align="stretch" spacing={0}>
-                <Row label="Erstgespräch" price="0 €" duration="50 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow1Label"
+                      defaultValue="Erstgespräch"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow1Price"
+                      defaultValue="0 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow1Duration"
+                      defaultValue="50 Minuten"
+                    />
+                  }
+                />
                 <Divider />
-                <Row label="Einzelsetting" price="80 €" duration="50 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow2Label"
+                      defaultValue="Einzelsetting"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow2Price"
+                      defaultValue="80 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow2Duration"
+                      defaultValue="50 Minuten"
+                    />
+                  }
+                />
                 <Divider />
-                <Row label="Gruppen" price="40 €" duration="60 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow3Label"
+                      defaultValue="Gruppen"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow3Price"
+                      defaultValue="40 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesCoachingRow3Duration"
+                      defaultValue="60 Minuten"
+                    />
+                  }
+                />
               </VStack>
             </Box>
           </Box>
@@ -130,26 +222,99 @@ const Prices: FC<PricesProps> = ({
             boxShadow="0 12px 40px rgba(0,0,0,0.12)"
             bg="white"
           >
-            {/* <Box
-              position="absolute"
-              inset={0}
-              bgGradient={`linear(to-tr, transparent 60%, ${ACCENT}33 100%)`}
-              pointerEvents="none"
-            /> */}
             <Box position="relative" zIndex={1} p={{ base: 5, md: 6 }}>
-              <Heading as="h3" fontSize={{ base: 'lg', md: 'xl' }} fontWeight="900" mb={2}>
-                Psychotherapie
+              <Heading
+                as="h3"
+                fontSize={{ base: 'lg', md: 'xl' }}
+                fontWeight="900"
+                mb={2}
+              >
+                <Field.Text
+                  as={chakra.span}
+                  name="PricesTherapyTitle"
+                  defaultValue="Psychotherapie"
+                />
               </Heading>
               <Text color="blackAlpha.700" mb={4}>
-                Tiefenpsychologisch fundiert – vertraulich und prozessorientiert.
+                <Field.Text
+                  as={chakra.span}
+                  name="PricesTherapyDesc"
+                  defaultValue="Tiefenpsychologisch fundiert – vertraulich und prozessorientiert."
+                />
               </Text>
 
               <VStack align="stretch" spacing={0}>
-                <Row label="Erstgespräch" price="0 €" duration="50 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow1Label"
+                      defaultValue="Erstgespräch"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow1Price"
+                      defaultValue="0 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow1Duration"
+                      defaultValue="50 Minuten"
+                    />
+                  }
+                />
                 <Divider />
-                <Row label="Einzelsetting" price="160 €" duration="50 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow2Label"
+                      defaultValue="Einzelsetting"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow2Price"
+                      defaultValue="160 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow2Duration"
+                      defaultValue="50 Minuten"
+                    />
+                  }
+                />
                 <Divider />
-                <Row label="Gruppen" price="80 €" duration="60 Minuten" />
+                <Row
+                  label={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow3Label"
+                      defaultValue="Gruppen"
+                    />
+                  }
+                  price={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow3Price"
+                      defaultValue="80 €"
+                    />
+                  }
+                  duration={
+                    <Field.Text
+                      as={chakra.span}
+                      name="PricesTherapyRow3Duration"
+                      defaultValue="60 Minuten"
+                    />
+                  }
+                />
               </VStack>
             </Box>
           </Box>
@@ -158,8 +323,11 @@ const Prices: FC<PricesProps> = ({
         {/* Hinweistexte / Call to Action */}
         <VStack align="start" spacing={3} mt={{ base: 8, md: 12 }}>
           <Text color="blackAlpha.800" lineHeight="1.7">
-            Das <chakra.span fontWeight="700">Erstgespräch</chakra.span> dient dem gegenseitigen Kennenlernen,
-            dem Klären deines Anliegens und der Wahl des passenden Settings.
+            <Field.Text
+              as={chakra.span}
+              name="PricesNote"
+              defaultValue="Das <b>Erstgespräch</b> dient dem gegenseitigen Kennenlernen, dem Klären deines Anliegens und der Wahl des passenden Settings."
+            />
           </Text>
           <HStack pt={2}>
             <Button
@@ -171,7 +339,11 @@ const Prices: FC<PricesProps> = ({
               href="?contact"
               fontWeight="900"
             >
-              Erstgespräch vereinbaren
+              <Field.Text
+                as={chakra.span}
+                name="PricesCTA1"
+                defaultValue="Erstgespräch vereinbaren"
+              />
             </Button>
             <Button
               variant="outline"
@@ -183,7 +355,11 @@ const Prices: FC<PricesProps> = ({
               href="#faq"
               fontWeight="800"
             >
-              Fragen &amp; Antworten
+              <Field.Text
+                as={chakra.span}
+                name="PricesCTA2"
+                defaultValue="Fragen &amp; Antworten"
+              />
             </Button>
           </HStack>
         </VStack>

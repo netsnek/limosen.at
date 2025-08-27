@@ -11,6 +11,7 @@ import {
   LinkOverlay,
   useBreakpointValue,
   chakra,
+  VisuallyHidden,
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import Marquee from 'react-fast-marquee';
@@ -62,9 +63,12 @@ const Associates: FC = () => {
           borderColor={`${BRAND.accent}66`}
           animation={`${glow} 2.2s ease-in-out infinite alternate`}
         >
-          Netzwerk für Change Coaching
+          <Field.Text
+            as={chakra.span}
+            name="AssociatesTag"
+            defaultValue="Netzwerk für Change Coaching"
+          />
         </Tag>
-
         <Heading
           as="h2"
           mt={4}
@@ -73,16 +77,20 @@ const Associates: FC = () => {
           lineHeight="1.2"
           fontWeight="900"
         >
-          Ich kooperiere mit Expert:innen in Österreich
+          <Field.Text
+            as={chakra.span}
+            name="AssociatesHeading"
+            defaultValue="Ich kooperiere mit Expert:innen in Österreich"
+          />
           <chakra.span color={BRAND.accent}>.</chakra.span>
         </Heading>
-
         <Text mt={3} color="blackAlpha.800">
-          Für mein <strong>Change Coaching</strong> binde ich – je nach Thema – passende
-          Fachkompetenz ein (z.&nbsp;B. technische Consultants, IT/KI-Automatisierung, Design &amp; Content).
-          So bekommst du genau die Unterstützung, die dein Wandel braucht.
+          <Field.Text
+            as={chakra.span}
+            name="AssociatesDesc"
+            defaultValue="Für mein <b>Change Coaching</b> binde ich – je nach Thema – passende Fachkompetenz ein (z.&nbsp;B. technische Consultants, IT/KI-Automatisierung, Design &amp; Content). So bekommst du genau die Unterstützung, die dein Wandel braucht."
+          />
         </Text>
-
         {/* Logos als Marquee – ohne Overlay, clean & konsistent */}
         <Box mt={{ base: 8, md: 12 }}>
           <Marquee gradient={false} pauseOnHover speed={marqueeSpeed ?? 50}>
@@ -110,9 +118,22 @@ const Associates: FC = () => {
                     boxShadow: '0 18px 56px rgba(0,0,0,0.16)',
                   }}
                 >
-                  <LinkOverlay href={a.href} isExternal />
+                  {/* Keep external link from the static list; label editable for a11y */}
+                  <LinkOverlay href={a.href} isExternal>
+                    <VisuallyHidden>
+                      <Field.Text
+                        as={chakra.span}
+                        name={`Associate_${i}_LinkLabel`}
+                        defaultValue={a.name}
+                      />
+                    </VisuallyHidden>
+                  </LinkOverlay>
+
+                  {/* Editable logo image */}
                   <Image
-                    src={a.logo}
+                    as={Field.Image as any}
+                    name={`Associate_${i}_Logo`}
+                    defaultValue={a.logo}
                     alt={a.name}
                     w="100%"
                     h="100%"
@@ -124,7 +145,7 @@ const Associates: FC = () => {
           </Marquee>
         </Box>
 
-        {/* CMS-editierbarer Footer-Text */}
+        {/* CMS-editierbarer Footer-Text (optional) */}
         {/* <Box mt={{ base: 8, md: 12 }} textAlign="center">
           <Field.Text
             name="FooterLinkAllCustomers"
