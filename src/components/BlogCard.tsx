@@ -287,7 +287,7 @@ export const BlogCard = ({
   const prefixPathTrimmed = prefixPath
     ? prefixPath.trim().replace(/\/+$/, '')
     : '';
-  const path = `${prefixPathTrimmed}/recipes/${blog.handle}`;
+  const path = `${prefixPathTrimmed}/docs/${blog.handle}`;
 
   // Ref for radio inputs to control image previews
   const radioRef = React.useRef<(HTMLInputElement | null)[]>([]);
