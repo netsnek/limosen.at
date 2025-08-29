@@ -42,7 +42,7 @@ const config: GatsbyConfig = {
         //   dsn: 'https://37ffbc7589f79cfab5936ce5fca4f310@sentry.cronit.io/10'
         // },
         googleAnalytics: {
-          trackingIds: ['G-M58K75M9PG']
+          trackingIds: ['G-4B98VFJE2T']
         }
       }
     },
