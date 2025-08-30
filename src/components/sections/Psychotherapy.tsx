@@ -18,6 +18,8 @@ import {
 import { keyframes } from '@emotion/react';
 import { FiCheckCircle } from '@react-icons/all-files/fi/FiCheckCircle';
 import { Field } from 'jaen';
+// ✅ Contact modal hook
+import { useContactModal } from '../../services/contact';
 
 // Brandfarben
 const BRAND = {
@@ -51,6 +53,12 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
   const ACCENT = accentColor ?? BRAND.accent;
   const headingFont =
     "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
+
+  // ✅ Hook + handler for the contact modal
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    contactModal.onOpen({ meta: {} });
+  };
 
   return (
     <Box
@@ -281,14 +289,15 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                 </List>
               </Box>
               <HStack spacing={3} pt={2}>
+                {/* ✅ Opens contact modal */}
                 <Button
                   borderRadius="full"
                   bg={ACCENT}
                   color="white"
                   _hover={{ filter: 'brightness(1.1)' }}
-                  as="a"
-                  href="?contact"
                   fontWeight="900"
+                  type="button"
+                  onClick={handleOnContactClick}
                 >
                   <Field.Text
                     as={chakra.span}

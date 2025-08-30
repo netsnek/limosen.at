@@ -18,6 +18,9 @@ import {
 import { keyframes } from '@emotion/react';
 import { Field } from 'jaen';
 
+// ✅ Contact modal hook
+import { useContactModal } from '../../services/contact';
+
 // Optional: gleiche Brandfarben wie im Hero verwenden
 const BRAND = {
   base: '#18011a',
@@ -53,6 +56,12 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
   const ACCENT = accentColor ?? BRAND.accent;
   const headingFont =
     "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
+
+  // ✅ Hook + handler for the contact modal
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    contactModal.onOpen({ meta: {} });
+  };
 
   return (
     <Box
@@ -177,14 +186,15 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
                 </List>
               </Box>
               <HStack spacing={3} pt={1}>
+                {/* ✅ Opens contact modal instead of navigating */}
                 <Button
                   borderRadius="full"
                   bg={ACCENT}
                   color="white"
                   _hover={{ filter: 'brightness(1.1)' }}
-                  as="a"
-                  href="?contact"
                   fontWeight="900"
+                  type="button"
+                  onClick={handleOnContactClick}
                 >
                   <Field.Text
                     as={chakra.span}

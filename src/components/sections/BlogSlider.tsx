@@ -26,12 +26,10 @@ const glow = keyframes`
 `
 
 export interface BlogSliderProps {
-  /** pass the result of useJaenPageIndex({ jaenPageId: 'JaenPage /blog/' }) */
   blogIndex: any
   id?: string
   title?: string
   accentColor?: string
-  /** if true, only show featured posts (first 4) */
   featuredOnly?: boolean
 }
 
@@ -46,45 +44,45 @@ const BlogSlider: FC<BlogSliderProps> = ({
   const headingFont =
     "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
 
-  // pull CMS media for resolving media node ids
   const cmsMediaPage = usePage({id: 'JaenPage /cms/media/', injectMedia: true})
-
-  // 🔌 use Jaen → to BlogCard-compatible blog items
-  const {posts, featuredPosts} = useJaenBlogs(blogIndex, cmsMediaPage, {
-    limit: 12
-  })
-
+  const {posts, featuredPosts} = useJaenBlogs(blogIndex, cmsMediaPage, {limit: 12})
   const items = featuredOnly ? featuredPosts : posts
 
   const [loading, setLoading] = useState(true)
   useEffect(() => setLoading(false), [])
 
-  // Mobile UX: dots on, arrows off; Desktop: arrows on when useful.
   const isMobile = useBreakpointValue({base: true, md: false}) ?? true
   const showArrows = !isMobile && (items?.length || 0) > 1
   const showDots = true
 
-  // react-slick settings (mobile-first)
+  // Width caps per breakpoints (keeps card readable on mobile, tame on desktop)
+  const CARD_MAXW = {
+    base: 'clamp(320px, 92vw, 420px)',
+    sm:   'clamp(340px, 90vw, 440px)',
+    md:   '360px',
+    lg:   '380px',
+    xl:   '420px'
+  }
+
   const settings = useMemo(
     () => ({
+      mobileFirst: true,
       dots: showDots,
       arrows: showArrows,
-      infinite: (items?.length || 0) > 4,
+      // don't lock to "4" — infinite works regardless of card count
+      infinite: (items?.length || 0) > 1,
       speed: 500,
-      slidesToShow: 4,
+      slidesToShow: 1,           // ✅ base & sm: exactly 1 card
       slidesToScroll: 1,
       swipeToSlide: true,
       touchThreshold: 12,
-      adaptiveHeight: false,
+      adaptiveHeight: true,      // ✅ base: fit to card height
       lazyLoad: 'ondemand' as const,
+      // Match Chakra breakpoints: md(768), lg(992), xl(1280)
       responsive: [
-        { breakpoint: 1280, settings: { slidesToShow: 4 } },
-        { breakpoint: 1024, settings: { slidesToShow: 3 } },
-        { breakpoint: 768,  settings: { slidesToShow: 2, arrows: false } },
-        {
-          breakpoint: 640,
-          settings: { slidesToShow: 1, arrows: false, centerMode: true, centerPadding: '16px' }
-        }
+        { breakpoint: 768,  settings: { slidesToShow: 3, adaptiveHeight: false } }, // md: 3
+        { breakpoint: 992,  settings: { slidesToShow: 4 } },                        // lg: 4
+        { breakpoint: 1280, settings: { slidesToShow: 4 } }                         // xl: 4
       ],
       nextArrow: <Arrow dir="right" />,
       prevArrow: <Arrow dir="left" />
@@ -93,7 +91,7 @@ const BlogSlider: FC<BlogSliderProps> = ({
   )
 
   return (
-    <Box as="section" id={id} bg="white" color="black" py={{base: 8, md: 16}}>
+    <Box as="section" id={id} bg="white" color="black" py={{base: 8, md: 14}}>
       <Container maxW="7xl">
         <Tag
           size="lg"
@@ -112,7 +110,6 @@ const BlogSlider: FC<BlogSliderProps> = ({
           Blog
         </Tag>
 
-        {/* Editable headline via Jaen Field.Text */}
         <Heading
           as="h2"
           mt={4}
@@ -135,21 +132,48 @@ const BlogSlider: FC<BlogSliderProps> = ({
             <Box
               position="relative"
               sx={{
-                '.slick-slide > div': {px: {base: 1.5, md: 2.5}, height: '100%'},
-                '.slick-list': {mx: {base: -1.5, md: -2.5}, overflow: 'hidden'},
-                '.slick-track': {display: 'flex', alignItems: 'stretch'},
-                '.slick-slide': {height: 'auto'},
-                '.slick-dots': {bottom: '-32px'},
-                '.slick-dots li button:before': {fontSize: '10px', color: `${ACCENT}99`, opacity: 1},
-                '.slick-dots li.slick-active button:before': {color: ACCENT, opacity: 1}
+                // IMPORTANT: don't stretch slides by height — keep natural height
+                '.slick-track': {
+                  display: 'flex',
+                  alignItems: 'flex-start' // ⬅️ avoid height-stretch coupling
+                },
+                '.slick-slide': { height: 'auto' },
+                '.slick-slide > div': {
+                  px: { base: 2, md: 2.5 },
+                  // center each card in its slide
+                  display: 'block'
+                },
+                '.slick-list': {
+                  mx: { base: -2, md: -2.5 },
+                  overflow: { base: 'visible', md: 'hidden' },
+                  pb: { base: 2, md: 0 }
+                },
+                '.slick-dots': { bottom: '-32px' },
+                '.slick-dots li button:before': {
+                  fontSize: '10px',
+                  color: `${ACCENT}99`,
+                  opacity: 1
+                },
+                '.slick-dots li.slick-active button:before': { color: ACCENT, opacity: 1 }
               }}
             >
               <Slider {...settings}>
                 {items.map((post: any, i: number) => (
-                  <Box key={(post.handle || post.id) + i} my={{base: 2, md: 4}} h="100%">
-                    <Box h="100%">
-                      <BlogCard blog={post} borderline={false} bcolor={ACCENT} />
-                    </Box>
+                  <Box
+                    key={(post.handle || post.id) + i}
+                    my={{base: 2, md: 4}}
+                    w="full"
+                    // ✅ hard caps per breakpoint so cards never get too big/small
+                    maxW={{
+                      base: CARD_MAXW.base,
+                      sm: CARD_MAXW.sm,
+                      md: CARD_MAXW.md,
+                      lg: CARD_MAXW.lg,
+                      xl: CARD_MAXW.xl
+                    }}
+                    mx="auto"   // center the card inside slide
+                  >
+                    <BlogCard blog={post} borderline={false} bcolor={ACCENT} />
                   </Box>
                 ))}
               </Slider>
@@ -165,7 +189,6 @@ const BlogSlider: FC<BlogSliderProps> = ({
   )
 }
 
-// minimal Chakra arrow buttons for slick
 const Arrow: FC<{dir: 'left' | 'right'; onClick?: () => void}> = ({dir, onClick}) => (
   <Box
     onClick={onClick}
@@ -188,7 +211,6 @@ const Arrow: FC<{dir: 'left' | 'right'; onClick?: () => void}> = ({dir, onClick}
     placeItems="center"
     _hover={{boxShadow: '0 12px 36px rgba(0,0,0,0.16)'}}
     cursor="pointer"
-    onClick={onClick}
   >
     <chakra.span fontWeight="900" fontSize="lg" lineHeight="1">
       {dir === 'left' ? '‹' : '›'}

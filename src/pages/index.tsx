@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 import React from 'react';
 import { PageConfig, PageProps, Field } from 'jaen';
-import { graphql } from 'gatsby';
+import { graphql, Link as GatsbyLink } from 'gatsby';
 import { keyframes, css } from '@emotion/react';
 
 import {
@@ -22,8 +22,11 @@ import {
   VisuallyHidden
 } from '@chakra-ui/react';
 
-import { useScrollSync } from '../hooks/use-scroll-sync';
+// import { useScrollSync } from '../hooks/use-scroll-sync'; // not needed after parallax refactor (iOS fix)
 import useBlogPages from '../hooks/use-blogs';
+
+// 🔗 Contact modal hook (adjust path if your structure differs)
+import { useContactModal } from '../services/contact';
 
 // Social icons
 import { FaInstagram } from '@react-icons/all-files/fa/FaInstagram';
@@ -75,15 +78,16 @@ const parallaxMake = (parallaxLayers: number, speedFactor: number = 1) => {
     const x = (parallaxLayers - i) / 2;
     styles[`.parallax__layer__${i}`] = {
       top: i === 0 ? '-150%' : '0',
-      transform: `translateZ(${-100 * x * speedFactor}px) scale(${x + 1})`,
-      transformOrigin: 'center'
+      transformOrigin: 'center',
+      transform: `translateZ(${-100 * x * speedFactor}px) scale(${x + 1})`
     };
   }
   return styles;
 };
 
 const Section = (noScroll?: boolean) => css`
-  perspective: 100px;
+  /* iOS fix: remove perspective from the top-level wrapper to keep IntersectionObserver reliable */
+  //perspective: 100px;
   overflow-x: hidden;
   overflow-y: ${noScroll ? 'scroll' : 'hidden'};
   top: 0;
@@ -99,17 +103,22 @@ const Section = (noScroll?: boolean) => css`
     inset: 0;
   }
 
-  /* Decorative layers are click-through; keep 2 and 6 interactive */
-  .parallax__layer:not(.parallax__layer__2):not(.parallax__layer__6) {
-    pointer-events: none;
+  .parallax__layer__0 {
+    position: relative;
   }
+
+  /* Decorative layers are click-through; keep 2 and 6 interactive */
+  // .parallax__layer:not(.parallax__layer__2):not(.parallax__layer__6) {
+  //   pointer-events: none;
+  // }
 
   /* White content section: sits in normal flow below the reveal offset */
   .parallax__layer__6 {
     position: relative;
     z-index: 2;
     /* 88vh on base (12vh navbar), 85vh on md+ (15vh navbar), never less than 100px navbar */
-    margin-top: calc(120vh - max(var(--navbar-vh, 15vh), 100px));
+    //margin-top: calc(100vh - max(var(--navbar-vh, 15vh), 100px));
+    margin-top: 0;
     /* cancel any parallax transform and absolute geometry */
     transform: none;
   }
@@ -123,7 +132,7 @@ const Section = (noScroll?: boolean) => css`
     width: 100%;
   }
 
-  ${parallaxMake(7, 1)}
+  //${parallaxMake(7, 1)}
 
   @keyframes scrollarrows {
     0% {
@@ -203,8 +212,16 @@ const VCardQR: React.FC = () => (
 );
 
 const IndexPage: React.FC<PageProps> = () => {
-  const { ref } = useScrollSync(0);
+  // const { ref } = useScrollSync(0); // not needed; let the viewport be the scroll root (iOS fix)
   const blogIndex = useBlogPages();
+
+  // 🟣 Contact modal: reuse the global handler pattern
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    contactModal.onOpen({
+      meta: {}
+    });
+  };
 
   const BRAND = {
     base: '#18011a',
@@ -222,7 +239,8 @@ const IndexPage: React.FC<PageProps> = () => {
       <Box
         className="parallax"
         css={Section()}
-        ref={ref}
+        mb={{ base: 16, md: 32 }}
+        //ref={ref}
         /* Define navbar height var responsively (12vh base, 15vh md+) */
         sx={
           {
@@ -237,14 +255,14 @@ const IndexPage: React.FC<PageProps> = () => {
         <Box
           className="parallax__layer parallax__layer__0"
           display="flex"
-          h="160vh"
+          h="85vh"
           alignItems="center"
           justifyContent="center"
           overflow="hidden"
           m={0}
           pos="relative"
-          pointerEvents="none"
           sx={{
+            /* Keep perspective here on the decorative layer, not on the wrapper (iOS fix) */
             perspective: '100vmax',
             background: `
               radial-gradient(120% 70% at 50% 0%,
@@ -387,319 +405,375 @@ const IndexPage: React.FC<PageProps> = () => {
               }}
             />
           </Box>
-        </Box>
 
-        {/* CONTENT LAYER */}
-        <Box className="parallax__layer parallax__layer__2" position="relative">
-          <Container maxW="7xl" pt={{ base: 6, md: 10 }}>
-            <Flex
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'center', md: 'stretch' }}
-              gap={{ base: 6, md: 10 }}
-              justify="space-between"
-            >
-              {/* Mobile: circular avatar link */}
-              <LinkBox
-                as="article"
-                display={{ base: 'block', md: 'none' }}
-                position="relative"
+          {/* CONTENT OVERLAY */}
+          <Box position={'absolute'} width={'100%'} height={'100%'}>
+            <Container maxW="7xl" pt={{ base: 6, md: 10 }}>
+              <Flex
+                direction={{ base: 'column', md: 'row' }}
+                align={{ base: 'center', md: 'stretch' }}
+                gap={{ base: 6, md: 10 }}
+                justify="space-between"
               >
-                <LinkOverlay href="/blog" aria-label="Zum Blog" />
-                <Box
+                {/* Mobile: circular avatar link */}
+                <LinkBox
+                  as="article"
+                  display={{ base: 'block', md: 'none' }}
                   position="relative"
-                  w="140px"
-                  h="140px"
-                  borderRadius="full"
-                  overflow="hidden"
-                  border="2px solid rgba(255,255,255,0.35)"
-                  boxShadow="0 10px 30px rgba(0,0,0,0.35)"
                 >
-                  {/* Editable image fills container */}
-                  <Box position="absolute" inset={0}>
-                    <Field.Image
-                      name="HeroPortraitImage"
-                      defaultValue="/content/IMG_3038.jpg"
-                      alt="Nadine Hauswirth, Psychotherapeutin"
-                      objectFit="cover"
+                  <LinkOverlay href="/blog" aria-label="Zum Blog" />
+                  <Box
+                    position="relative"
+                    w="140px"
+                    h="140px"
+                    borderRadius="full"
+                    overflow="hidden"
+                    border="2px solid rgba(255,255,255,0.35)"
+                    boxShadow="0 10px 30px rgba(0,0,0,0.35)"
+                  >
+                    {/* Editable image fills container */}
+                    <Box position="absolute" inset={0}>
+                      <Field.Image
+                        name="HeroPortraitImage"
+                        defaultValue="/content/IMG_3038.jpg"
+                        alt="Nadine Hauswirth, Psychotherapeutin"
+                        objectFit="cover"
+                      />
+                    </Box>
+                    <Box
+                      position="absolute"
+                      inset={0}
+                      bgGradient="linear(to-br, rgba(255,255,255,0.18), rgba(255,255,255,0))"
                     />
                   </Box>
-                  <Box
-                    position="absolute"
-                    inset={0}
-                    bgGradient="linear(to-br, rgba(255,255,255,0.18), rgba(255,255,255,0))"
-                  />
-                </Box>
-              </LinkBox>
+                </LinkBox>
 
-              {/* Desktop: framed portrait link */}
-              <LinkBox
-                as="article"
-                display={{ base: 'none', md: 'block' }}
-                flexBasis={{ md: '380px', lg: '420px' }}
-                alignSelf={{ md: 'flex-start' }}
-                position="relative"
-              >
-                <LinkOverlay
-                  href="/blog"
-                  aria-label="Zum Blog"
-                  _hover={{ textDecoration: 'none' }}
-                />
-                <Box
-                  p="2px"
-                  borderRadius="28px"
-                  transition="transform 0.3s ease, box-shadow 0.3s ease"
-                  bgGradient={`linear(to-br, ${BRAND.accent}, rgba(255,255,255,0.9))`}
-                  boxShadow="0 16px 60px rgba(127,24,140,0.35)"
-                  _hover={{
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 24px 80px rgba(127,24,140,0.5)'
-                  }}
-                  maxW="420px"
-                  w="full"
+                {/* Desktop: framed portrait link */}
+                <LinkBox
+                  as="article"
+                  display={{ base: 'none', md: 'block' }}
+                  flexBasis={{ md: '380px', lg: '420px' }}
+                  alignSelf={{ md: 'flex-start' }}
+                  position="relative"
                 >
+                  <LinkOverlay
+                    href="/blog"
+                    aria-label="Zum Blog"
+                    _hover={{ textDecoration: 'none' }}
+                  />
                   <Box
-                    bg={BRAND.base}
-                    borderRadius="26px"
-                    border="1px solid"
-                    borderColor="rgba(255,255,255,0.28)"
-                    p="10px"
-                    overflow="hidden"
-                    position="relative"
-                    _before={{
+                    p="2px"
+                    borderRadius="28px"
+                    transition="transform 0.3s ease, box-shadow 0.3s ease"
+                    bgGradient={`linear(to-br, ${BRAND.accent}, rgba(255,255,255,0.9))`}
+                    boxShadow="0 16px 60px rgba(127,24,140,0.35)"
+                    _hover={{
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 24px 80px rgba(127,24,140,0.5)'
+                    }}
+                    maxW="420px"
+                    w="full"
+                  >
+                    <Box
+                      bg={BRAND.base}
+                      borderRadius="26px"
+                      border="1px solid"
+                      borderColor="rgba(255,255,255,0.28)"
+                      p="10px"
+                      overflow="hidden"
+                      position="relative"
+                      _before={{
+                        content: '""',
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: '22px',
+                        boxShadow:
+                          'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -20px 40px rgba(0,0,0,0.25)'
+                      }}
+                    >
+                      <AspectRatio ratio={5 / 6} w="full">
+                        {/* Editable image fills container */}
+                        <Box
+                          position="absolute"
+                          inset={0}
+                          borderRadius="22px"
+                          overflow="hidden"
+                        >
+                          <Field.Image
+                            name="HeroPortraitImage"
+                            defaultValue="/content/IMG_3038.jpg"
+                            alt="Nadine Hauswirth, Psychotherapeutin"
+                            objectFit="cover"
+                          />
+                        </Box>
+                      </AspectRatio>
+                    </Box>
+                  </Box>
+                </LinkBox>
+
+                {/* Liquid Glass Panel */}
+                <Box
+                  flex="1"
+                  maxW={{ base: '720px', lg: '820px' }}
+                  w="full"
+                  position="relative"
+                  zIndex={2} /* ensure above decorative overlays */
+                  borderRadius="2xl"
+                  px={{ base: 5, md: 8 }}
+                  py={{ base: 6, md: 8 }}
+                  bg="rgba(255,255,255,0.06)"
+                  border="1px solid rgba(255,255,255,0.22)"
+                  boxShadow="0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.22)"
+                  backdropFilter="blur(16px) saturate(130%)"
+                  sx={{
+                    WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+                    overflow: 'hidden',
+                    isolation: 'isolate',
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
+                    '&::before': {
                       content: '""',
                       position: 'absolute',
-                      inset: 0,
-                      pointerEvents: 'none',
-                      borderRadius: '22px',
-                      boxShadow:
-                        'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -20px 40px rgba(0,0,0,0.25)'
-                    }}
-                  >
-                    <AspectRatio ratio={5 / 6} w="full">
-                      {/* Editable image fills container */}
-                      <Box position="absolute" inset={0} borderRadius="22px" overflow="hidden">
-                        <Field.Image
-                          name="HeroPortraitImage"
-                          defaultValue="/content/IMG_3038.jpg"
-                          alt="Nadine Hauswirth, Psychotherapeutin"
-                          objectFit="cover"
-                        />
-                      </Box>
-                    </AspectRatio>
-                  </Box>
-                </Box>
-              </LinkBox>
-
-              {/* Liquid Glass Panel */}
-              <Box
-                flex="1"
-                maxW={{ base: '720px', lg: '820px' }}
-                w="full"
-                position="relative"
-                borderRadius="2xl"
-                px={{ base: 5, md: 8 }}
-                py={{ base: 6, md: 8 }}
-                bg="rgba(255,255,255,0.06)"
-                border="1px solid rgba(255,255,255,0.22)"
-                boxShadow="0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.22)"
-                backdropFilter="blur(16px) saturate(130%)"
-                sx={{
-                  WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-                  overflow: 'hidden',
-                  isolation: 'isolate',
-                  textRendering: 'optimizeLegibility',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: '-20%',
-                    background: `radial-gradient(40% 40% at 20% 10%, rgba(127,24,140,0.28) 0%, rgba(127,24,140,0.00) 60%),
+                      inset: '-20%',
+                      background: `radial-gradient(40% 40% at 20% 10%, rgba(127,24,140,0.28) 0%, rgba(127,24,140,0.00) 60%),
                        radial-gradient(35% 35% at 80% 30%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.00) 60%),
                        radial-gradient(50% 50% at 60% 80%, rgba(127,24,140,0.18) 0%, rgba(127,24,140,0.00) 60%)`,
-                    filter: 'blur(24px)',
-                    animation: `${blob} 36s ease-in-out infinite`,
-                    zIndex: -2,
-                    pointerEvents: 'none',
-                    mixBlendMode: 'screen'
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '-30%',
-                    left: '-10%',
-                    width: '140%',
-                    height: '200%',
-                    background:
-                      'linear-gradient(120deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0) 55%)',
-                    animation: `${sheen} 18s linear infinite`,
-                    pointerEvents: 'none',
-                    zIndex: -1
-                  }
-                }}
-              >
-                <Box position="relative" zIndex={1}>
-                  <VStack align="flex-start" spacing={{ base: 4, md: 5 }}>
-                    <Heading
-                      as="h1"
-                      fontFamily={MODERN_FONT}
-                      fontWeight="800"
-                      letterSpacing="-0.02em"
-                      fontSize={{ base: '2xl', md: '3xl' }}
-                      lineHeight="1.15"
-                      color={BRAND.white}
-                    >
-                      <Field.Text
-                        as={chakra.span}
-                        name="HeroTitle"
-                        defaultValue="COACHING &amp; PSYCHOTHERAPIE"
-                      />
-                    </Heading>
-
-                    <Text
-                      fontFamily={MODERN_FONT}
-                      fontWeight="500"
-                      letterSpacing="0.01em"
-                      fontSize={{ base: 'md', md: 'lg' }}
-                      color="whiteAlpha.900"
-                      maxW="60ch"
-                    >
-                      <Field.Text
-                        as={chakra.span}
-                        name="HeroLead"
-                        defaultValue="Nadine Hauswirth, BA. Pth – Psychotherapeutin in Ausbildung unter Supervision und Psychoanalyse in Wien"
-                      />
-                    </Text>
-
-                    <HStack spacing={3} pt={1} flexWrap="wrap" alignItems="center" w="full">
-                      <Button
-                        size="md"
-                        variant="outline"
-                        borderRadius="full"
-                        borderColor={BRAND.white}
-                        color={BRAND.white}
-                        _hover={{ bg: 'whiteAlpha.100' }}
-                        _focusVisible={{
-                          boxShadow: '0 0 0 3px rgba(127,24,140,0.45)'
-                        }}
-                      >
-                        Kontakt
-                      </Button>
-                      <Button
-                        size="md"
-                        borderRadius="full"
-                        bg={BRAND.accent}
-                        color="white"
-                        _hover={{ filter: 'brightness(1.1)' }}
-                        _focusVisible={{
-                          boxShadow: '0 0 0 3px rgba(127,24,140,0.45)'
-                        }}
-                      >
-                        Termin buchen
-                      </Button>
-
-                      {/* QR sits to the right on md+, stays out on mobile to keep layout clean */}
-                      <Box ml={{ base: 0, md: 'auto' }} display={{ base: 'none', md: 'block' }}>
-                        <VCardQR />
-                      </Box>
-
-                      {/* Socials */}
-                      <HStack spacing={3} pl={{ base: 0, md: 2 }}>
-                        <Link href="#" isExternal aria-label="TikTok">
-                          <VisuallyHidden>TikTok</VisuallyHidden>
-                          <Box as={FaTiktok} boxSize="22px" color="whiteAlpha.900" />
-                        </Link>
-                        <Link href="#" isExternal aria-label="LinkedIn">
-                          <VisuallyHidden>LinkedIn</VisuallyHidden>
-                          <Box as={FaLinkedin} boxSize="22px" color="whiteAlpha.900" />
-                        </Link>
-                        <Link href="#" isExternal aria-label="Instagram">
-                          <VisuallyHidden>Instagram</VisuallyHidden>
-                          <Box as={FaInstagram} boxSize="22px" color="whiteAlpha.900" />
-                        </Link>
-                        <Link href="#" isExternal aria-label="Facebook">
-                          <VisuallyHidden>Facebook</VisuallyHidden>
-                          <Box as={FaFacebook} boxSize="22px" color="whiteAlpha.900" />
-                        </Link>
-                        <Link href="#" isExternal aria-label="GitHub">
-                          <VisuallyHidden>GitHub</VisuallyHidden>
-                          <Box as={FaGithub} boxSize="22px" color="whiteAlpha.900" />
-                        </Link>
-                      </HStack>
-                    </HStack>
-                  </VStack>
-                </Box>
-
-                {/* Decorative SVG overlay */}
-                <chakra.svg
-                  viewBox="0 0 800 600"
-                  position="absolute"
-                  inset={0}
-                  w="full"
-                  h="full"
-                  opacity={0.6}
-                  style={{ mixBlendMode: 'soft-light', pointerEvents: 'none' }}
-                  zIndex={0}
+                      filter: 'blur(24px)',
+                      animation: `${blob} 36s ease-in-out infinite`,
+                      zIndex: -2,
+                      mixBlendMode: 'screen',
+                      pointerEvents: 'none'
+                    },
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '-30%',
+                      left: '-10%',
+                      width: '140%',
+                      height: '200%',
+                      background:
+                        'linear-gradient(120deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0) 55%)',
+                      animation: `${sheen} 18s linear infinite`,
+                      zIndex: -1,
+                      pointerEvents: 'none'
+                    }
+                  }}
                 >
-                  <defs>
-                    <linearGradient id="g-accent" x1="0" y1="0" x2="1" y2="1">
-                      <stop
-                        offset="0"
-                        stopColor={BRAND.accent}
-                        stopOpacity="0.45"
-                      />
-                      <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
-                    </linearGradient>
-                    <filter
-                      id="blur40"
-                      x="-20%"
-                      y="-20%"
-                      width="140%"
-                      height="140%"
-                    >
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
-                    </filter>
-                  </defs>
+                  <Box position="relative" zIndex={1}>
+                    <VStack align="flex-start" spacing={{ base: 4, md: 5 }}>
+                      <Heading
+                        as="h1"
+                        fontFamily={MODERN_FONT}
+                        fontWeight="800"
+                        letterSpacing="-0.02em"
+                        fontSize={{ base: '2xl', md: '3xl' }}
+                        lineHeight="1.15"
+                        color={BRAND.white}
+                      >
+                        <Field.Text
+                          as={chakra.span}
+                          name="HeroTitle"
+                          defaultValue="COACHING &amp; PSYCHOTHERAPIE"
+                        />
+                      </Heading>
 
-                  <circle
-                    cx="140"
-                    cy="90"
-                    r="220"
-                    fill="url(#g-accent)"
-                    filter="url(#blur40)"
-                  />
-                  <circle
-                    cx="680"
-                    cy="180"
-                    r="180"
-                    fill="url(#g-accent)"
-                    filter="url(#blur40)"
-                  />
-                  <circle
-                    cx="480"
-                    cy="520"
-                    r="220"
-                    fill="url(#g-accent)"
-                    filter="url(#blur40)"
-                  />
+                      <Text
+                        fontFamily={MODERN_FONT}
+                        fontWeight="500"
+                        letterSpacing="0.01em"
+                        fontSize={{ base: 'md', md: 'lg' }}
+                        color="whiteAlpha.900"
+                        maxW="60ch"
+                      >
+                        <Field.Text
+                          as={chakra.span}
+                          name="HeroLead"
+                          defaultValue="Nadine Hauswirth, BA. Pth – Psychotherapeutin in Ausbildung unter Supervision und Psychoanalyse in Wien"
+                        />
+                      </Text>
 
-                  {[140, 220, 300, 380, 460].map((y, i) => (
-                    <path
-                      key={y}
-                      d={`M0 ${y} Q 150 ${
-                        y - 20
-                      }, 300 ${y} T 600 ${y} T 900 ${y}`}
-                      fill="none"
-                      stroke={`rgba(255,255,255,${0.1 + i * 0.05})`}
-                      strokeWidth="1"
+                      <HStack
+                        spacing={3}
+                        pt={1}
+                        flexWrap="wrap"
+                        alignItems="center"
+                        w="full"
+                      >
+                        {/* ✅ Kontakt opens the global contact modal */}
+                        <Button
+                          size="md"
+                          borderRadius="full"
+                          bg={BRAND.accent}
+                          color="white"
+                          _hover={{ filter: 'brightness(1.1)' }}
+                          _focusVisible={{
+                            boxShadow: '0 0 0 3px rgba(127,24,140,0.45)'
+                          }}
+                          onClick={handleOnContactClick}
+                        >
+                          <Field.Text
+                            as={chakra.span}
+                            name="HeroCTA1"
+                            defaultValue="Termin buchen"
+                          />
+                        </Button>
+                        <Button
+                          size="md"
+                          variant="outline"
+                          borderRadius="full"
+                          borderColor={BRAND.white}
+                          color={BRAND.white}
+                          _hover={{ bg: 'whiteAlpha.100' }}
+                          _focusVisible={{
+                            boxShadow: '0 0 0 3px rgba(127,24,140,0.45)'
+                          }}
+                          type="button"
+                          as={GatsbyLink}
+                          to="#faq" // TODO: set to your booking route or anchor (e.g., "#termin")
+                        >
+                          <Field.Text
+                            as={chakra.span}
+                            name="HeroCTA2"
+                            defaultValue="Fragen &amp; Antworten"
+                          />
+                        </Button>
+                        {/* QR sits to the right on md+, stays out on mobile to keep layout clean */}
+                        <Box
+                          ml={{ base: 0, md: 'auto' }}
+                          display={{ base: 'none', md: 'block' }}
+                        >
+                          <VCardQR />
+                        </Box>
+
+                        {/* Socials */}
+                        <HStack spacing={3} pl={{ base: 0, md: 2 }}>
+                          <Link href="#" isExternal aria-label="TikTok">
+                            <VisuallyHidden>TikTok</VisuallyHidden>
+                            <Box
+                              as={FaTiktok}
+                              boxSize="22px"
+                              color="whiteAlpha.900"
+                            />
+                          </Link>
+                          <Link href="#" isExternal aria-label="LinkedIn">
+                            <VisuallyHidden>LinkedIn</VisuallyHidden>
+                            <Box
+                              as={FaLinkedin}
+                              boxSize="22px"
+                              color="whiteAlpha.900"
+                            />
+                          </Link>
+                          <Link href="#" isExternal aria-label="Instagram">
+                            <VisuallyHidden>Instagram</VisuallyHidden>
+                            <Box
+                              as={FaInstagram}
+                              boxSize="22px"
+                              color="whiteAlpha.900"
+                            />
+                          </Link>
+                          <Link href="#" isExternal aria-label="Facebook">
+                            <VisuallyHidden>Facebook</VisuallyHidden>
+                            <Box
+                              as={FaFacebook}
+                              boxSize="22px"
+                              color="whiteAlpha.900"
+                            />
+                          </Link>
+                          <Link href="#" isExternal aria-label="GitHub">
+                            <VisuallyHidden>GitHub</VisuallyHidden>
+                            <Box
+                              as={FaGithub}
+                              boxSize="22px"
+                              color="whiteAlpha.900"
+                            />
+                          </Link>
+                        </HStack>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  {/* Decorative SVG overlay — make it click-through */}
+                  <chakra.svg
+                    viewBox="0 0 800 600"
+                    position="absolute"
+                    inset={0}
+                    w="full"
+                    h="full"
+                    opacity={0.6}
+                    style={{ mixBlendMode: 'soft-light' }}
+                    zIndex={0}
+                    pointerEvents="none"
+                  >
+                    <defs>
+                      <linearGradient id="g-accent" x1="0" y1="0" x2="1" y2="1">
+                        <stop
+                          offset="0"
+                          stopColor={BRAND.accent}
+                          stopOpacity="0.45"
+                        />
+                        <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+                      </linearGradient>
+                      <filter
+                        id="blur40"
+                        x="-20%"
+                        y="-20%"
+                        width="140%"
+                        height="140%"
+                      >
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
+                      </filter>
+                    </defs>
+
+                    <circle
+                      cx="140"
+                      cy="90"
+                      r="220"
+                      fill="url(#g-accent)"
+                      filter="url(#blur40)"
                     />
-                  ))}
-                </chakra.svg>
-              </Box>
-            </Flex>
-          </Container>
-          {/* Scroll arrows — bottom center */}
-          <ScrollArrows isVisible={true} />
+                    <circle
+                      cx="680"
+                      cy="180"
+                      r="180"
+                      fill="url(#g-accent)"
+                      filter="url(#blur40)"
+                    />
+                    <circle
+                      cx="480"
+                      cy="520"
+                      r="220"
+                      fill="url(#g-accent)"
+                      filter="url(#blur40)"
+                    />
+
+                    {[140, 220, 300, 380, 460].map((y, i) => (
+                      <path
+                        key={y}
+                        d={`M0 ${y} Q 150 ${
+                          y - 20
+                        }, 300 ${y} T 600 ${y} T 900 ${y}`}
+                        fill="none"
+                        stroke={`rgba(255,255,255,${0.1 + i * 0.05})`}
+                        strokeWidth="1"
+                      />
+                    ))}
+                  </chakra.svg>
+                </Box>
+              </Flex>
+            </Container>
+
+            {/* Scroll arrows — bottom center (click-through) */}
+            <Box
+              h="max(var(--navbar-vh, 15vh), 100px)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              pointerEvents="none"
+            >
+              <ScrollArrows isVisible={true} />
+            </Box>
+          </Box>
         </Box>
 
         {/* WHITE CONTENT AREA BELOW (flow content; margin-top creates the reveal) */}
@@ -727,6 +801,7 @@ const IndexPage: React.FC<PageProps> = () => {
           </Box>
         </Box>
       </Box>
+
       <GoogleMaps
         objectFit="cover"
         h="full"

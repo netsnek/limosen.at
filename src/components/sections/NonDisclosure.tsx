@@ -18,6 +18,8 @@ import { keyframes } from '@emotion/react';
 import { Field } from 'jaen';
 // Kein Schild-Icon
 import { FiCheckCircle as FiCheck } from '@react-icons/all-files/fi/FiCheckCircle';
+// ✅ Contact modal hook
+import { useContactModal } from '../../services/contact';
 
 const BRAND = {
   base: '#18011a',
@@ -42,6 +44,12 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
   headingFont = "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
 }) => {
   const ACCENT = accentColor ?? BRAND.accent;
+
+  // ✅ Hook + handler for the contact modal
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    contactModal.onOpen({ meta: {} });
+  };
 
   return (
     <Box
@@ -126,14 +134,15 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
               </ListItem>
             </List>
             <HStack spacing={3} pt={6}>
+              {/* ✅ Opens contact modal */}
               <Button
                 borderRadius="full"
                 bg={ACCENT}
                 color="white"
                 _hover={{ filter: 'brightness(1.1)' }}
-                as="a"
-                href="?contact"
                 fontWeight="900"
+                type="button"
+                onClick={handleOnContactClick}
               >
                 <Field.Text
                   as={chakra.span}

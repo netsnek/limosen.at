@@ -15,6 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { Field } from 'jaen';
+// ✅ Contact modal hook
+import { useContactModal } from '../../services/contact';
 
 // Gleiche Brandfarben wie in den anderen Sections
 const BRAND = {
@@ -57,6 +59,12 @@ const Prices: FC<PricesProps> = ({
   headingFont = "'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
 }) => {
   const ACCENT = accentColor ?? BRAND.accent;
+
+  // ✅ Hook + handler for the contact modal
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    contactModal.onOpen({ meta: {} });
+  };
 
   return (
     <Box
@@ -330,14 +338,15 @@ const Prices: FC<PricesProps> = ({
             />
           </Text>
           <HStack pt={2}>
+            {/* ✅ Opens contact modal */}
             <Button
               borderRadius="full"
               bg={ACCENT}
               color="white"
               _hover={{ filter: 'brightness(1.1)' }}
-              as="a"
-              href="?contact"
               fontWeight="900"
+              type="button"
+              onClick={handleOnContactClick}
             >
               <Field.Text
                 as={chakra.span}
