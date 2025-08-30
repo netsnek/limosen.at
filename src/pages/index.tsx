@@ -173,8 +173,8 @@ const ScrollArrows: React.FC<ScrollArrowsProps> = ({ isVisible }) => (
         animation={`scrollarrows 2s infinite ${index * 0.15}s`}
         opacity="0"
         borderRadius="sm"
-        borderLeft="1px solid #7f188c"
-        borderBottom="1px solid #7f188c"
+        borderLeft="1px solid #ffffffff"
+        borderBottom="1px solid #ffffffff"
         boxShadow="-2px 2px 2px rgba(0, 0, 0, 0.1)"
         transform="translateX(-50%) rotate(-45deg)"
       />
