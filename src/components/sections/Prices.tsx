@@ -11,7 +11,8 @@ import {
   Tag,
   Button,
   Divider,
-  chakra
+  chakra,
+  Stack
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { Field } from 'jaen';
@@ -107,6 +108,7 @@ const Prices: FC<PricesProps> = ({
           />
           <chakra.span color={ACCENT}>.</chakra.span>
         </Heading>
+
         {/* Preis-Karten */}
         <SimpleGrid
           mt={{ base: 8, md: 12 }}
@@ -329,7 +331,7 @@ const Prices: FC<PricesProps> = ({
         </SimpleGrid>
 
         {/* Hinweistexte / Call to Action */}
-        <VStack align="start" spacing={3} mt={{ base: 8, md: 12 }}>
+        <VStack align="stretch" spacing={3} mt={{ base: 8, md: 12 }}>
           <Text color="blackAlpha.800" lineHeight="1.7">
             <Field.Text
               as={chakra.span}
@@ -337,7 +339,15 @@ const Prices: FC<PricesProps> = ({
               defaultValue="Das <b>Erstgespräch</b> dient dem gegenseitigen Kennenlernen, dem Klären deines Anliegens und der Wahl des passenden Settings."
             />
           </Text>
-          <HStack pt={2}>
+
+          {/* Buttons: stacked on mobile, inline from sm up; full width on base */}
+          <Stack
+            direction={{ base: 'column', sm: 'row' }}
+            spacing={3}
+            pt={2}
+            align={{ base: 'stretch', sm: 'center' }}
+            w="full"
+          >
             {/* ✅ Opens contact modal */}
             <Button
               borderRadius="full"
@@ -347,6 +357,7 @@ const Prices: FC<PricesProps> = ({
               fontWeight="900"
               type="button"
               onClick={handleOnContactClick}
+              w={{ base: 'full', sm: 'auto' }}
             >
               <Field.Text
                 as={chakra.span}
@@ -363,6 +374,7 @@ const Prices: FC<PricesProps> = ({
               as="a"
               href="#faq"
               fontWeight="800"
+              w={{ base: 'full', sm: 'auto' }}
             >
               <Field.Text
                 as={chakra.span}
@@ -370,7 +382,7 @@ const Prices: FC<PricesProps> = ({
                 defaultValue="Fragen &amp; Antworten"
               />
             </Button>
-          </HStack>
+          </Stack>
         </VStack>
       </Container>
     </Box>

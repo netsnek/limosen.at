@@ -6,7 +6,7 @@ import {
   SimpleGrid,
   Heading,
   Text,
-  HStack,
+  Stack, // ← use Stack for responsive direction
   Button,
   Tag,
   chakra,
@@ -133,7 +133,14 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
                 />
               </ListItem>
             </List>
-            <HStack spacing={3} pt={6}>
+
+            {/* Buttons: stacked on mobile, inline from sm up */}
+            <Stack
+              direction={{ base: 'column', sm: 'row' }}
+              spacing={3}
+              pt={6}
+              align={{ base: 'stretch', sm: 'center' }}
+            >
               {/* ✅ Opens contact modal */}
               <Button
                 borderRadius="full"
@@ -143,6 +150,7 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
                 fontWeight="900"
                 type="button"
                 onClick={handleOnContactClick}
+                w={{ base: 'full', sm: 'auto' }}
               >
                 <Field.Text
                   as={chakra.span}
@@ -159,6 +167,7 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
                 as="a"
                 href="#rahmenbedingungen"
                 fontWeight="800"
+                w={{ base: 'full', sm: 'auto' }}
               >
                 <Field.Text
                   as={chakra.span}
@@ -166,8 +175,9 @@ const NonDisclosure: FC<NonDisclosureProps> = ({
                   defaultValue="Mehr erfahren"
                 />
               </Button>
-            </HStack>
+            </Stack>
           </Box>
+
           {/* Bild */}
           <Box
             order={{ base: 1, md: 2 }}

@@ -6,7 +6,7 @@ import {
   SimpleGrid,
   Heading,
   Text,
-  HStack,
+  Stack, // ← use Stack for responsive direction
   VStack,
   Button,
   Tag,
@@ -103,6 +103,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
               pointerEvents="none"
             />
           </Box>
+
           {/* Text rechts */}
           <Box
             gridColumn={{ base: '1 / -1', md: '6 / span 7' }}
@@ -160,6 +161,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                 defaultValue="Tiefenpsychologisch fundierte Psychotherapie unterstützt dich dabei, <b>unbewusste Dynamiken zu verstehen</b> und deinen Handlungsspielraum zu erweitern. In einem geschützten, verlässlichen Rahmen arbeiten wir an den Mustern, die deinen Alltag, Beziehungen und deine Lebensgestaltung prägen – mit dem Ziel von mehr Selbstbestimmtheit und innerer Klarheit."
               />
             </Text>
+
             {/* Therapieformen */}
             <VStack align="stretch" spacing={5} mt={8}>
               <Box id="therapieformen">
@@ -229,6 +231,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                   </Bullet>
                 </List>
               </Box>
+
               {/* Beispiele – Ich behandle */}
               <Box>
                 <Heading as="h3" fontSize="lg" fontWeight="900" mb={2}>
@@ -288,7 +291,14 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                   </Bullet>
                 </List>
               </Box>
-              <HStack spacing={3} pt={2}>
+
+              {/* Buttons: stacked on mobile, inline from sm up */}
+              <Stack
+                direction={{ base: 'column', sm: 'row' }}
+                spacing={3}
+                pt={2}
+                align={{ base: 'stretch', sm: 'center' }}
+              >
                 {/* ✅ Opens contact modal */}
                 <Button
                   borderRadius="full"
@@ -298,6 +308,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                   fontWeight="900"
                   type="button"
                   onClick={handleOnContactClick}
+                  w={{ base: 'full', sm: 'auto' }}
                 >
                   <Field.Text
                     as={chakra.span}
@@ -314,6 +325,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                   as="a"
                   href="#therapieformen"
                   fontWeight="800"
+                  w={{ base: 'full', sm: 'auto' }}
                 >
                   <Field.Text
                     as={chakra.span}
@@ -321,7 +333,7 @@ const Psychotherapie: FC<PsychotherapieProps> = ({
                     defaultValue="Mehr zu den Formen"
                   />
                 </Button>
-              </HStack>
+              </Stack>
             </VStack>
           </Box>
         </SimpleGrid>

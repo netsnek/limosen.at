@@ -6,7 +6,7 @@ import {
   SimpleGrid,
   Heading,
   Text,
-  HStack,
+  Stack, // ← use Stack for responsive direction
   VStack,
   Button,
   Tag,
@@ -185,7 +185,14 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
                   </FeatureItem>
                 </List>
               </Box>
-              <HStack spacing={3} pt={1}>
+
+              {/* Buttons: stacked on mobile, inline from sm/md up */}
+              <Stack
+                direction={{ base: 'column', sm: 'row' }}
+                spacing={3}
+                pt={1}
+                align={{ base: 'stretch', sm: 'center' }}
+              >
                 {/* ✅ Opens contact modal instead of navigating */}
                 <Button
                   borderRadius="full"
@@ -195,6 +202,7 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
                   fontWeight="900"
                   type="button"
                   onClick={handleOnContactClick}
+                  w={{ base: 'full', sm: 'auto' }}
                 >
                   <Field.Text
                     as={chakra.span}
@@ -211,6 +219,7 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
                   as="a"
                   href="/docs"
                   fontWeight="800"
+                  w={{ base: 'full', sm: 'auto' }}
                 >
                   <Field.Text
                     as={chakra.span}
@@ -218,9 +227,10 @@ const ChangeCoaching: FC<ChangeCoachingProps> = ({
                     defaultValue="Mehr erfahren"
                   />
                 </Button>
-              </HStack>
+              </Stack>
             </VStack>
           </Box>
+
           {/* Bild – frei austauschbar; jetzt als Jaen Field.Image */}
           <Box
             order={{ base: 1, md: 2 }}
