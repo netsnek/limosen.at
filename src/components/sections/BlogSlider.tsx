@@ -64,30 +64,37 @@ const BlogSlider: FC<BlogSliderProps> = ({
     xl:   '420px'
   }
 
+  // We want 3 on md+ (but not more than we have), and 1 on mobile.
+  const slidesMdUp = Math.min(3, items?.length || 1)
+
   const settings = useMemo(
     () => ({
-      mobileFirst: true,
+      // default (desktop-first): md and up
       dots: showDots,
       arrows: showArrows,
-      // don't lock to "4" — infinite works regardless of card count
-      infinite: (items?.length || 0) > 1,
+      infinite: (items?.length || 0) > slidesMdUp,
       speed: 500,
-      slidesToShow: 1,           // ✅ base & sm: exactly 1 card
+      slidesToShow: slidesMdUp,   // ✅ md and up: 3 (or fewer if not available)
       slidesToScroll: 1,
       swipeToSlide: true,
-      touchThreshold: 12,
-      adaptiveHeight: true,      // ✅ base: fit to card height
+      adaptiveHeight: false,      // ✅ desktop: fixed track height
       lazyLoad: 'ondemand' as const,
-      // Match Chakra breakpoints: md(768), lg(992), xl(1280)
+      // React-Slick breakpoints are MAX-width by default.
+      // < 768px → 1 card, adaptiveHeight on for tall mobile cards.
       responsive: [
-        { breakpoint: 768,  settings: { slidesToShow: 3, adaptiveHeight: false } }, // md: 3
-        { breakpoint: 992,  settings: { slidesToShow: 4 } },                        // lg: 4
-        { breakpoint: 1280, settings: { slidesToShow: 4 } }                         // xl: 4
+        {
+          breakpoint: 768,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            adaptiveHeight: true
+          }
+        }
       ],
       nextArrow: <Arrow dir="right" />,
       prevArrow: <Arrow dir="left" />
     }),
-    [items?.length, showArrows, showDots]
+    [items?.length, slidesMdUp, showArrows, showDots]
   )
 
   return (
@@ -132,15 +139,13 @@ const BlogSlider: FC<BlogSliderProps> = ({
             <Box
               position="relative"
               sx={{
-                // IMPORTANT: don't stretch slides by height — keep natural height
                 '.slick-track': {
                   display: 'flex',
-                  alignItems: 'flex-start' // ⬅️ avoid height-stretch coupling
+                  alignItems: 'flex-start' // avoid height-stretch coupling
                 },
                 '.slick-slide': { height: 'auto' },
                 '.slick-slide > div': {
                   px: { base: 2, md: 2.5 },
-                  // center each card in its slide
                   display: 'block'
                 },
                 '.slick-list': {
@@ -163,7 +168,6 @@ const BlogSlider: FC<BlogSliderProps> = ({
                     key={(post.handle || post.id) + i}
                     my={{base: 2, md: 4}}
                     w="full"
-                    // ✅ hard caps per breakpoint so cards never get too big/small
                     maxW={{
                       base: CARD_MAXW.base,
                       sm: CARD_MAXW.sm,
@@ -171,7 +175,7 @@ const BlogSlider: FC<BlogSliderProps> = ({
                       lg: CARD_MAXW.lg,
                       xl: CARD_MAXW.xl
                     }}
-                    mx="auto"   // center the card inside slide
+                    mx="auto"
                   >
                     <BlogCard blog={post} borderline={false} bcolor={ACCENT} />
                   </Box>
