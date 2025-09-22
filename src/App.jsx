@@ -458,6 +458,7 @@ function HeaderBar() {
                 as={Link}
                 href={href}
                 aria-label={label}
+
                 icon={<IconComponent />}
                 isRound
                 size="sm"
