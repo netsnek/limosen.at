@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Container,
@@ -86,6 +91,29 @@ const LOGO_SRC = 'https://admin.limosen.at/uploads/7-1601985268947.png';
 const FLAG_SRC = 'https://limosen.at/flags/de.png';
 const ABOUT_IMAGE = 'https://limosen.at/_nuxt/img/cars.3ec3e98.jpg';
 const BOOKING_BACKGROUND = 'https://limosen.at/_nuxt/img/home-2.32cb6f9.jpg';
+
+const FAQ_ITEMS = [
+  {
+    question: 'Welche Fahrzeugklassen stehen zur Auswahl?',
+    answer:
+      'Unsere Flotte umfasst Business- und First-Class-Modelle wie die Mercedes-Benz E Klasse, die V Klasse für Gruppen sowie die luxuriöse S Klasse für repräsentative Anlässe.',
+  },
+  {
+    question: 'Wie läuft der Flughafentransfer ab?',
+    answer:
+      'Ihre vorgebuchten Chauffeure warten direkt am Flughafen, übernehmen Ihr Gepäck und bringen Sie ohne Wartezeiten sicher und komfortabel an Ihr Ziel – auf Wunsch auch wieder zurück.',
+  },
+  {
+    question: 'Gibt es Kindersitze oder mehrsprachige Fahrer?',
+    answer:
+      'Auf Anfrage stellen wir Kindersitze, mehrsprachige Chauffeure in formeller Kleidung sowie bei Bedarf Übersetzer zur Verfügung, damit jede Fahrt Ihren Erwartungen entspricht.',
+  },
+  {
+    question: 'Sind internationale Transfers möglich?',
+    answer:
+      'Ja, wir organisieren Auslandsfahrten zu Destinationen wie Bratislava, Budapest, Prag oder Venedig und begleiten Sie mit Tracking-System und persönlichem Service während der gesamten Reise.',
+  },
+];
 
 const SERVICES_CONTENT = [
   {
@@ -268,8 +296,9 @@ export default function App() {
       <Box as="main" flex="1" display="flex" flexDirection="column" gap={0} className="homepage">
         <HeroSection background={HERO_SLIDES[slideIndex]} />
         <AboutSection />
-        <ServicesSection />
         <FleetSection />
+        <ServicesSection />
+        <FAQSection />
         <OnlineBookingSection />
       </Box>
 
@@ -698,6 +727,11 @@ function ServicesSection() {
     return blocks;
   };
 
+  const summaryText = (paragraphs) => {
+    const firstParagraph = paragraphs.find((paragraph) => !paragraph.trim().startsWith('•'));
+    return firstParagraph || '';
+  };
+
   return (
     <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }} id="services">
       <Container maxW="6xl">
@@ -705,70 +739,165 @@ function ServicesSection() {
           <VStack spacing={3} textAlign="center">
             <Heading size="lg">Unsere Services</Heading>
             <Text color="whiteAlpha.700" maxW="3xl">
-              Entdecken Sie unser gesamtes Leistungsspektrum – vom Flughafentransfer bis hin zu maßgeschneiderten
-              Business-Lösungen für Ihr Unternehmen.
+              Erhalten Sie einen schnellen Überblick über unser Angebot und vertiefen Sie sich bei Bedarf in die
+              detaillierten Beschreibungen unserer Premium-Services.
             </Text>
             <Divider borderColor="whiteAlpha.300" w={{ base: '80px', md: '120px' }} />
           </VStack>
-          {SERVICES_CONTENT.map((service, index) => {
-            const blocks = createContentBlocks(service.paragraphs);
-            const hasImage = Boolean(service.image);
-            const isEven = index % 2 === 0;
 
-            return (
-              <Box
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 6, md: 8 }}>
+            {SERVICES_CONTENT.map((service) => (
+              <LinkBox
                 key={service.id}
-                id={service.id}
-                bgGradient="linear(to-b, rgba(255,255,255,0.04), rgba(255,255,255,0.02))"
-                borderRadius="2xl"
+                id={`${service.id}-overview`}
+                bg="#252525"
+                borderRadius="xl"
+                overflow="hidden"
                 border="1px solid"
                 borderColor="whiteAlpha.100"
-                boxShadow="2xl"
-                overflow="hidden"
+                boxShadow="lg"
+                role="group"
+                transition="transform 0.2s ease, box-shadow 0.2s ease"
+                _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
               >
-                <Flex
-                  direction={{ base: 'column', md: hasImage ? (isEven ? 'row' : 'row-reverse') : 'column' }}
-                  align="stretch"
-                >
-                  {hasImage && (
-                    <Box flex={{ base: 'none', md: '0 0 40%' }}>
-                      <Image
-                        src={service.image}
-                        alt={service.title}
-                        objectFit="cover"
-                        w="full"
-                        h={{ base: '220px', md: '100%' }}
-                      />
-                    </Box>
-                  )}
-                  <Stack
-                    spacing={4}
-                    flex="1"
-                    p={{ base: 6, md: 8 }}
-                    bg={hasImage ? 'transparent' : 'rgba(0,0,0,0.35)'}
-                  >
-                    <Heading size="md">{service.title}</Heading>
-                    <Stack spacing={4} color="whiteAlpha.900" fontSize="lg">
-                      {blocks.map((block, blockIndex) => {
-                        if (block.type === 'list') {
-                          return (
-                            <List key={blockIndex} spacing={2} pl={4} styleType="disc" color="whiteAlpha.900">
-                              {block.items.map((item, itemIndex) => (
-                                <ListItem key={itemIndex}>{item}</ListItem>
-                              ))}
-                            </List>
-                          );
-                        }
-                        return (
-                          <Text key={blockIndex}>{block.text}</Text>
-                        );
-                      })}
+                {service.image && (
+                  <Box h="160px" overflow="hidden">
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      w="full"
+                      h="full"
+                      objectFit="cover"
+                      transform="scale(1)"
+                      transition="transform 0.4s"
+                      _groupHover={{ transform: 'scale(1.05)' }}
+                    />
+                  </Box>
+                )}
+                <Box p={6}>
+                  <LinkOverlay href={`#${service.id}`} display="block">
+                    <Stack spacing={3}>
+                      <Heading size="sm">{service.title}</Heading>
+                      <Text color="whiteAlpha.800" fontSize="sm" noOfLines={3}>
+                        {summaryText(service.paragraphs)}
+                      </Text>
+                      <Text fontWeight="semibold" color="#bb4338">
+                        Mehr erfahren →
+                      </Text>
                     </Stack>
-                  </Stack>
-                </Flex>
-              </Box>
-            );
-          })}
+                  </LinkOverlay>
+                </Box>
+              </LinkBox>
+            ))}
+          </SimpleGrid>
+
+          <Box>
+            <Heading size="md" mb={4} textAlign="center">
+              Details zu unseren Leistungen
+            </Heading>
+            <Accordion allowMultiple reduceMotion>
+              {SERVICES_CONTENT.map((service) => {
+                const blocks = createContentBlocks(service.paragraphs);
+                const hasImage = Boolean(service.image);
+
+                return (
+                  <AccordionItem key={service.id} id={service.id} border="none" mb={4}>
+                    <h3>
+                      <AccordionButton
+                        bg="rgba(255, 255, 255, 0.04)"
+                        _expanded={{ bg: 'rgba(187, 67, 56, 0.2)', color: '#fff' }}
+                        borderRadius="lg"
+                        px={{ base: 4, md: 6 }}
+                        py={{ base: 4, md: 5 }}
+                        border="1px solid"
+                        borderColor="whiteAlpha.100"
+                      >
+                        <Box flex="1" textAlign="left" fontWeight="semibold">
+                          {service.title}
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h3>
+                    <AccordionPanel px={{ base: 4, md: 6 }} pt={6} pb={2}>
+                      <Stack
+                        spacing={6}
+                        direction={{ base: 'column', md: hasImage ? 'row' : 'column' }}
+                        align={{ base: 'stretch', md: 'flex-start' }}
+                      >
+                        {hasImage && (
+                          <Image
+                            src={service.image}
+                            alt={service.title}
+                            borderRadius="lg"
+                            maxW={{ base: '100%', md: '320px' }}
+                            objectFit="cover"
+                            boxShadow="lg"
+                          />
+                        )}
+                        <Stack spacing={4} color="whiteAlpha.900" fontSize="md" flex="1">
+                          {blocks.map((block, blockIndex) => {
+                            if (block.type === 'list') {
+                              return (
+                                <List key={blockIndex} spacing={2} pl={4} styleType="disc">
+                                  {block.items.map((item, itemIndex) => (
+                                    <ListItem key={itemIndex}>{item}</ListItem>
+                                  ))}
+                                </List>
+                              );
+                            }
+                            return <Text key={blockIndex}>{block.text}</Text>;
+                          })}
+                        </Stack>
+                      </Stack>
+                    </AccordionPanel>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </Box>
+        </VStack>
+      </Container>
+    </Box>
+  );
+}
+
+function FAQSection() {
+  return (
+    <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }}>
+      <Container maxW="5xl">
+        <VStack spacing={{ base: 8, md: 10 }} align="stretch">
+          <VStack spacing={3} textAlign="center">
+            <Heading size="lg">Häufig gestellte Fragen</Heading>
+            <Text color="whiteAlpha.700" maxW="3xl">
+              Antworten auf die wichtigsten Fragen zu Buchung, Fahrzeugen und unserem Premium-Service.
+            </Text>
+            <Divider borderColor="whiteAlpha.300" w={{ base: '80px', md: '120px' }} />
+          </VStack>
+          <Accordion allowToggle reduceMotion>
+            {FAQ_ITEMS.map((item) => (
+              <AccordionItem key={item.question} border="none" mb={3}>
+                <h3>
+                  <AccordionButton
+                    bg="rgba(255, 255, 255, 0.04)"
+                    _expanded={{ bg: 'rgba(187, 67, 56, 0.2)', color: '#fff' }}
+                    borderRadius="lg"
+                    px={{ base: 4, md: 6 }}
+                    py={{ base: 4, md: 5 }}
+                    border="1px solid"
+                    borderColor="whiteAlpha.100"
+                  >
+                    <Box flex="1" textAlign="left" fontWeight="semibold">
+                      {item.question}
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h3>
+                <AccordionPanel px={{ base: 4, md: 6 }} pt={4} pb={6} color="whiteAlpha.900">
+                  {item.answer}
+                </AccordionPanel>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </VStack>
       </Container>
     </Box>
