@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Flex,
   Heading,
   HStack,
@@ -10,9 +11,12 @@ import {
   IconButton,
   Image,
   Link,
+  SimpleGrid,
   Stack,
   Text,
   VStack,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import {
   FaEnvelopeOpen,
@@ -42,13 +46,75 @@ const SOCIAL_LINKS = [
 ];
 
 const HERO_SLIDES = [
-  'https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589244001207.jpeg',
   'https://admin.limosen.at/uploads/beauty_of_vienna-wallpaper-1920x10802-1593739458218.jpg',
+  'https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589243923726.jpeg',
+  'https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589244001207.jpeg',
+  'https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589244017831.jpeg',
+  'https://admin.limosen.at/uploads/vienna_austria_cityscape_4k-hd_wallpapers2-1593739468623.jpg',
+  'https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589244160841.jpeg',
+  'https://admin.limosen.at/uploads/wien-hofburg-palace-at-night_2880x18002-1593740896794.jpg',
 ];
 
 const LOGO_SRC = 'https://admin.limosen.at/uploads/7-1601985268947.png';
 const FLAG_SRC = 'https://limosen.at/flags/de.png';
 const ABOUT_IMAGE = 'https://limosen.at/_nuxt/img/cars.3ec3e98.jpg';
+const BOOKING_BACKGROUND = 'https://limosen.at/_nuxt/img/home-2.32cb6f9.jpg';
+
+const FLEET_VEHICLES = [
+  {
+    name: 'Mercedes-Benz E Klasse',
+    category: 'Business Class',
+    description: 'E 350 d 4MATIC - 2020',
+    image: 'https://admin.limosen.at/uploads/mercedes-benz-e-klasse%20e350d-1589814289680.jpg',
+  },
+  {
+    name: 'Mercedes-Benz V Klasse',
+    category: 'Business Van',
+    description: 'V 250 d extralang - 2018',
+    image: 'https://admin.limosen.at/uploads/vclass-1581462635925.jpeg',
+  },
+  {
+    name: 'Mercedes-Benz S Klasse',
+    category: 'First Class',
+    description: 'S 400 d lang 4MATIC - 2020',
+    image: 'https://admin.limosen.at/uploads/sclass-1581462643811.jpeg',
+  },
+  {
+    name: 'Mercedes-Benz E Klasse',
+    category: 'Business Class',
+    description: 'E 220 d 4MATIC - 2020',
+    image: 'https://admin.limosen.at/uploads/eclass-1581462657307.jpeg',
+  },
+];
+
+const FOOTER_LINK_GROUPS = [
+  {
+    title: 'Navigation',
+    links: [
+      { label: 'Hauptseite', href: 'https://limosen.at/de' },
+      { label: 'Unsere Fahrzeuge', href: 'https://limosen.at/de/cars' },
+      { label: 'Kundenfeedback', href: 'https://limosen.at/de/feedback' },
+      { label: 'Kontakt', href: 'https://limosen.at/de/page/contact' },
+    ],
+  },
+  {
+    title: 'Services',
+    links: [
+      { label: 'Registrieren', href: 'https://limosen.at/de/register/driver' },
+      { label: 'Jetzt buchen', href: 'https://limosen.at/de/booking' },
+      { label: 'Impressum', href: 'https://limosen.at/de/page/imprint' },
+      { label: 'Datenschutz', href: 'https://limosen.at/de/page/privacy' },
+    ],
+  },
+  {
+    title: 'Kontakt',
+    links: [
+      { label: CONTACT_PHONE, href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}` },
+      { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+      { label: 'Schreiben Sie uns', href: 'https://limosen.at/de/page/contact' },
+    ],
+  },
+];
 
 export default function App() {
   const [slideIndex, setSlideIndex] = useState(0);
@@ -72,6 +138,7 @@ export default function App() {
       <Box as="main" flex="1" display="flex" flexDirection="column" gap={0} className="homepage">
         <HeroSection background={HERO_SLIDES[slideIndex]} />
         <AboutSection />
+        <FleetSection />
         <OnlineBookingSection />
       </Box>
 
@@ -93,14 +160,17 @@ function HeaderBar() {
           gap={{ base: 2, md: 4 }}
         >
           <HStack spacing={3} className="header-bar__item">
-            <Icon as={FaEnvelopeOpenText} color="yellow.300" />
-            <Link href={`mailto:${CONTACT_EMAIL}`} color="yellow.300">
+            <Icon as={FaEnvelopeOpenText} color="#bb4338" />
+            <Link href={`mailto:${CONTACT_EMAIL}`} color="#bb4338">
               {CONTACT_EMAIL}
             </Link>
           </HStack>
           <HStack spacing={3} className="header-bar__item">
-            <Icon as={FaWhatsapp} color="yellow.300" />
-            <Link href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`} color="yellow.300">
+            <Icon as={FaWhatsapp} color="#00e676" />
+            <Link
+              href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`}
+              color="#00e676"
+            >
               {CONTACT_PHONE}
             </Link>
           </HStack>
@@ -152,6 +222,16 @@ function Navigation() {
             <HStack spacing={3} align="center" className="menu-right">
               <Image src={FLAG_SRC} alt="Deutsch" boxSize={6} />
               <Text fontWeight="semibold">DE</Text>
+              <Button
+                as={Link}
+                href="https://limosen.at/en"
+                size="sm"
+                variant="outline"
+                colorScheme="whiteAlpha"
+                _hover={{ bg: 'whiteAlpha.200' }}
+              >
+                Change
+              </Button>
               <Button
                 as={Link}
                 href="https://limosen.at/de/booking"
@@ -224,9 +304,58 @@ function AboutSection() {
   );
 }
 
+function FleetSection() {
+  return (
+    <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }}>
+      <Container maxW="6xl">
+        <VStack spacing={10} align="stretch">
+          <Heading size="lg" textAlign="center">
+            Unsere Fahrzeugflotte
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 10 }}>
+            {FLEET_VEHICLES.map((vehicle) => (
+              <Box
+                key={vehicle.image}
+                bg="#252525"
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="lg"
+              >
+                <Image
+                  src={vehicle.image}
+                  alt={vehicle.name}
+                  w="full"
+                  h={{ base: '220px', md: '260px' }}
+                  objectFit="cover"
+                />
+                <Stack spacing={3} p={6}>
+                  <Heading size="md">{vehicle.name}</Heading>
+                  <Text fontWeight="semibold" color="whiteAlpha.700">
+                    {vehicle.category}
+                  </Text>
+                  <Text color="whiteAlpha.800">{vehicle.description}</Text>
+                </Stack>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </VStack>
+      </Container>
+    </Box>
+  );
+}
+
 function OnlineBookingSection() {
   return (
-    <Box as="section" bg="#1f1f1f" py={{ base: 12, md: 16 }} className="online-booking">
+    <Box
+      as="section"
+      bg="#1f1f1f"
+      py={{ base: 12, md: 16 }}
+      className="online-booking"
+      bgImage={`url('${BOOKING_BACKGROUND}')`}
+      bgSize="cover"
+      bgPos="center"
+      bgRepeat="no-repeat"
+    >
       <Container maxW="4xl">
         <VStack spacing={5} textAlign="center">
           <Heading size="md" className="online-booking__title">
@@ -260,8 +389,58 @@ function OnlineBookingSection() {
 
 function Footer() {
   return (
-    <Box as="footer" bg="#121212" py={6} textAlign="center" fontSize="sm">
-      © All Rights Reserved LIMOSEN KG
+    <Box as="footer" bg="#0f0f0f" py={{ base: 12, md: 16 }}>
+      <Container maxW="6xl">
+        <VStack spacing={{ base: 10, md: 14 }} align="stretch">
+          <Flex direction={{ base: 'column', md: 'row' }} align="flex-start" gap={{ base: 8, md: 14 }}>
+            <Box flexShrink={0}>
+              <Image src={LOGO_SRC} alt="Limosen KG" h={{ base: 14, md: 16 }} objectFit="contain" />
+              <Text mt={4} color="whiteAlpha.700">
+                Premium Chauffeur-Service in Wien und darüber hinaus.
+              </Text>
+            </Box>
+            <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 8, md: 10 }} flex="1">
+              {FOOTER_LINK_GROUPS.map((group) => (
+                <VStack key={group.title} spacing={4} align="flex-start">
+                  <Text fontWeight="bold" textTransform="uppercase" letterSpacing="widest">
+                    {group.title}
+                  </Text>
+                  <VStack spacing={2} align="flex-start">
+                    {group.links.map((link) => (
+                      <Link key={link.label} href={link.href} color="whiteAlpha.700" _hover={{ color: 'white' }}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </VStack>
+                </VStack>
+              ))}
+            </SimpleGrid>
+          </Flex>
+          <Divider borderColor="whiteAlpha.200" />
+          <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between" gap={4}>
+            <Text fontSize="sm" color="whiteAlpha.700">
+              © {new Date().getFullYear()} LIMOSEN KG. Alle Rechte vorbehalten.
+            </Text>
+            <Wrap spacing={3}>
+              {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
+                <WrapItem key={label}>
+                  <IconButton
+                    as={Link}
+                    href={href}
+                    aria-label={label}
+                    icon={<IconComponent />}
+                    variant="ghost"
+                    colorScheme="whiteAlpha"
+                    isRound
+                    size="sm"
+                    isExternal
+                  />
+                </WrapItem>
+              ))}
+            </Wrap>
+          </Flex>
+        </VStack>
+      </Container>
     </Box>
   );
 }
@@ -285,7 +464,9 @@ function CookieNotice({ onAccept }) {
             Diese Seite verwendet Cookies. Mit der Weiternutzung der Seite, stimmst du die Verwendung von Cookies zu.
           </Text>
           <HStack spacing={4}>
-            <Text fontWeight="medium">Datenschutzerklärung</Text>
+            <Link href="https://limosen.at/de/page/privacy" fontWeight="medium" color="yellow.300">
+              Datenschutzerklärung
+            </Link>
             <Button colorScheme="yellow" onClick={onAccept} size="sm">
               Akzeptieren
             </Button>
