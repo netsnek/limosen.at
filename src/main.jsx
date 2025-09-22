@@ -4,6 +4,13 @@ import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import App from './App.jsx';
 
 const theme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        bg: '#424242',
+      },
+    },
+  },
   fonts: {
     heading: '"Segoe UI", sans-serif',
     body: '"Segoe UI", sans-serif',

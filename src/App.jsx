@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -30,49 +30,21 @@ const SOCIAL_LINKS = [
   { href: 'https://www.twitter.com/exclusive_a_t', label: 'Twitter', icon: FaTwitter },
 ];
 
+const HERO_IMAGES = [
+  "https://admin.limosen.at/uploads/WhatsApp%20Image%202020-05-12%20at%2002-1589244001207.jpeg",
+  'https://admin.limosen.at/uploads/beauty_of_vienna-wallpaper-1920x10802-1593739458218.jpg',
+];
+
 export default function App() {
   const [acceptedCookies, setAcceptedCookies] = useState(false);
 
   return (
-    <Box bg="gray.50" minH="100vh" display="flex" flexDirection="column">
+    <Box minH="100vh" display="flex" flexDirection="column">
       <TopBar />
       <Navigation />
       <HeroSection />
-
-      <Box as="main" flex="1" py={{ base: 10, md: 16 }}>
-        <Container maxW="6xl">
-          <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: 10, lg: 12 }} alignItems="stretch">
-            <VStack align="flex-start" spacing={6} maxW="2xl">
-              <Heading size="2xl" color="gray.800">
-                Über uns
-              </Heading>
-              <Text fontSize="lg" color="gray.700">
-                LIMOSEN KG verfolgt seit 2016 die sektoralen und technologischen Entwicklungen und ist das ganze Jahr rund um die
-                Uhr erreichbar. Unsere Flotte bestehend aus den modernsten Mercedes-Benz-Fahrzeugen mit unseren freundlichen,
-                professionellen und erfahrenen Fahrern und einer zuverlässigen, wirtschaftlichen und komfortablen Serviceauffassung
-                steigern wir die Servicequalität permanent und wachsen kontinuierlich weiter.
-              </Text>
-              <Text fontSize="lg" color="gray.700">
-                Kundenzufriedenheit ist unsere oberste Priorität und unser Unternehmen übt die Destinationen in unserem Portfolio in
-                bester Weise aus, um unseren Kunden die höchste Qualität zu bieten. Buchen sie heute und lassen Sie uns den Komfort
-                Ihrer Reise berücksichtigen.
-              </Text>
-              <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} align={{ base: 'stretch', sm: 'center' }}>
-                <Button as={Link} href="https://limosen.at/de/booking" colorScheme="yellow" size="lg" px={10}>
-                  Jetzt Buchen
-                </Button>
-                <Button as={Link} href="https://limosen.at/de/page/contact" variant="outline" colorScheme="yellow" size="lg" px={10}>
-                  Kontakt
-                </Button>
-              </Stack>
-            </VStack>
-
-            <AboutImage />
-            <ContactDetails />
-          </SimpleGrid>
-        </Container>
-      </Box>
-
+      <AboutSection />
+      <OnlineBookingSection />
       <Footer />
 
       {!acceptedCookies && (
@@ -99,33 +71,108 @@ export default function App() {
 }
 
 function HeroSection() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <Box
-      as="section"
-      bgImage="url('https://admin.limosen.at/uploads/beauty_of_vienna-wallpaper-1920x10802-1593739458218.jpg')"
-      bgSize="cover"
-      bgPos="center"
-      bgRepeat="no-repeat"
-      minH={{ base: '320px', md: '500px' }}
-    >
-      <Box bg="blackAlpha.400" w="full" h="full">
-        <Container maxW="6xl" minH={{ base: '320px', md: '500px' }} display="flex" alignItems="center">
-          <VStack spacing={4} align="flex-start" color="white" maxW="xl">
-            <Heading size="2xl">Exclusive Austrian Transfer</Heading>
+    <Box as="section" position="relative">
+      <Box
+        bgImage={`url('${HERO_IMAGES[activeSlide]}')`}
+        bgSize="cover"
+        bgPos="center"
+        bgRepeat="no-repeat"
+        minH={{ base: '360px', md: '520px' }}
+        transition="background-image 0.8s ease-in-out"
+      >
+        <Box bg="blackAlpha.500" w="full" h="full">
+          <Container maxW="6xl" minH={{ base: '360px', md: '520px' }} display="flex" alignItems="center">
+            <VStack spacing={5} align="flex-start" color="white" maxW="2xl">
+              <Heading size="2xl">Exclusive Austrian Transfer</Heading>
+              <Text fontSize="lg">
+                Ihr zuverlässiger Partner für exklusive Fahrten mit Mercedes-Benz Business- und First-Class-Fahrzeugen.
+              </Text>
+              <Stack direction={{ base: 'column', sm: 'row' }} spacing={4}>
+                <Button as={Link} href="https://limosen.at/de/booking" colorScheme="yellow" size="lg">
+                  Jetzt Buchen
+                </Button>
+                <Button as={Link} href="https://limosen.at/de/page/contact" variant="outline" colorScheme="whiteAlpha" size="lg">
+                  Kontakt
+                </Button>
+              </Stack>
+            </VStack>
+          </Container>
+        </Box>
+      </Box>
+
+      <HStack
+        position="absolute"
+        bottom={6}
+        left="50%"
+        transform="translateX(-50%)"
+        spacing={2}
+      >
+        {HERO_IMAGES.map((_, index) => (
+          <Box
+            key={index}
+            w={index === activeSlide ? 8 : 6}
+            h={index === activeSlide ? 2 : 1}
+            borderRadius="full"
+            bg={index === activeSlide ? 'yellow.300' : 'whiteAlpha.700'}
+            transition="all 0.3s ease"
+          />
+        ))}
+      </HStack>
+    </Box>
+  );
+}
+
+function AboutSection() {
+  return (
+    <Box as="section" flex="1" py={{ base: 10, md: 16 }}>
+      <Container maxW="6xl">
+        <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: 10, lg: 12 }} alignItems="stretch">
+          <VStack
+            align="flex-start"
+            spacing={6}
+            bg="#1c1c1c"
+            color="white"
+            borderRadius="xl"
+            p={{ base: 6, md: 10 }}
+            boxShadow="xl"
+          >
+            <Heading size="2xl">Über uns</Heading>
             <Text fontSize="lg">
-              Ihr zuverlässiger Partner für exklusive Fahrten mit Mercedes-Benz Business- und First-Class-Fahrzeugen.
+              LIMOSEN KG verfolgt seit 2016 die sektoralen und technologischen Entwicklungen und ist das ganze Jahr rund um die Uhr
+              erreichbar. Unsere Flotte bestehend aus den modernsten Mercedes-Benz-Fahrzeugen mit unseren freundlichen,
+              professionellen und erfahrenen Fahrern und einer zuverlässigen, wirtschaftlichen und komfortablen Serviceauffassung
+              steigern wir die Servicequalität permanent und wachsen kontinuierlich weiter.
             </Text>
-            <Stack direction={{ base: 'column', sm: 'row' }} spacing={4}>
-              <Button as={Link} href="https://limosen.at/de/booking" colorScheme="yellow" size="lg">
+            <Text fontSize="lg">
+              Kundenzufriedenheit ist unsere oberste Priorität und unser Unternehmen übt die Destinationen in unserem Portfolio in
+              bester Weise aus, um unseren Kunden die höchste Qualität zu bieten. Buchen sie heute und lassen Sie uns den Komfort
+              Ihrer Reise berücksichtigen.
+            </Text>
+            <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} align={{ base: 'stretch', sm: 'center' }}>
+              <Button as={Link} href="https://limosen.at/de/booking" colorScheme="yellow" size="lg" px={10}>
                 Jetzt Buchen
               </Button>
-              <Button as={Link} href="https://limosen.at/de/page/contact" variant="outline" colorScheme="whiteAlpha" size="lg">
+              <Button as={Link} href="https://limosen.at/de/page/contact" variant="outline" colorScheme="yellow" size="lg" px={10}>
                 Kontakt
               </Button>
             </Stack>
           </VStack>
-        </Container>
-      </Box>
+
+          <AboutImage />
+          <ContactDetails />
+        </SimpleGrid>
+      </Container>
     </Box>
   );
 }
@@ -245,6 +292,40 @@ function AboutImage() {
       bgPos="center"
       bgRepeat="no-repeat"
     />
+  );
+}
+
+function OnlineBookingSection() {
+  return (
+    <Box
+      as="section"
+      bgImage="url('https://limosen.at/_nuxt/img/home-2.32cb6f9.jpg')"
+      bgSize="cover"
+      bgPos="top"
+      bgRepeat="no-repeat"
+      py={{ base: 12, md: 20 }}
+      mt={-6}
+    >
+      <Box bg="blackAlpha.600">
+        <Container maxW="6xl">
+          <VStack spacing={6} color="white" textAlign="center">
+            <Heading size="lg">Buchen sie heute und lassen Sie uns den Komfort Ihrer Reise berücksichtigen.</Heading>
+            <Text fontSize="md">
+              Sie können uns telefonisch <Link href="https://api.whatsapp.com/send?phone=+43 660 876 06 06" color="yellow.200">+43 660 876 06 06</Link> und auch mit einer E-Mail unter{' '}
+              <Link href="mailto:office@limosen.at" color="yellow.200">office@limosen.at</Link> erreichen.
+            </Text>
+            <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} justify="center">
+              <Button as={Link} href="https://limosen.at/de/booking" colorScheme="yellow" size="lg">
+                Jetzt Buchen
+              </Button>
+              <Button as={Link} href="https://limosen.at/de/page/contact" variant="outline" colorScheme="yellow" size="lg">
+                Kontakt
+              </Button>
+            </Stack>
+          </VStack>
+        </Container>
+      </Box>
+    </Box>
   );
 }
 
