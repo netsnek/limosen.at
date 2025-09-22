@@ -53,6 +53,16 @@ const NAV_LINKS = [
   { label: 'Kontakt', href: 'https://limosen.at/de/page/contact' },
 ];
 
+const SERVICE_LINKS = [
+  { label: 'Flughafentransfer', href: '#flughafentransfer' },
+  { label: 'Stadtreise', href: '#stadtreise' },
+  { label: 'Individueller Fahrer-Service', href: '#individueller-fahrer-service' },
+  { label: 'Institutionelle Dienstleistungen', href: '#institutionelle-dienstleistungen' },
+  { label: 'Ortschaftstransfer', href: '#ortschaftstransfer' },
+  { label: 'Auslandtransfer', href: '#auslandtransfer' },
+  { label: 'Transfer Zwischen Den Bundesländern', href: '#transfer-zwischen-den-bundeslaendern' },
+];
+
 const SOCIAL_LINKS = [
   { label: 'Facebook', href: 'https://www.facebook.com/exclusiveaustriantransfer', icon: FaFacebookF },
   { label: 'Instagram', href: 'https://www.instagram.com/exclusive_austrian_transfer', icon: FaInstagram },
@@ -73,6 +83,101 @@ const LOGO_SRC = 'https://admin.limosen.at/uploads/7-1601985268947.png';
 const FLAG_SRC = 'https://limosen.at/flags/de.png';
 const ABOUT_IMAGE = 'https://limosen.at/_nuxt/img/cars.3ec3e98.jpg';
 const BOOKING_BACKGROUND = 'https://limosen.at/_nuxt/img/home-2.32cb6f9.jpg';
+
+const SERVICES_CONTENT = [
+  {
+    id: 'flughafentransfer',
+    title: 'Flughafentransfer',
+    image: 'https://admin.limosen.at/uploads/airport-transfer-1581462786357.jpg',
+    paragraphs: [
+      'Am internationalen Flughafen Wien bieten wir Ihnen mit dem professionellsten Transferservice der Stadt Luxus und Komfort.',
+      'Unsere, speziell für Sie eingerichteten vorgebuchten Luxusfahrzeuge warten mit erfahrenen Fahrern am Flughafen auf Ihre Transfer-Anordnungen.',
+      'Um Ihr Ziel nach Ihrer Landung zu erreichen, können sie sich sofort ein Fahrzeug zuteilen lassen.',
+      'Wir verhelfen Ihnen zu einem dynamischeren und energischeren Start in Ihren Urlaub und auf gleiche Weise, bringen wir Sie nach Ihrem Urlaub wieder auf den Flughafen zurück.',
+    ],
+  },
+  {
+    id: 'stadtreise',
+    title: 'Stadtreise',
+    image: 'https://admin.limosen.at/uploads/driver-1581462805549.jpg',
+    paragraphs: [
+      'Durch unseren Tour-Service zu allen touristischen Orten innerhalb Österreichs, bieten wir durch unsere Mercedes-Benz-Fahrzeuge Luxus und Komfort in Einem.',
+      'Mit unseren kompetenten Fahrern reisen Sie auf festgelegten Routen und finden Gelegenheit, die kulturelle, historische Struktur und Naturschönheiten Österreichs zu besichtigen.',
+      'Wir haben Touren zum Stephansdom, nach Hofburg, Schönbrunn, Kahlenberg, zur Salzburger Altstadt, Seepromenade, nach Hallstadt, Eisriesenwelt, zum Gollinger Wasserfall und noch zu vielen sehenswerten Orten.',
+      'Während Ihrer Tour sind wir für Ihre Sicherheit und Gelassenheit verantwortlich und wählen daher die praktischste, sicherste und einfachste Route aus.',
+      'Unser Unternehmen entwickelt sich diesbezüglich ständig weiter und ist bestrebt, seinen Gästen immer hochwertigen Service anzubieten.',
+      'Während Sie unsere sicheren und komfortablen Standards genießen, möchten wir Sie noch einmal darauf aufmerksam machen, dass Sie von allen Top-Einrichtungen, die wir Ihnen in unseren neuesten Mercedes-Benz Fahrzeugen anbieten, profitieren können.',
+      'Wenn Sie möchten, können Sie Ihre Tour in Begleitung des von uns zugewiesenen Reiseleiters durchführen, ein angenehmeres und besonderes Erlebnis haben und unvergessliche Erinnerungen sammeln.',
+    ],
+  },
+  {
+    id: 'individueller-fahrer-service',
+    title: 'Individueller Fahrer-Service',
+    image: 'https://admin.limosen.at/uploads/limousine-1581462830996.jpg',
+    paragraphs: [
+      'Wenn Sie zum Beispiel ein Meeting in Wien haben, einen Gast herumführen oder bequem zu Ihrer Arbeit fahren möchten benötigen Sie möglicherweise ein VIP-Fahrzeug der Marken Mercedes-Benz V-Klasse (Business Van), S-Klasse (First Class) und E-Klasse (Business Class).',
+      'Wenn Sie nach einem luxuriösen und komfortablen Service suchen, sind Sie hier richtig.',
+      'Wir garantieren Ihnen, dass die Zeit, die Sie im Verkehr verbringen, blitzschnell vergehen wird und die Umweltfaktoren keinen Einfluss auf Sie haben werden.',
+      'Darüber hinaus bieten wir Dienstleistungen wie privaten Fahrer mit Fremdsprachenkenntnissen und formeller Kleidung und auf Wunsch private Übersetzer an. Somit genießen Sie einen bequemeren Aufenthalt.',
+      'Da wir in jeder Hinsicht an Ihre Sicherheit und natürlich auch an die Sicherheit Ihrer Kinder denken, befindet sich im Fahrzeug auch ein Kindersitz.',
+      'Somit verbringen Sie eine sichere Fahrt im Verkehr und brauchen sich auch keine Sorgen um die Sicherheit Ihres Kindes zu machen.',
+      'Da private Transfers nach den Ankunftszeiten der Gäste organisiert werden, gibt es an den Flughäfen keine Wartezeit.',
+      'An den Ankunftsorten werden unsere Gäste von unseren Mitarbeitern empfangen und zu den Fahrzeugen geleitet, die sie transportieren werden.',
+      'Auf diese Weise gelangen sie zum richtigen Fahrzeug.',
+      'In unserem VIP-Fahrzeug der Marke Mercedes-Benz können Sie sich sicher und geborgen fühlen.',
+      'Obgleich unsere Mitarbeiter alles mögliche unternehmen werden, um Ihren Komfort und Ihre Bequemlichkeit zu gewährleisten, können Sie sich bezüglich Ihrer zusätzlichen Bedürfnisse an unser Unternehmen wenden und Anfragen stellen.',
+      'Da unsere Prinzipien auf Gastfreundschaft basieren, sind wir bestrebt unseren Gästen so gut wie möglich behilflich zu sein.',
+    ],
+  },
+  {
+    id: 'institutionelle-dienstleistungen',
+    title: 'Institutionelle Dienstleistungen',
+    image: null,
+    paragraphs: [
+      'Aufgrund unserer jahrelangen Erfahrung, versichern wir, dass alle, durch uns erbrachten Dienste im Rahmen eines gut durchdachten Planes und Programms erstellt wurden und unsere Qualitätsstandards ständig aktualisiert und an die weltweite Konjunktur angepasst werden.',
+      'Für die Transportanforderungen Ihres Unternehmens können Sie, indem Sie uns Informationen über Destinationen weitergeben, günstige Preisangebote erhalten und von unseren Pauschalpreisen profitieren.',
+      '• Organisationstransfers',
+      '• Touristischer Transfers',
+      '• Sportmannschaftstransfers',
+      '• Eröffnung, Feier Transfers',
+      '• Unternehmens- und Gewerkschaftstransfers',
+      '• Gruppentransfers',
+      '• Roadshow-Transfers',
+      '• Messentransfer',
+      '• Fahrzeugsoptionen in verschiedenen Segmenten',
+      'Wir bieten Lösungen in den Bereichen institutioneller Verkauf, Fahrzeugzuteilung. Jede bestätigte Reservierung, ist eine Zusage an Sie.',
+    ],
+  },
+  {
+    id: 'ortschaftstransfer',
+    title: 'Ortschaftstransfer',
+    image: null,
+    paragraphs: [
+      'Das Exclusive Austrian Transfer Team holt Sie vom Hotel, Wohnort, Adresse oder Aufenthaltsort, den Sie angegeben haben, ohne Wartezeiten ab und bringt Sie unabhängig von der Fahrstrecke unter Genuss einer hochwertigen Fahrt zum gewünschten Ankunftsort.',
+      'Anhand unserer Erfahrung in diesem Bereich bestimmen wir Ihre Route mit großer Sorgfalt und wählen die praktischste, sicherste und einfachste Route, um die Zeit, die sie im Verkehr verbringen werden, zu minimieren.',
+    ],
+  },
+  {
+    id: 'auslandtransfer',
+    title: 'Auslandtransfer',
+    image: null,
+    paragraphs: [
+      'Der Flughafen von Wien, eine der zentralsten Hauptstädte Europas, ist aufgrund seiner Lage der wichtigste Punkt für internationale Transfers.',
+      'Als Flughafen-Transferservice empfangen wir Sie, tragen Ihr Gepäck vorsichtig bis zum Fahrzeug und bringen Sie zu Ihrer gewünschten Destination wie z.B. Bratislava, Budapest, Prag, Venedig und weitere Orte innerhalb der Schengen-Ländern.',
+      'Gemäß unserer Unternehmensrichtlinien ist die Sicherheit unserer Kunden für uns einer der wichtigsten Faktoren.',
+      'Wir werden Sie bis zu Ihrer Ankunft in unseren Fahrzeugen begleiten und dank unserem Fahrzeug-Tracking-System werden Sie sich immer sicher fühlen und Ihre Reise genießen.',
+    ],
+  },
+  {
+    id: 'transfer-zwischen-den-bundeslaendern',
+    title: 'Transfer Zwischen Den Bundesländern',
+    image: null,
+    paragraphs: [
+      'Die Bundesrepublik Österreich besteht aus neun Bundesländern. Wien, Niederösterreich, Oberösterreich, Steiermark, Tirol, Kärnten, Salzburg, Vorarlberg, Burgenland.',
+      'In Österreich, wo Reisen zwischen den Bundesländern sehr intensiv sind, sorgen wir dafür, dass Sie nach Ihrer Landung wenn Sie kein Fahrzeug bereit haben oder öffentliche Verkehrsmittel aus zeitlichen Gründen nicht nutzen können, mit oder ohne Reservierung, sicher ihr Zielort erreichen.',
+    ],
+  },
+];
 
 const FLEET_VEHICLES = [
   {
@@ -160,6 +265,7 @@ export default function App() {
       <Box as="main" flex="1" display="flex" flexDirection="column" gap={0} className="homepage">
         <HeroSection background={HERO_SLIDES[slideIndex]} />
         <AboutSection />
+        <ServicesSection />
         <FleetSection />
         <OnlineBookingSection />
       </Box>
@@ -279,20 +385,35 @@ function TopNavigation() {
           gap={0}
         >
           <Box gridArea="empty" h={{ base: '12vh', md: '15vh' }} minH="100px" />
-          <LinkBox
+          <Box
             gridArea="services"
             display="flex"
-            alignItems="center"
+            flexDirection="column"
+            justifyContent="center"
             pl={{ base: 8, md: 16 }}
+            py={6}
             borderWidth="1px"
             borderLeft="0"
             borderBottom="0"
             borderColor="rgba(255, 255, 255, 0.08)"
-            transition="color 0.2s"
-            _hover={{ color: '#bb4338' }}
+            color="white"
           >
-            <LinkOverlay href="#fahrzeuge">Unsere Fahrzeuge</LinkOverlay>
-          </LinkBox>
+            <Text fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={4}>
+              Service
+            </Text>
+            <VStack align="flex-start" spacing={3}>
+              {SERVICE_LINKS.map((service) => (
+                <Link
+                  key={service.href}
+                  href={service.href}
+                  color="white"
+                  _hover={{ color: '#bb4338' }}
+                >
+                  {service.label}
+                </Link>
+              ))}
+            </VStack>
+          </Box>
           <LinkBox
             gridArea="team"
             display="flex"
@@ -404,6 +525,32 @@ function TopNavigation() {
           </Link>
           <Flex align="center" gap={{ base: 2, lg: 4 }}>
             <Flex display={{ base: 'none', lg: 'flex' }} align="center" gap={2}>
+              <Menu placement="bottom" gutter={4}>
+                <MenuButton
+                  as={Button}
+                  variant="ghost"
+                  fontSize="sm"
+                  fontWeight="semibold"
+                  color="#f5f5f5"
+                  rightIcon={<ChevronDownIcon color="#f5f5f5" />}
+                  _hover={{ color: '#bb4338', bg: 'whiteAlpha.200' }}
+                  _expanded={{ bg: 'whiteAlpha.200', color: '#bb4338' }}
+                >
+                  Service
+                </MenuButton>
+                <MenuList bg="#1c1c1c" borderColor="rgba(255, 255, 255, 0.1)" color="white">
+                  {SERVICE_LINKS.map((service) => (
+                    <MenuItem
+                      key={service.href}
+                      as={Link}
+                      href={service.href}
+                      _hover={{ bg: 'whiteAlpha.200', color: '#bb4338' }}
+                    >
+                      {service.label}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
               {NAV_LINKS.map((link) => (
                 <Button
                   key={link.href}
@@ -540,6 +687,47 @@ function AboutSection() {
             bgRepeat="no-repeat"
           />
         </Flex>
+      </Container>
+    </Box>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }} id="services">
+      <Container maxW="6xl">
+        <VStack spacing={{ base: 12, md: 16 }} align="stretch">
+          {SERVICES_CONTENT.map((service) => (
+            <Box key={service.id} id={service.id}>
+              <VStack spacing={3} align="center" textAlign="center">
+                <Heading size="lg">{service.title}</Heading>
+                <Divider borderColor="whiteAlpha.300" w={{ base: '60px', md: '80px' }} />
+              </VStack>
+              <Flex
+                mt={{ base: 6, md: 10 }}
+                direction={{ base: 'column', md: service.image ? 'row' : 'column' }}
+                gap={{ base: 6, md: 10 }}
+                align="stretch"
+              >
+                {service.image && (
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    flex={{ base: 'none', md: '0 0 40%' }}
+                    borderRadius="lg"
+                    objectFit="cover"
+                    h={{ base: '220px', md: '100%' }}
+                  />
+                )}
+                <Stack spacing={3} flex="1" color="whiteAlpha.900">
+                  {service.paragraphs.map((paragraph, index) => (
+                    <Text key={index}>{paragraph}</Text>
+                  ))}
+                </Stack>
+              </Flex>
+            </Box>
+          ))}
+        </VStack>
       </Container>
     </Box>
   );
