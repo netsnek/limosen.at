@@ -477,14 +477,10 @@ function TopNavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [menuActive, setMenuActive] = useState(false);
 
-  const closeMenu = useCallback(() => {
-    setMenuActive(false);
-    onClose();
-  }, [onClose]);
-
   const toggleMenu = () => {
     if (isOpen) {
-      closeMenu();
+      setMenuActive(false);
+      onClose();
     } else {
       setMenuActive(true);
       onOpen();
@@ -494,13 +490,14 @@ function TopNavigation() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        closeMenu();
+        setMenuActive(false);
+        onClose();
       }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [closeMenu]);
+  }, [onClose]);
 
   return (
     <Box
@@ -537,62 +534,20 @@ function TopNavigation() {
           gap={0}
         >
           <Box gridArea="empty" h={{ base: '12vh', md: '15vh' }} minH="100px" />
-          <Box
+          <LinkBox
             gridArea="services"
             display="flex"
-            flexDirection="column"
-            justifyContent="center"
+            alignItems="center"
             pl={{ base: 8, md: 16 }}
-            py={6}
             borderWidth="1px"
             borderLeft="0"
             borderBottom="0"
             borderColor="rgba(255, 255, 255, 0.08)"
-            color="white"
+            transition="color 0.2s"
+            _hover={{ color: '#bb4338' }}
           >
-            <Text fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={4}>
-              Services
-            </Text>
-            <Button
-              as={Link}
-              href="#services"
-              variant="outline"
-              size="sm"
-              colorScheme="whiteAlpha"
-              borderColor="rgba(255, 255, 255, 0.24)"
-              _hover={{ bg: 'whiteAlpha.200', borderColor: '#bb4338', color: '#bb4338' }}
-              display={{ base: 'inline-flex', md: 'none' }}
-              onClick={(event) => {
-                event.preventDefault();
-                if (typeof window !== 'undefined') {
-                  window.location.hash = 'services';
-                }
-                closeMenu();
-              }}
-            >
-              Unsere Services
-            </Button>
-            <Wrap spacing={3} shouldWrapChildren display={{ base: 'none', md: 'flex' }}>
-              {SERVICE_LINKS.map((service) => (
-                <Button
-                  key={service.href}
-                  as={Link}
-                  href={service.href}
-                  variant="outline"
-                  size="sm"
-                  colorScheme="whiteAlpha"
-                  borderColor="rgba(255, 255, 255, 0.24)"
-                  _hover={{ bg: 'whiteAlpha.200', borderColor: '#bb4338', color: '#bb4338' }}
-                  onClick={(event) => {
-                    handleServiceLinkClick(event, service.href);
-                    closeMenu();
-                  }}
-                >
-                  {service.label}
-                </Button>
-              ))}
-            </Wrap>
-          </Box>
+            <LinkOverlay href="#fahrzeuge">Unsere Fahrzeuge</LinkOverlay>
+          </LinkBox>
           <LinkBox
             gridArea="team"
             display="flex"
