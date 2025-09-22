@@ -14,6 +14,10 @@ import {
   Link,
   LinkBox,
   LinkOverlay,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   SimpleGrid,
   Stack,
   Text,
@@ -23,6 +27,7 @@ import {
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   FaEnvelopeOpen,
   FaEnvelopeOpenText,
@@ -42,7 +47,7 @@ const CONTACT_PHONE_TEL = '+436608760606';
 
 const NAV_LINKS = [
   { label: 'Hauptseite', href: 'https://limosen.at/de' },
-  { label: 'Unsere Fahrzeuge', href: 'https://limosen.at/de/cars' },
+  { label: 'Unsere Fahrzeuge', href: '#fahrzeuge' },
   { label: 'Kundenfeedback', href: 'https://limosen.at/de/feedback' },
   { label: 'Registrieren', href: 'https://limosen.at/de/register/driver' },
   { label: 'Kontakt', href: 'https://limosen.at/de/page/contact' },
@@ -243,14 +248,14 @@ function TopNavigation() {
     <Box
       pos="relative"
       overflow="hidden"
-      backgroundColor="#dee9ec"
+      backgroundColor="#1c1c1c"
       height={isOpen ? 'calc(100vh + 15px)' : { base: '12vh', md: '15vh' }}
       minH={isOpen ? '600px' : '100px'}
       transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
     >
       <Box
         pos="relative"
-        bg="#0f0f0f"
+        bg="#1c1c1c"
         color="white"
         transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
         height={isOpen ? 'max(600px, calc(100vh + 15px))' : '0'}
@@ -286,7 +291,7 @@ function TopNavigation() {
             transition="color 0.2s"
             _hover={{ color: '#bb4338' }}
           >
-            <LinkOverlay href="https://limosen.at/de/cars">Unsere Fahrzeuge</LinkOverlay>
+            <LinkOverlay href="#fahrzeuge">Unsere Fahrzeuge</LinkOverlay>
           </LinkBox>
           <LinkBox
             gridArea="team"
@@ -407,32 +412,57 @@ function TopNavigation() {
                   variant="ghost"
                   fontSize="sm"
                   fontWeight="semibold"
-                  color="#273E53"
+                  color="#f5f5f5"
                   _hover={{ color: '#bb4338', bg: 'whiteAlpha.200' }}
                 >
                   {link.label}
                 </Button>
               ))}
             </Flex>
-            <HStack spacing={2} display="flex">
-              <Tooltip label="Deutsch" hasArrow>
-                <Image src={FLAG_SRC} alt="Deutsch" boxSize={6} />
-              </Tooltip>
-              <Text fontWeight="semibold" color="#273E53">
-                DE
-              </Text>
-              <Button
-                as={Link}
-                href="https://limosen.at/en"
-                size="sm"
-                variant="outline"
-                color="#273E53"
-                borderColor="#273E53"
-                _hover={{ bg: 'white', color: '#bb4338', borderColor: '#bb4338' }}
+            <Menu placement="bottom-end">
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                color="#f5f5f5"
+                px={2}
+                _hover={{ bg: 'whiteAlpha.200' }}
+                _expanded={{ bg: 'whiteAlpha.200' }}
+                rightIcon={<ChevronDownIcon color="#f5f5f5" />}
               >
-                Change
-              </Button>
-            </HStack>
+                <HStack spacing={2}>
+                  <Tooltip label="Deutsch" hasArrow>
+                    <Image src={FLAG_SRC} alt="Deutsch" boxSize={6} />
+                  </Tooltip>
+                  <Text fontWeight="semibold" color="#f5f5f5">
+                    DE
+                  </Text>
+                </HStack>
+              </MenuButton>
+              <MenuList bg="#1c1c1c" borderColor="rgba(255, 255, 255, 0.1)" color="white">
+                <MenuItem
+                  as={Link}
+                  href="https://limosen.at/en"
+                  display="flex"
+                  alignItems="center"
+                  gap={3}
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                >
+                  <Image src="https://limosen.at/flags/en.png" alt="English" boxSize={8} />
+                  <Text>English</Text>
+                </MenuItem>
+                <MenuItem
+                  as={Link}
+                  href="https://limosen.at/tr"
+                  display="flex"
+                  alignItems="center"
+                  gap={3}
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                >
+                  <Image src="https://limosen.at/flags/tr.png" alt="Türkçe" boxSize={8} />
+                  <Text>Türkçe</Text>
+                </MenuItem>
+              </MenuList>
+            </Menu>
             <Button
               as={Link}
               href="https://limosen.at/de/booking"
@@ -517,7 +547,7 @@ function AboutSection() {
 
 function FleetSection() {
   return (
-    <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }}>
+    <Box as="section" id="fahrzeuge" bg="#1b1b1b" py={{ base: 12, md: 20 }}>
       <Container maxW="6xl">
         <VStack spacing={10} align="stretch">
           <Heading size="lg" textAlign="center">
