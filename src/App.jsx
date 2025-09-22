@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Accordion,
   AccordionButton,
@@ -309,6 +309,7 @@ function useServiceAccordionNavigation(serviceIds) {
   }, [serviceIds]);
 
   const [expandedIndices, setExpandedIndices] = useState([]);
+  const pendingScrollIdRef = useRef(null);
 
   const scrollToService = useCallback((id) => {
     if (typeof window === 'undefined') {
@@ -330,10 +331,10 @@ function useServiceAccordionNavigation(serviceIds) {
       }
 
       const index = idToIndex[targetId];
+      pendingScrollIdRef.current = targetId;
       setExpandedIndices([index]);
-      scrollToService(targetId);
     },
-    [idToIndex, scrollToService]
+    [idToIndex]
   );
 
   useEffect(() => {
@@ -374,6 +375,16 @@ function useServiceAccordionNavigation(serviceIds) {
     window.addEventListener(SERVICE_NAVIGATION_EVENT, handleNavigation);
     return () => window.removeEventListener(SERVICE_NAVIGATION_EVENT, handleNavigation);
   }, [openServiceById]);
+
+  useEffect(() => {
+    if (!pendingScrollIdRef.current) {
+      return;
+    }
+
+    const targetId = pendingScrollIdRef.current;
+    pendingScrollIdRef.current = null;
+    scrollToService(targetId);
+  }, [expandedIndices, scrollToService]);
 
   const handleAccordionChange = useCallback((value) => {
     if (Array.isArray(value)) {
