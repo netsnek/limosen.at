@@ -24,7 +24,9 @@ import {
   FaFacebookF,
   FaInstagram,
   FaPhone,
+  FaSuitcaseRolling,
   FaTwitter,
+  FaUser,
   FaWhatsapp,
 } from 'react-icons/fa';
 
@@ -64,26 +66,34 @@ const FLEET_VEHICLES = [
   {
     name: 'Mercedes-Benz E Klasse',
     category: 'Business Class',
-    description: 'E 350 d 4MATIC - 2020',
+    description: 'E 350 d AMG Line - 2015 / 2016',
     image: 'https://admin.limosen.at/uploads/mercedes-benz-e-klasse%20e350d-1589814289680.jpg',
+    passengers: 4,
+    luggage: 3,
   },
   {
     name: 'Mercedes-Benz V Klasse',
-    category: 'Business Van',
+    category: 'Business Class',
     description: 'V 250 d extralang - 2018',
     image: 'https://admin.limosen.at/uploads/vclass-1581462635925.jpeg',
+    passengers: 7,
+    luggage: 7,
   },
   {
     name: 'Mercedes-Benz S Klasse',
     category: 'First Class',
     description: 'S 400 d lang 4MATIC - 2020',
     image: 'https://admin.limosen.at/uploads/sclass-1581462643811.jpeg',
+    passengers: 3,
+    luggage: 2,
   },
   {
     name: 'Mercedes-Benz E Klasse',
     category: 'Business Class',
-    description: 'E 220 d 4MATIC - 2020',
+    description: 'E 220 d AMG Line - 2017 / 2018 / 2019',
     image: 'https://admin.limosen.at/uploads/eclass-1581462657307.jpeg',
+    passengers: 4,
+    luggage: 3,
   },
 ];
 
@@ -334,6 +344,24 @@ function FleetSection() {
                     {vehicle.category}
                   </Text>
                   <Text color="whiteAlpha.800">{vehicle.description}</Text>
+                  <Wrap spacing={6} pt={2}>
+                    <WrapItem>
+                      <HStack spacing={2}>
+                        <Icon as={FaUser} color="#319fb9" />
+                        <Text color="whiteAlpha.800" fontWeight="medium">
+                          Passagieranzahl: {vehicle.passengers}
+                        </Text>
+                      </HStack>
+                    </WrapItem>
+                    <WrapItem>
+                      <HStack spacing={2}>
+                        <Icon as={FaSuitcaseRolling} color="#319fb9" />
+                        <Text color="whiteAlpha.800" fontWeight="medium">
+                          Gepäckanzahl: {vehicle.luggage}
+                        </Text>
+                      </HStack>
+                    </WrapItem>
+                  </Wrap>
                 </Stack>
               </Box>
             ))}
