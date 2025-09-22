@@ -18,6 +18,8 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  List,
+  ListItem,
   SimpleGrid,
   Stack,
   Text,
@@ -46,6 +48,7 @@ const CONTACT_PHONE = '+43 660 876 06 06';
 const CONTACT_PHONE_TEL = '+436608760606';
 
 const NAV_LINKS = [
+  { label: 'Service', href: '#services' },
   { label: 'Hauptseite', href: 'https://limosen.at/de' },
   { label: 'Unsere Fahrzeuge', href: '#fahrzeuge' },
   { label: 'Kundenfeedback', href: 'https://limosen.at/de/feedback' },
@@ -399,20 +402,24 @@ function TopNavigation() {
             color="white"
           >
             <Text fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={4}>
-              Service
+              Services
             </Text>
-            <VStack align="flex-start" spacing={3}>
+            <Wrap spacing={3} shouldWrapChildren>
               {SERVICE_LINKS.map((service) => (
-                <Link
+                <Button
                   key={service.href}
+                  as={Link}
                   href={service.href}
-                  color="white"
-                  _hover={{ color: '#bb4338' }}
+                  variant="outline"
+                  size="sm"
+                  colorScheme="whiteAlpha"
+                  borderColor="rgba(255, 255, 255, 0.24)"
+                  _hover={{ bg: 'whiteAlpha.200', borderColor: '#bb4338', color: '#bb4338' }}
                 >
                   {service.label}
-                </Link>
+                </Button>
               ))}
-            </VStack>
+            </Wrap>
           </Box>
           <LinkBox
             gridArea="team"
@@ -525,32 +532,6 @@ function TopNavigation() {
           </Link>
           <Flex align="center" gap={{ base: 2, lg: 4 }}>
             <Flex display={{ base: 'none', lg: 'flex' }} align="center" gap={2}>
-              <Menu placement="bottom" gutter={4}>
-                <MenuButton
-                  as={Button}
-                  variant="ghost"
-                  fontSize="sm"
-                  fontWeight="semibold"
-                  color="#f5f5f5"
-                  rightIcon={<ChevronDownIcon color="#f5f5f5" />}
-                  _hover={{ color: '#bb4338', bg: 'whiteAlpha.200' }}
-                  _expanded={{ bg: 'whiteAlpha.200', color: '#bb4338' }}
-                >
-                  Service
-                </MenuButton>
-                <MenuList bg="#1c1c1c" borderColor="rgba(255, 255, 255, 0.1)" color="white">
-                  {SERVICE_LINKS.map((service) => (
-                    <MenuItem
-                      key={service.href}
-                      as={Link}
-                      href={service.href}
-                      _hover={{ bg: 'whiteAlpha.200', color: '#bb4338' }}
-                    >
-                      {service.label}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
               {NAV_LINKS.map((link) => (
                 <Button
                   key={link.href}
@@ -693,40 +674,101 @@ function AboutSection() {
 }
 
 function ServicesSection() {
+  const createContentBlocks = (paragraphs) => {
+    const blocks = [];
+    let listItems = [];
+
+    paragraphs.forEach((paragraph) => {
+      const trimmed = paragraph.trim();
+      if (trimmed.startsWith('•')) {
+        listItems.push(trimmed.replace(/^•\s*/, ''));
+      } else {
+        if (listItems.length) {
+          blocks.push({ type: 'list', items: listItems });
+          listItems = [];
+        }
+        blocks.push({ type: 'text', text: paragraph });
+      }
+    });
+
+    if (listItems.length) {
+      blocks.push({ type: 'list', items: listItems });
+    }
+
+    return blocks;
+  };
+
   return (
     <Box as="section" bg="#1b1b1b" py={{ base: 12, md: 20 }} id="services">
       <Container maxW="6xl">
         <VStack spacing={{ base: 12, md: 16 }} align="stretch">
-          {SERVICES_CONTENT.map((service) => (
-            <Box key={service.id} id={service.id}>
-              <VStack spacing={3} align="center" textAlign="center">
-                <Heading size="lg">{service.title}</Heading>
-                <Divider borderColor="whiteAlpha.300" w={{ base: '60px', md: '80px' }} />
-              </VStack>
-              <Flex
-                mt={{ base: 6, md: 10 }}
-                direction={{ base: 'column', md: service.image ? 'row' : 'column' }}
-                gap={{ base: 6, md: 10 }}
-                align="stretch"
+          <VStack spacing={3} textAlign="center">
+            <Heading size="lg">Unsere Services</Heading>
+            <Text color="whiteAlpha.700" maxW="3xl">
+              Entdecken Sie unser gesamtes Leistungsspektrum – vom Flughafentransfer bis hin zu maßgeschneiderten
+              Business-Lösungen für Ihr Unternehmen.
+            </Text>
+            <Divider borderColor="whiteAlpha.300" w={{ base: '80px', md: '120px' }} />
+          </VStack>
+          {SERVICES_CONTENT.map((service, index) => {
+            const blocks = createContentBlocks(service.paragraphs);
+            const hasImage = Boolean(service.image);
+            const isEven = index % 2 === 0;
+
+            return (
+              <Box
+                key={service.id}
+                id={service.id}
+                bgGradient="linear(to-b, rgba(255,255,255,0.04), rgba(255,255,255,0.02))"
+                borderRadius="2xl"
+                border="1px solid"
+                borderColor="whiteAlpha.100"
+                boxShadow="2xl"
+                overflow="hidden"
               >
-                {service.image && (
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    flex={{ base: 'none', md: '0 0 40%' }}
-                    borderRadius="lg"
-                    objectFit="cover"
-                    h={{ base: '220px', md: '100%' }}
-                  />
-                )}
-                <Stack spacing={3} flex="1" color="whiteAlpha.900">
-                  {service.paragraphs.map((paragraph, index) => (
-                    <Text key={index}>{paragraph}</Text>
-                  ))}
-                </Stack>
-              </Flex>
-            </Box>
-          ))}
+                <Flex
+                  direction={{ base: 'column', md: hasImage ? (isEven ? 'row' : 'row-reverse') : 'column' }}
+                  align="stretch"
+                >
+                  {hasImage && (
+                    <Box flex={{ base: 'none', md: '0 0 40%' }}>
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        objectFit="cover"
+                        w="full"
+                        h={{ base: '220px', md: '100%' }}
+                      />
+                    </Box>
+                  )}
+                  <Stack
+                    spacing={4}
+                    flex="1"
+                    p={{ base: 6, md: 8 }}
+                    bg={hasImage ? 'transparent' : 'rgba(0,0,0,0.35)'}
+                  >
+                    <Heading size="md">{service.title}</Heading>
+                    <Stack spacing={4} color="whiteAlpha.900" fontSize="lg">
+                      {blocks.map((block, blockIndex) => {
+                        if (block.type === 'list') {
+                          return (
+                            <List key={blockIndex} spacing={2} pl={4} styleType="disc" color="whiteAlpha.900">
+                              {block.items.map((item, itemIndex) => (
+                                <ListItem key={itemIndex}>{item}</ListItem>
+                              ))}
+                            </List>
+                          );
+                        }
+                        return (
+                          <Text key={blockIndex}>{block.text}</Text>
+                        );
+                      })}
+                    </Stack>
+                  </Stack>
+                </Flex>
+              </Box>
+            );
+          })}
         </VStack>
       </Container>
     </Box>
