@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Accordion,
   AccordionButton,
@@ -91,6 +91,31 @@ const LOGO_SRC = 'https://admin.limosen.at/uploads/7-1601985268947.png';
 const FLAG_SRC = 'https://limosen.at/flags/de.png';
 const ABOUT_IMAGE = 'https://limosen.at/_nuxt/img/cars.3ec3e98.jpg';
 const BOOKING_BACKGROUND = 'https://limosen.at/_nuxt/img/home-2.32cb6f9.jpg';
+
+const SERVICE_NAVIGATION_EVENT = 'service-accordion:navigate';
+
+function emitServiceNavigation(target) {
+  if (typeof window === 'undefined' || !target) {
+    return;
+  }
+
+  const targetId = target.replace(/^#/, '');
+
+  window.dispatchEvent(
+    new CustomEvent(SERVICE_NAVIGATION_EVENT, {
+      detail: targetId,
+    })
+  );
+}
+
+function handleServiceLinkClick(event, targetHref) {
+  if (!targetHref || !targetHref.startsWith('#')) {
+    return;
+  }
+
+  event?.preventDefault();
+  emitServiceNavigation(targetHref);
+}
 
 const FAQ_ITEMS = [
   {
@@ -274,6 +299,98 @@ const FOOTER_LINK_GROUPS = [
   },
 ];
 
+function useServiceAccordionNavigation(serviceIds) {
+  const idToIndex = useMemo(() => {
+    const mapping = {};
+    serviceIds.forEach((id, index) => {
+      mapping[id] = index;
+    });
+    return mapping;
+  }, [serviceIds]);
+
+  const [expandedIndices, setExpandedIndices] = useState([]);
+
+  const scrollToService = useCallback((id) => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const element = document.getElementById(id);
+    if (element) {
+      window.requestAnimationFrame(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, []);
+
+  const openServiceById = useCallback(
+    (targetId) => {
+      if (!targetId || !(targetId in idToIndex)) {
+        return;
+      }
+
+      const index = idToIndex[targetId];
+      setExpandedIndices([index]);
+      scrollToService(targetId);
+    },
+    [idToIndex, scrollToService]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return () => {};
+    }
+
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      openServiceById(hash);
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [openServiceById]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return () => {};
+    }
+
+    const handleNavigation = (event) => {
+      const targetId = typeof event.detail === 'string' ? event.detail : '';
+      if (!targetId) {
+        return;
+      }
+
+      openServiceById(targetId);
+
+      const currentHash = window.location.hash.replace('#', '');
+      if (currentHash !== targetId) {
+        window.history?.pushState?.(null, '', `#${targetId}`);
+      }
+    };
+
+    window.addEventListener(SERVICE_NAVIGATION_EVENT, handleNavigation);
+    return () => window.removeEventListener(SERVICE_NAVIGATION_EVENT, handleNavigation);
+  }, [openServiceById]);
+
+  const handleAccordionChange = useCallback((value) => {
+    if (Array.isArray(value)) {
+      setExpandedIndices(value);
+    } else if (typeof value === 'number') {
+      setExpandedIndices([value]);
+    } else {
+      setExpandedIndices([]);
+    }
+  }, []);
+
+  return {
+    expandedIndices,
+    handleAccordionChange,
+  };
+}
+
 export default function App() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [showCookies, setShowCookies] = useState(true);
@@ -360,10 +477,14 @@ function TopNavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [menuActive, setMenuActive] = useState(false);
 
+  const closeMenu = useCallback(() => {
+    setMenuActive(false);
+    onClose();
+  }, [onClose]);
+
   const toggleMenu = () => {
     if (isOpen) {
-      setMenuActive(false);
-      onClose();
+      closeMenu();
     } else {
       setMenuActive(true);
       onOpen();
@@ -373,14 +494,13 @@ function TopNavigation() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        setMenuActive(false);
-        onClose();
+        closeMenu();
       }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [onClose]);
+  }, [closeMenu]);
 
   return (
     <Box
@@ -433,7 +553,26 @@ function TopNavigation() {
             <Text fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={4}>
               Services
             </Text>
-            <Wrap spacing={3} shouldWrapChildren>
+            <Button
+              as={Link}
+              href="#services"
+              variant="outline"
+              size="sm"
+              colorScheme="whiteAlpha"
+              borderColor="rgba(255, 255, 255, 0.24)"
+              _hover={{ bg: 'whiteAlpha.200', borderColor: '#bb4338', color: '#bb4338' }}
+              display={{ base: 'inline-flex', md: 'none' }}
+              onClick={(event) => {
+                event.preventDefault();
+                if (typeof window !== 'undefined') {
+                  window.location.hash = 'services';
+                }
+                closeMenu();
+              }}
+            >
+              Unsere Services
+            </Button>
+            <Wrap spacing={3} shouldWrapChildren display={{ base: 'none', md: 'flex' }}>
               {SERVICE_LINKS.map((service) => (
                 <Button
                   key={service.href}
@@ -444,6 +583,10 @@ function TopNavigation() {
                   colorScheme="whiteAlpha"
                   borderColor="rgba(255, 255, 255, 0.24)"
                   _hover={{ bg: 'whiteAlpha.200', borderColor: '#bb4338', color: '#bb4338' }}
+                  onClick={(event) => {
+                    handleServiceLinkClick(event, service.href);
+                    closeMenu();
+                  }}
                 >
                   {service.label}
                 </Button>
@@ -703,6 +846,9 @@ function AboutSection() {
 }
 
 function ServicesSection() {
+  const serviceIds = useMemo(() => SERVICES_CONTENT.map((service) => service.id), []);
+  const { expandedIndices, handleAccordionChange } = useServiceAccordionNavigation(serviceIds);
+
   const createContentBlocks = (paragraphs) => {
     const blocks = [];
     let listItems = [];
@@ -746,62 +892,81 @@ function ServicesSection() {
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 6, md: 8 }}>
-            {SERVICES_CONTENT.map((service) => (
-              <LinkBox
-                key={service.id}
-                id={`${service.id}-overview`}
-                bg="#252525"
-                borderRadius="xl"
-                overflow="hidden"
-                border="1px solid"
-                borderColor="whiteAlpha.100"
-                boxShadow="lg"
-                role="group"
-                transition="transform 0.2s ease, box-shadow 0.2s ease"
-                _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
-              >
-                {service.image && (
-                  <Box h="160px" overflow="hidden">
-                    <Image
-                      src={service.image}
-                      alt={service.title}
-                      w="full"
-                      h="full"
-                      objectFit="cover"
-                      transform="scale(1)"
-                      transition="transform 0.4s"
-                      _groupHover={{ transform: 'scale(1.05)' }}
-                    />
+            {SERVICES_CONTENT.map((service) => {
+              const targetHref = `#${service.id}`;
+
+              return (
+                <LinkBox
+                  key={service.id}
+                  id={`${service.id}-overview`}
+                  bg="#252525"
+                  borderRadius="xl"
+                  overflow="hidden"
+                  border="1px solid"
+                  borderColor="whiteAlpha.100"
+                  boxShadow="lg"
+                  role="group"
+                  transition="transform 0.2s ease, box-shadow 0.2s ease"
+                  _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
+                >
+                  {service.image && (
+                    <Box h="160px" overflow="hidden">
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        w="full"
+                        h="full"
+                        objectFit="cover"
+                        transform="scale(1)"
+                        transition="transform 0.4s"
+                        _groupHover={{ transform: 'scale(1.05)' }}
+                      />
+                    </Box>
+                  )}
+                  <Box p={6}>
+                    <LinkOverlay
+                      href={targetHref}
+                      display="block"
+                      onClick={(event) => handleServiceLinkClick(event, targetHref)}
+                    >
+                      <Stack spacing={3}>
+                        <Heading size="sm">{service.title}</Heading>
+                        <Text color="whiteAlpha.800" fontSize="sm" noOfLines={3}>
+                          {summaryText(service.paragraphs)}
+                        </Text>
+                        <Text fontWeight="semibold" color="#bb4338">
+                          Mehr erfahren →
+                        </Text>
+                      </Stack>
+                    </LinkOverlay>
                   </Box>
-                )}
-                <Box p={6}>
-                  <LinkOverlay href={`#${service.id}`} display="block">
-                    <Stack spacing={3}>
-                      <Heading size="sm">{service.title}</Heading>
-                      <Text color="whiteAlpha.800" fontSize="sm" noOfLines={3}>
-                        {summaryText(service.paragraphs)}
-                      </Text>
-                      <Text fontWeight="semibold" color="#bb4338">
-                        Mehr erfahren →
-                      </Text>
-                    </Stack>
-                  </LinkOverlay>
-                </Box>
-              </LinkBox>
-            ))}
+                </LinkBox>
+              );
+            })}
           </SimpleGrid>
 
           <Box>
             <Heading size="md" mb={4} textAlign="center">
               Details zu unseren Leistungen
             </Heading>
-            <Accordion allowMultiple reduceMotion>
+            <Accordion
+              allowMultiple
+              reduceMotion
+              index={expandedIndices}
+              onChange={handleAccordionChange}
+            >
               {SERVICES_CONTENT.map((service) => {
                 const blocks = createContentBlocks(service.paragraphs);
                 const hasImage = Boolean(service.image);
 
                 return (
-                  <AccordionItem key={service.id} id={service.id} border="none" mb={4}>
+                  <AccordionItem
+                    key={service.id}
+                    id={service.id}
+                    border="none"
+                    mb={4}
+                    scrollMarginTop={{ base: '120px', md: '160px' }}
+                  >
                     <h3>
                       <AccordionButton
                         bg="rgba(255, 255, 255, 0.04)"
