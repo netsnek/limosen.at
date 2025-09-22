@@ -5,15 +5,20 @@ import {
   Container,
   Divider,
   Flex,
+  Grid,
   Heading,
   HStack,
   Icon,
   IconButton,
   Image,
   Link,
+  LinkBox,
+  LinkOverlay,
   SimpleGrid,
   Stack,
   Text,
+  Tooltip,
+  useDisclosure,
   VStack,
   Wrap,
   WrapItem,
@@ -21,6 +26,7 @@ import {
 import {
   FaEnvelopeOpen,
   FaEnvelopeOpenText,
+  FaBars,
   FaFacebookF,
   FaInstagram,
   FaPhone,
@@ -32,6 +38,7 @@ import {
 
 const CONTACT_EMAIL = 'office@limosen.at';
 const CONTACT_PHONE = '+43 660 876 06 06';
+const CONTACT_PHONE_TEL = '+436608760606';
 
 const NAV_LINKS = [
   { label: 'Hauptseite', href: 'https://limosen.at/de' },
@@ -142,7 +149,7 @@ export default function App() {
     <Box minH="100vh" bg="#424242" color="whiteAlpha.900" display="flex" flexDirection="column">
       <Box as="header" className="main-wrapper">
         <HeaderBar />
-        <Navigation />
+        <TopNavigation />
       </Box>
 
       <Box as="main" flex="1" display="flex" flexDirection="column" gap={0} className="homepage">
@@ -206,54 +213,248 @@ function HeaderBar() {
   );
 }
 
-function Navigation() {
+function TopNavigation() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [menuActive, setMenuActive] = useState(false);
+
+  const toggleMenu = () => {
+    if (isOpen) {
+      setMenuActive(false);
+      onClose();
+    } else {
+      setMenuActive(true);
+      onOpen();
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMenuActive(false);
+        onClose();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [onClose]);
+
   return (
-    <Box bg="#252525" borderBottom="1px solid rgba(255, 255, 255, 0.08)" className="header">
-      <Container maxW="6xl" py={6} className="container">
-        <VStack spacing={6} w="full">
-          <Link href="https://limosen.at" className="first-logo">
-            <Image src={LOGO_SRC} alt="Limosen KG" height={{ base: 20, md: 24 }} objectFit="contain" />
-          </Link>
-          <Flex
-            direction={{ base: 'column', md: 'row' }}
-            align={{ base: 'flex-start', md: 'center' }}
-            justify="space-between"
-            w="full"
-            gap={6}
-            className="header__nav"
+    <Box
+      pos="relative"
+      overflow="hidden"
+      backgroundColor="#dee9ec"
+      height={isOpen ? 'calc(100vh + 15px)' : { base: '12vh', md: '15vh' }}
+      minH={isOpen ? '600px' : '100px'}
+      transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
+    >
+      <Box
+        pos="relative"
+        bg="#0f0f0f"
+        color="white"
+        transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
+        height={isOpen ? 'max(600px, calc(100vh + 15px))' : '0'}
+        minH={isOpen ? 'fit-content' : '0'}
+        width="100%"
+        overflow="hidden"
+      >
+        <Grid
+          as={Container}
+          maxW="6xl"
+          minH="max(600px, calc(100vh + 15px))"
+          templateRows={{ base: 'auto repeat(7, 1fr)', md: 'auto repeat(3, 1fr)' }}
+          templateColumns={{ base: '1fr', md: '1fr 1fr' }}
+          templateAreas={{
+            base: `"empty" "services" "team" "portfolio" "blog" "offices" "social"`,
+            md: `"empty empty" "services team" "portfolio blog" "offices social"`,
+          }}
+          fontSize={{ base: 'xl', md: '2xl' }}
+          h="full"
+          w="full"
+          gap={0}
+        >
+          <Box gridArea="empty" h={{ base: '12vh', md: '15vh' }} minH="100px" />
+          <LinkBox
+            gridArea="services"
+            display="flex"
+            alignItems="center"
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderLeft="0"
+            borderBottom="0"
+            borderColor="rgba(255, 255, 255, 0.08)"
+            transition="color 0.2s"
+            _hover={{ color: '#bb4338' }}
           >
-            <Flex wrap="wrap" gap={4} className="navbar-nav">
-              {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} color="whiteAlpha.900" fontWeight="medium" className="header__nav__item">
-                  {link.label}
+            <LinkOverlay href="https://limosen.at/de/cars">Unsere Fahrzeuge</LinkOverlay>
+          </LinkBox>
+          <LinkBox
+            gridArea="team"
+            display="flex"
+            alignItems="center"
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderBottom="0"
+            borderLeft={{ base: '1px', md: '0' }}
+            borderColor="rgba(255, 255, 255, 0.08)"
+            transition="color 0.2s"
+            _hover={{ color: '#bb4338' }}
+          >
+            <LinkOverlay href="https://limosen.at/de/feedback">Kundenfeedback</LinkOverlay>
+          </LinkBox>
+          <LinkBox
+            gridArea="portfolio"
+            display="flex"
+            alignItems="center"
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderLeft="0"
+            borderBottom="0"
+            borderColor="rgba(255, 255, 255, 0.08)"
+            transition="color 0.2s"
+            _hover={{ color: '#bb4338' }}
+          >
+            <LinkOverlay href="https://limosen.at/de/booking">Jetzt buchen</LinkOverlay>
+          </LinkBox>
+          <LinkBox
+            gridArea="blog"
+            display="flex"
+            alignItems="center"
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderBottom="1px"
+            borderLeft={{ base: '1px', md: '0' }}
+            borderColor="rgba(255, 255, 255, 0.08)"
+            transition="color 0.2s"
+            _hover={{ color: '#bb4338' }}
+          >
+            <LinkOverlay href="https://limosen.at/de/page/contact">Kontakt</LinkOverlay>
+          </LinkBox>
+          <Box
+            gridArea="offices"
+            pt={{ base: 8 }}
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderTop="1px"
+            borderBottom="0"
+            borderLeft="0"
+            borderRight={{ base: '1px', md: '0' }}
+            borderColor={{ base: 'transparent', md: 'rgba(255, 255, 255, 0.08)' }}
+          >
+            <Text color="white" fontWeight="bold" fontSize="lg" pb={2}>
+              Immer erreichbar
+            </Text>
+            <VStack align="flex-start" spacing={2} color="whiteAlpha.800" fontSize="md">
+              <Link href={`tel:${CONTACT_PHONE_TEL}`} color="whiteAlpha.900">
+                {CONTACT_PHONE}
+              </Link>
+              <Link href={`mailto:${CONTACT_EMAIL}`} color="whiteAlpha.900">
+                {CONTACT_EMAIL}
+              </Link>
+              <Text color="whiteAlpha.700">Wien, Österreich</Text>
+            </VStack>
+          </Box>
+          <Box
+            gridArea="social"
+            pt={{ base: 8 }}
+            pl={{ base: 8, md: 16 }}
+            borderWidth="1px"
+            borderTop="0"
+            borderBottom="0"
+            borderLeft="0"
+            borderColor="rgba(255, 255, 255, 0.08)"
+          >
+            <Text color="white" fontWeight="bold" fontSize="lg" mb={3}>
+              Folgen Sie uns
+            </Text>
+            <HStack spacing={6}>
+              {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  isExternal
+                  color="white"
+                  transition="color 0.2s"
+                  _hover={{ color: '#bb4338' }}
+                >
+                  <Icon as={IconComponent} boxSize={6} />
                 </Link>
               ))}
+            </HStack>
+          </Box>
+        </Grid>
+      </Box>
+      <Container maxW="6xl" pos="absolute" inset={0} pointerEvents="none">
+        <Flex
+          h={{ base: '12vh', md: '15vh' }}
+          minH="100px"
+          align="center"
+          px={{ base: 4, md: 6 }}
+          py={{ base: 2, md: 4 }}
+          justify="space-between"
+          pointerEvents="auto"
+        >
+          <Link href="https://limosen.at" display="flex" alignItems="center" height="100%">
+            <Image src={LOGO_SRC} alt="Limosen KG" height={{ base: 16, md: 20 }} objectFit="contain" />
+          </Link>
+          <Flex align="center" gap={{ base: 2, lg: 4 }}>
+            <Flex display={{ base: 'none', lg: 'flex' }} align="center" gap={2}>
+              {NAV_LINKS.map((link) => (
+                <Button
+                  key={link.href}
+                  as={Link}
+                  href={link.href}
+                  variant="ghost"
+                  fontSize="sm"
+                  fontWeight="semibold"
+                  color="#273E53"
+                  _hover={{ color: '#bb4338', bg: 'whiteAlpha.200' }}
+                >
+                  {link.label}
+                </Button>
+              ))}
             </Flex>
-            <HStack spacing={3} align="center" className="menu-right">
-              <Image src={FLAG_SRC} alt="Deutsch" boxSize={6} />
-              <Text fontWeight="semibold">DE</Text>
+            <HStack spacing={2} display="flex">
+              <Tooltip label="Deutsch" hasArrow>
+                <Image src={FLAG_SRC} alt="Deutsch" boxSize={6} />
+              </Tooltip>
+              <Text fontWeight="semibold" color="#273E53">
+                DE
+              </Text>
               <Button
                 as={Link}
                 href="https://limosen.at/en"
                 size="sm"
                 variant="outline"
-                colorScheme="whiteAlpha"
-                _hover={{ bg: 'whiteAlpha.200' }}
+                color="#273E53"
+                borderColor="#273E53"
+                _hover={{ bg: 'white', color: '#bb4338', borderColor: '#bb4338' }}
               >
                 Change
               </Button>
-              <Button
-                as={Link}
-                href="https://limosen.at/de/booking"
-                colorScheme="yellow"
-                size="sm"
-                className="default-button"
-              >
-                Jetzt Buchen
-              </Button>
             </HStack>
+            <Button
+              as={Link}
+              href="https://limosen.at/de/booking"
+              size="sm"
+              bg="#bb4338"
+              color="white"
+              _hover={{ bg: '#a1382f' }}
+            >
+              Jetzt Buchen
+            </Button>
+            <IconButton
+              aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'}
+              icon={<Icon as={FaBars} boxSize={5} />}
+              variant="ghost"
+              onClick={toggleMenu}
+              color={menuActive ? 'white' : '#273E53'}
+              bg={menuActive ? '#bb4338' : 'transparent'}
+              _hover={{ bg: menuActive ? '#a1382f' : 'rgba(0,0,0,0.08)' }}
+              display={{ base: 'flex', lg: 'none' }}
+            />
           </Flex>
-        </VStack>
+        </Flex>
       </Container>
     </Box>
   );
