@@ -1,21 +1,11 @@
 import { PageConfig } from 'jaen';
 import {
-  Box,
   Center,
-  Flex,
   Spinner,
-  Stack,
-  Text,
-  VStack
 } from '@chakra-ui/react';
 import { PageProps, graphql } from 'gatsby';
 import * as React from 'react';
-import TableOfContent from '../components/navigation/TableOfContent';
-import useNavOffset from '../hooks/use-nav-offset';
 import MdxEditor from '../components/mdx-editor/MdxEditor';
-import Links from '../components/Links';
-import RightNav from '../components/navigation/RightNav';
-import MainBottomNav from '../components/navigation/MainBottomNav';
 import { useTOCContext } from '../contexts/toc';
 import { useProtectedDocs } from '../hooks/use-protected-docs';
 

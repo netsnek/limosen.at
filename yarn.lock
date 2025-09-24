@@ -4290,6 +4290,11 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-paragraph/-/extension-paragraph-2.4.0.tgz#5b9aea8775937b327bbe6754be12ae3144fb09ff"
   integrity sha512-+yse0Ow67IRwcACd9K/CzBcxlpr9OFnmf0x9uqpaWt1eHck1sJnti6jrw5DVVkyEBHDh/cnkkV49gvctT/NyCw==
 
+"@tiptap/extension-placeholder@^2.11.0":
+  version "2.26.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-placeholder/-/extension-placeholder-2.26.2.tgz#359db95a599b72660981f9f4728549586cce678a"
+  integrity sha512-XBTDcpEo7Zo/1+RhGnRxA2TF0elQW7EayUcV+lJ3f7HQ5lrb5NTnakYc1ydeZ8Ih6vUqbK2CQUsESe3UWHHgHg==
+
 "@tiptap/extension-strike@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-strike/-/extension-strike-2.4.0.tgz#f09c4f51f7fed01c356026d7e8d8a1d1f2ac8f18"
@@ -8583,15 +8588,16 @@ gatsby-jaen-lens@1.2.0:
     use-debounce "^9.0.4"
     zxcvbn "^4.4.2"
 
-gatsby-jaen-mailpress@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/gatsby-jaen-mailpress/-/gatsby-jaen-mailpress-2.0.0.tgz#b2f188fc2c71b4568a091e4b71f102f0b02aac3c"
-  integrity sha512-ZGIMzBUX+UVKhGxcdpUe54m+jYbswUT/ROaK1enW21/veFSk/TleZ9Y5O7ruyrVlgVp0/FW3fzCViC/IM5rkxA==
+gatsby-jaen-mailpress@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/gatsby-jaen-mailpress/-/gatsby-jaen-mailpress-2.1.1.tgz#bc17576fda04f3e8e88b3660b4423307b5bad477"
+  integrity sha512-zoi2SsovWIZWqko9ptoiKZLShjqFgHYii0OlIgbtPmxCj4ox3W7sM5hW7Jkurnj+59FQzNErtS5As0Tm+UBOoQ==
   dependencies:
     "@gqty/react" "^3.0.5"
     "@monaco-editor/react" "^4.6.0"
     "@react-icons/all-files" "https://github.com/react-icons/react-icons/releases/download/v4.11.0/react-icons-all-files-4.11.0.tgz"
     "@tanstack/react-table" "^8.10.7"
+    "@tiptap/extension-placeholder" "^2.11.0"
     isomorphic-dompurify "^1.9.0"
     react-hook-form "^7.46.1"
 

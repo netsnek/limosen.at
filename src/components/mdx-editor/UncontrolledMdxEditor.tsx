@@ -5,7 +5,7 @@ import {
   useInjectMdxPropContext
 } from 'jaen-fields-mdx';
 import { mdxEditorComponents } from './MdxEditor';
-import Heading from '../main-content/heading/components/Heading';
+import Heading from '../docs/heading/components/Heading';
 import {
   AspectRatio,
   Box,

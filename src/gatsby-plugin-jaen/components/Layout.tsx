@@ -1,10 +1,8 @@
 import { LayoutProps } from 'jaen';
 import { useLocation } from '@reach/router';
-import { FaFlask } from '@react-icons/all-files/fa/FaFlask';
 import { CMSManagement, useJaenFrameMenuContext } from 'gatsby-plugin-jaen';
-import { useEffect } from 'react';
 import AppLayout from '../../components/AppLayout';
-import Footer from '../../components/sections/Footer';
+import { Footer } from '../../components/Everything';
 import { ContactModalProvider } from '../../services/contact';
 
 const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {

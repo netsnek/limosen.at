@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { MdxFieldProps, UncontrolledMdxField } from 'jaen-fields-mdx';
 import { mdxEditorComponents } from './MdxEditor';
-import Heading from '../main-content/heading/components/Heading';
+import Heading from '../docs/heading/components/Heading';
 import { Stack, chakra } from '@chakra-ui/react';
 import { text } from 'stream/consumers';
 import TabsTemplate from './TabsTemplate';

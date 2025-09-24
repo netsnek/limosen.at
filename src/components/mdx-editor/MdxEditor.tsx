@@ -28,14 +28,13 @@ import { MdxField, MdxFieldProps } from 'jaen-fields-mdx';
 import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
 import { Link } from 'gatsby-plugin-jaen';
 
-import Heading from '../main-content/heading/components/Heading';
-import Callout from '../main-content/callout/components/Callouts';
-import CodeSnippet from '../main-content/code-snippet/components/CodeSnippet';
-import DocsIndex from '../main-content/docs-index/components/DocsIndex';
-import Filesystem from '../main-content/filesystem/components/Filesystem';
-import IconCard from '../main-content/icon-card/components/IconCard';
-import ImageCard from '../main-content/image-card/components/ImageCard';
-import { QASMPlayground } from '../main-content/qasm-playground/components/qasm-playground';
+import Heading from '../docs/heading/components/Heading';
+import Callout from '../docs/callout/components/Callouts';
+import CodeSnippet from '../docs/code-snippet/components/CodeSnippet';
+import DocsIndex from '../docs/docs-index/components/DocsIndex';
+import Filesystem from '../docs/filesystem/components/Filesystem';
+import IconCard from '../docs/icon-card/components/IconCard';
+import ImageCard from '../docs/image-card/components/ImageCard';
 import JaenImage from '../JaenImage';
 
 interface IMdxEditorProps {
@@ -71,43 +70,9 @@ export const mdxEditorComponents: MdxFieldProps['components'] = {
   th: (props: any) => <Th id={props.id} children={props.children} />,
   td: (props: any) => <Td id={props.id} children={props.children} />,
   // MISC
-  code: ({
-    className,
-    playground,
-    ...props
-  }: {
-    playground?: boolean;
-    className?: string;
-    children?: string;
-    headerText?: string;
-    withoutSimulate?: boolean;
-    withoutTranslate?: boolean;
-  }) => {
-    const lang = className?.replace('language-', '') || 'text';
-
-    if (playground) {
-      return (
-        <QASMPlayground
-          children={props.children}
-          wrapWithPre={false}
-          withoutSimulate={props.withoutSimulate}
-          withoutTranslate={props.withoutTranslate}
-        />
-      );
-    }
-
-    return (
-      <CodeSnippet
-        language={lang}
-        children={props.children}
-        headerText={props.headerText}
-      />
-    );
-  },
   img: JaenImage,
   Image: JaenImage,
   // CUSTOM COMPONENTS
-  QASMPlayground,
   Filesystem,
   ImageCard,
   Callout,
