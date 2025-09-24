@@ -67,8 +67,8 @@ const AppLayout: FC<AppLayoutProps> = ({ children, isDocs, path, footer }) => {
           minW="210px"
           h="max(100%, 100vh)"
           minH="100vh">
-          {!isAuthenticated && path !== "/" && <TopNavigation />}
-          {!isAuthenticated && path === "/" && <TopNavigation />}
+          {!isAuthenticated && path !== "/" && <TopNavigation  path={ path }/>}
+          {!isAuthenticated && path === "/" && <TopNavigation path={ path } />}
           {childrenElmnt}
         </Box>
       </MenuStructureContext.Provider>
