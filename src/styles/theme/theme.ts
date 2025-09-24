@@ -2,7 +2,6 @@
 import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
 
 const config: ThemeConfig = {
-  initialColorMode: "dark",
   useSystemColorMode: false,
 };
 
@@ -50,9 +49,9 @@ const semanticTokens = {
     "bg.surfaceAlt": { default: "neutral.300" },
 
     // Text
-    "text.primary": { default: "whiteAlpha.900" },
-    "text.secondary": { default: "whiteAlpha.800" },
-    "text.muted": { default: "whiteAlpha.700" },
+    "text.primary": { default: "blackAlpha.900" },
+    "text.secondary": { default: "blackAlpha.800" },
+    "text.muted": { default: "blackAlpha.700" },
 
     // Borders
     "border.faint": { default: "whiteAlpha.100" },
@@ -140,22 +139,11 @@ const components = {
   Container: { baseStyle: { px: { base: 4, md: 6 } } },
 };
 
-const styles = {
-  global: {
-    "html, body, #___gatsby, #gatsby-focus-wrapper": {
-      height: "100%",
-      bg: "bg.canvas",
-      color: "text.primary",
-    },
-  },
-};
-
 const theme = extendTheme({
   config,
   colors,
   semanticTokens,
   components,
-  styles,
 });
 
 export default theme;

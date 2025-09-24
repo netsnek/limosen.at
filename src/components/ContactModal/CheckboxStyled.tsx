@@ -71,7 +71,7 @@ export const CheckboxStyled = forwardRef<HTMLInputElement, CheckboxStyledProps>(
     }
 
     return (
-      <Checkbox spacing={spacing} sx={classes} {...props} ref={ref}>
+      <Checkbox spacing={spacing} sx={classes} {...props} ref={ref} color={'text.primary'}>
         {children}
       </Checkbox>
     )
