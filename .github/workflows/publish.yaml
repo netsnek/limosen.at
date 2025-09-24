@@ -2,14 +2,14 @@ name: publish
 
 on: [push]
 env:
-  IMAGE_NAME: photonq-gatsby
+  IMAGE_NAME: limosen-gatsby
 
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   publish-container:
     runs-on: ubuntu-latest
-    environment: photonq-internal
+    environment: limosen-internal
     env:
       GATSBY_ORIGIN_API_URL: ${{ vars.GATSBY_ORIGIN_API_URL }}
     permissions:
