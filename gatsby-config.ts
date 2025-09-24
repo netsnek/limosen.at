@@ -22,7 +22,7 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         remote: {
-          repository: 'netsnek/nadine-hauswirth'
+          repository: 'netsnek/limosen.at'
         },
         zitadel: {
           organizationId: '339284789469124181',
@@ -30,7 +30,7 @@ const config: GatsbyConfig = {
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
-              ? 'https://limosen.at'
+              ? 'https://new.limosen.at/'
               : 'https://psychic-dollop-6vwv6x9vq9jf464g-8000.app.github.dev',
           projectIds: [
             '2268283277977065078'
