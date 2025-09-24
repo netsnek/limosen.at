@@ -6,7 +6,7 @@ require('dotenv').config({
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    siteUrl: `https://barbara-mauz.at/`
+    siteUrl: `https://limosen.at/`
   },
   // More easily incorporate content into your pages through automatic TypeScript type generation and better GraphQL IntelliSense.
   // If you use VSCode you can also use the GraphQL plugin
@@ -22,15 +22,15 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         remote: {
-          repository: 'netsnek/nadine-hauswirth'
+          repository: 'netsnek/limosen.at'
         },
         zitadel: {
-          organizationId: '334831568918943355',
+          organizationId: '339284789469124181',
           clientId: '268283382465631862@cms',
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
-              ? 'https://nadine-hauswirth.com'
+              ? 'https://new.limosen.at'
               : 'https://psychic-dollop-6vwv6x9vq9jf464g-8000.app.github.dev',
           projectIds: [
             '2268283277977065078'
@@ -42,7 +42,7 @@ const config: GatsbyConfig = {
         //   dsn: 'https://37ffbc7589f79cfab5936ce5fca4f310@sentry.cronit.io/10'
         // },
         googleAnalytics: {
-          trackingIds: ['G-4B98VFJE2T']
+          trackingIds: ['G-G6Z65QP3Y3']
         }
       }
     },
