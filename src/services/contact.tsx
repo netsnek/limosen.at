@@ -31,7 +31,6 @@ export interface ContactModalDrawerProps {
 }
 
 export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ children }) => {
-  // Use the current location from @reach/router.
   const location = useLocation()
   const { isCalled, paramValue } = useQueryRouter(location, "contact")
 
@@ -41,20 +40,16 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   const toast = useToast()
   const authentication = useAuth()
 
-  // Helper: always get a full URL (incl. protocol, domain, path, search, hash) and guard SSR
   const getCurrentUrl = React.useCallback(() => {
     if (typeof window !== "undefined" && window.location) {
-      // Prefer the full href; this includes search and hash even on root "/"
       return window.location.href
     }
-    // SSR-safe fallback using @reach/router location
     const pathname = location?.pathname ?? "/"
     const search = location?.search ?? ""
     const hash = location?.hash ?? ""
     return `${pathname}${search}${hash}`
   }, [location])
 
-  // When the query parameter is present, open the modal AND set meta.url
   React.useEffect(() => {
     if (isCalled) {
       setMeta(prev => ({ ...prev, url: getCurrentUrl() }))
@@ -65,7 +60,7 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   const onOpen: ContactModalContextProps["onOpen"] = (args) => {
     const updatedMeta = {
       ...meta,
-      url: getCurrentUrl(), // ensure we always store a URL when opening
+      url: getCurrentUrl(),
       ...args?.meta,
     }
     setMeta(updatedMeta)
@@ -73,7 +68,6 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   }
 
   const onClose = () => {
-    // Remove the "contact" query parameter from the URL without reloading the page.
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href)
       url.searchParams.delete("contact")
@@ -83,22 +77,42 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   }
 
   const onSubmit = async (data: ContactFormValues): Promise<void> => {
-    // Never empty: prefer meta.url, else current url, else "unknown"
     const invokedOnUrl = meta?.url ?? getCurrentUrl() ?? "unknown"
 
     const { errors } = await sendTemplateMail(
-      "9c919b15-02f9-46ef-8fe8-db0b04abfc40", // replace with your actual template ID
+      "cc744364-b930-4d3c-918b-d9e98637607b",
       {
         envelope: {
           replyTo: data.email,
         },
         values: {
+          // Kontakt
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
           phone: data.phone || "",
+          flightNumber: data.flightNumber || "",
           message: data.message,
-          invokedOnUrl, // <-- full href incl. search + hash; never empty
+
+          // Fahrt-Details
+          rideCategory: data.rideCategory || "",
+          rideType: data.rideType || "",
+          date: data.date || "",
+          time: data.time || "",
+          pickupAddress: data.pickupAddress || "",
+          destinationAddress: data.destinationAddress || "",
+          passengers: data.passengers ?? "",
+          luggage: data.luggage ?? "",
+          childSeats: data.childSeats ?? "",
+          extraTime: data.extraTime ?? "",
+
+          // Fahrzeug/Preis
+          carClass: data.carClass || "",
+          carTitle: data.carTitle || "",
+          price: data.price ?? "",
+
+          // Meta
+          invokedOnUrl,
         },
       }
     )
@@ -114,7 +128,7 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
     } else {
       toast({
         title: "Erfolg",
-        description: "Ihre Nachricht wurde erfolgreich versendet.",
+        description: "Ihre Reservierungsanfrage wurde erfolgreich versendet.",
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -131,6 +145,7 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
       firstName: authentication.user.profile?.given_name,
       lastName: authentication.user.profile?.family_name,
       email: authentication.user.profile?.email,
+      phone: authentication.user.profile?.phone_number,
     }
   }, [authentication.user])
 
