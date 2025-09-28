@@ -2,70 +2,95 @@
 import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
 
 const config: ThemeConfig = {
-  initialColorMode: "dark",
+  initialColorMode: "light", // app defaults to light
   useSystemColorMode: false,
 };
 
 const colors = {
-  // Gold / Yellow brand scale (logo-led)
   brand: {
     50:  "#fffbeb",
     100: "#fef3c7",
     200: "#fde68a",
     300: "#fcd34d",
     400: "#fbbf24",
-    500: "#d4af37", // logo gold
+    500: "#d4af37", // gold
     600: "#b8932f",
     700: "#9a7b26",
     800: "#7a611d",
     900: "#5a4815",
   },
-
-  // Neutral dark scale to replace inline hex grays
   neutral: {
-    25:  "#0b0b0b",
-    50:  "#0f0f0f", // footer
-    100: "#171717",
-    200: "#1b1b1b", // section bg
-    250: "#1c1c1c", // top nav bg
-    300: "#1f1f1f", // booking section
-    350: "#252525", // cards
+    200: "#1b1b1b",
+    250: "#1c1c1d",
+    300: "#1f1f1f",
+    350: "#252525",
     400: "#2a2a2a",
-    450: "#2f2f2f", // about section
     500: "#333333",
-    600: "#3a3a3a",
-    700: "#424242", // page canvas
+    700: "#424242",
+  },
+  // optional warm accent for homepage CTAs (use via colorScheme="limosen")
+  limosen: {
+    50:  "#fff7ed",
+    100: "#ffedd5",
+    200: "#fed7aa",
+    300: "#fdba74",
+    400: "#fb923c",
+    500: "#f97316",
+    600: "#ea580c",
+    700: "#c2410c",
+    800: "#9a3412",
+    900: "#7c2d12",
   },
 };
 
 const semanticTokens = {
   colors: {
-    // Surfaces
-    "bg.canvas": { default: "neutral.700" },
-    "bg.header": { default: "neutral.250" },
-    "bg.headerBar": { default: "neutral.200" },
-    "bg.section": { default: "neutral.200" },
-    "bg.sectionAlt": { default: "neutral.450" },
-    "bg.surface": { default: "neutral.350" },
-    "bg.surfaceAlt": { default: "neutral.300" },
+    // ---- App-wide (light) defaults you already had ----
+    "bg.canvas":      { default: "white" },
+    "bg.header":      { default: "white" },
+    "bg.section":     { default: "white" },
+    "bg.surface":     { default: "white" },
+    "bg.surfaceAlt":  { default: "gray.50" },
+    "text.primary":   { default: "blackAlpha.900" },
+    "text.secondary": { default: "blackAlpha.700" },
+    "text.muted":     { default: "blackAlpha.600" },
+    "border.faint":   { default: "blackAlpha.100" },
+    "border.subtle":  { default: "gray.200" },
+    accent:           { default: "brand.500" },
+    "accent.emphasis":{ default: "brand.600" },
+    "accent.muted":   { default: "brand.200" },
+    "accent.on":      { default: "black" },
 
-    // Text
-    "text.primary": { default: "whiteAlpha.900" },
-    "text.secondary": { default: "whiteAlpha.800" },
-    "text.muted": { default: "whiteAlpha.700" },
+    // ---- Limosen (homepage) semantic tokens (dark-look surfaces) ----
+    // Exact colors requested:
+    // banner: #1b1b1b, nav top: #1c1c1c, über uns: #2f2f2f,
+    // fleet background: #1b1b1b, cards: #252525, cars backdrop: white, footer: #0f0f0f
+    "limosen.bg.canvas":     { default: "#1b1b1b" },  // overall dark canvas (hero area / page body on that page)
+    "limosen.bg.banner":     { default: "#1b1b1b" },  // top banner (HeaderBar)
+    "limosen.bg.navTop":     { default: "#1c1c1c" },  // TopNavigation background/mega
+    "limosen.bg.about":      { default: "#2f2f2f" },  // Über uns section
+    "limosen.bg.fleet":      { default: "#1b1b1b" },  // Fahrzeugflotte section background
+    "limosen.bg.card":       { default: "#252525" },  // all cards on that page
+    "limosen.bg.carsBackdrop": { default: "white" },  // image wrapper "behind cars" (white)
+    "limosen.bg.footer":     { default: "#0f0f0f" },  // footer
+    // Generic surfaces if you want to reuse:
+    "limosen.bg.section":    { default: "neutral.200" },
+    "limosen.bg.surface":    { default: "neutral.350" },
+    "limosen.bg.surfaceAlt": { default: "neutral.300" },
 
-    // Borders
-    "border.faint": { default: "whiteAlpha.100" },
-    "border.subtle": { default: "whiteAlpha.200" },
+    // Text in dark sections
+    "limosen.text.primary":   { default: "whiteAlpha.900" },
+    "limosen.text.secondary": { default: "whiteAlpha.800" },
+    "limosen.text.muted":     { default: "whiteAlpha.700" },
 
-    // Accents (gold)
-    accent: { default: "brand.500" },
-    "accent.emphasis": { default: "brand.600" },
-    "accent.muted": { default: "brand.200" },
-    "accent.on": { default: "black" },
+    // Borders for dark sections
+    "limosen.border.faint":  { default: "whiteAlpha.100" },
+    "limosen.border.subtle": { default: "whiteAlpha.200" },
 
-    // Special for hamburger bars (kept)
-    "topNav.mobile.hamburger.bgColor": { default: "text.primary" },
+    // Accent for homepage — uses your gold by default
+    "limosen.accent":          { default: "brand.500" },
+    "limosen.accent.emphasis": { default: "brand.600" },
+    "limosen.accent.on":       { default: "black" },
   },
 };
 
@@ -79,84 +104,58 @@ const components = {
         _hover: { bg: "accent.emphasis" },
         _active: { bg: "brand.700" },
       },
-      outline: {
-        borderColor: "accent",
-        color: "accent",
-        _hover: { bg: "whiteAlpha.100" },
+      // Homepage-only look via variant="limosen"
+      limosen: {
+        bg: "limosen.accent",
+        color: "limosen.accent.on",
+        _hover: { bg: "limosen.accent.emphasis" },
+        _active: { bg: "brand.700" },
       },
       ghost: {
-        color: "text.primary",
-        _hover: { bg: "whiteAlpha.200", color: "accent" },
+        _hover: { bg: "blackAlpha.50" },
+        _active: { bg: "blackAlpha.100" },
       },
     },
   },
-  IconButton: {
-    defaultProps: { variant: "ghost" },
+  // If using Card from Chakra v2, a helpful variant
+  Card: {
     variants: {
-      ghost: {
-        color: "text.primary",
-        _hover: { color: "accent", bg: "whiteAlpha.200" },
-      },
-    },
-  },
-  Link: {
-    baseStyle: {
-      color: "text.primary",
-      _hover: { color: "accent", textDecoration: "none" },
-    },
-  },
-  Divider: { baseStyle: { borderColor: "border.subtle" } },
-  Accordion: {
-    baseStyle: {
-      container: { border: "none" },
-      button: {
-        bg: "whiteAlpha.50",
-        border: "1px solid",
-        borderColor: "border.faint",
-        _expanded: {
-          bg: "whiteAlpha.200",
-          borderColor: "accent",
-          color: "text.primary",
+      limosen: {
+        container: {
+          bg: "limosen.bg.card",
+          color: "limosen.text.primary",
+          borderColor: "limosen.border.subtle",
+          borderWidth: "1px",
+          borderRadius: "xl",
         },
       },
     },
   },
-  Menu: {
-    baseStyle: {
-      list: { bg: "bg.header", borderColor: "border.faint" },
-      item: { _hover: { bg: "whiteAlpha.200", color: "text.primary" } },
-    },
-  },
-  Tooltip: {
-    baseStyle: {
-      bg: "neutral.100",
-      color: "text.primary",
-      border: "1px solid",
-      borderColor: "border.faint",
-    },
-  },
-  Heading: { baseStyle: { color: "text.primary" } },
-  Text: { baseStyle: { color: "text.primary" } },
-  Container: { baseStyle: { px: { base: 4, md: 6 } } },
 };
 
-const styles = {
-  global: {
-    "html, body, #___gatsby, #gatsby-focus-wrapper": {
-      height: "100%",
-      bg: "bg.canvas",
-      color: "text.primary",
-    },
+const layerStyles = {
+  // Page wrapper for the Limosen homepage
+  "limosen.page": {
+    bg: "limosen.bg.canvas",
+    color: "limosen.text.primary",
+    minH: "100dvh",
+  },
+  // Generic surface using limosen tokens
+  "limosen.surface": {
+    bg: "limosen.bg.surface",
+    color: "limosen.text.primary",
+    borderColor: "limosen.border.subtle",
+    borderWidth: "1px",
+    borderRadius: "xl",
   },
 };
 
-const theme = extendTheme({
+export const theme = extendTheme({
   config,
   colors,
   semanticTokens,
   components,
-  styles,
+  layerStyles,
 });
 
 export default theme;
-export { theme };
