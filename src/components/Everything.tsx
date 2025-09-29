@@ -38,7 +38,7 @@ import {
   ModalBody,
   chakra
 } from '@chakra-ui/react';
-import { Field } from 'jaen';
+import { Field, useAuth } from 'jaen';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   FaEnvelopeOpen,
@@ -76,6 +76,7 @@ import {
   GOOGLE_MAPS_OPEN
 } from './vars/limosen';
 import { useContactModal } from '../services/contact';
+import { useBookingModal } from '../services/booking';
 
 function emitServiceNavigation(target: string) {
   if (typeof window === 'undefined' || !target) return;
@@ -283,6 +284,8 @@ export default function App() {
 }
 
 export function HeaderBar() {
+  const { signinRedirect } = useAuth();
+
   return (
     <Box
       bg="limosen.bg.banner"
@@ -330,6 +333,13 @@ export function HeaderBar() {
                 _hover={{ bg: 'whiteAlpha.200', color: 'limosen.accent' }}
               />
             ))}
+            <Button
+              size={'xs'}
+              variant="limosen"
+              onClick={() => void signinRedirect()}
+            >
+              Login
+            </Button>
           </HStack>
         </Flex>
       </Container>
@@ -340,6 +350,7 @@ export function HeaderBar() {
 export function TopNavigation({ path }: { path?: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
+  const { signinRedirect } = useAuth();
 
   const [menuActive, setMenuActive] = useState(false);
   const closeMenu = useCallback(() => {
@@ -389,6 +400,14 @@ export function TopNavigation({ path }: { path?: string }) {
   const handleOnContactClick = () => {
     console.log('contactModal', contactModal);
     contactModal.onOpen({
+      meta: {}
+    });
+  };
+
+  const bookingModal = useBookingModal();
+  const handleOnBookingClick = () => {
+    console.log('cbookingModal', bookingModal);
+    bookingModal.onOpen({
       meta: {}
     });
   };
@@ -477,9 +496,7 @@ export function TopNavigation({ path }: { path?: string }) {
             _hover={{ color: 'limosen.accent' }}
           >
             <LinkOverlay
-              //href="https://limosen.at/de/booking"
-              //onClick={handleNavLinkClick}
-              onClick={handleOnContactClick}
+              onClick={handleOnBookingClick}
             >
               Jetzt buchen
             </LinkOverlay>
@@ -498,12 +515,14 @@ export function TopNavigation({ path }: { path?: string }) {
             _hover={{ color: 'limosen.accent' }}
           >
             <LinkOverlay
-              href="/imprint"
-              onClick={handleNavLinkClick}
+              onClick={handleOnContactClick}
             >
               Kontakt
             </LinkOverlay>
           </LinkBox>
+
+          {/* === OFFICES: Left "Immer erreichbar" ===
+              (Hide entirely on mobile to avoid duplication; we re-render it in the "social" grid for mobile) */}
           <Box
             gridArea="offices"
             pt={{ base: 8 }}
@@ -514,48 +533,55 @@ export function TopNavigation({ path }: { path?: string }) {
             borderLeft="0"
             borderRight={{ base: '1px', md: '0' }}
             borderColor={{ base: 'transparent', md: 'limosen.border.faint' }}
+            display={{ base: 'none', md: 'block' }}
           >
-            <Text
-              color="limosen.text.primary"
-              fontWeight="bold"
-              fontSize="lg"
-              pb={2}
-            >
-              <Field.Text
-                as={chakra.span}
-                name="TopNavAlwaysReachable"
-                defaultValue="Immer erreichbar"
-              />
-            </Text>
-            <VStack
-              align="flex-start"
-              spacing={2}
-              color="limosen.text.secondary"
-              fontSize="md"
-            >
-              <Link
-                href={`tel:${CONTACT_PHONE_TEL}`}
-                color="limosen.text.primary"
-                onClick={handleNavLinkClick}
-              >
-                {CONTACT_PHONE}
-              </Link>
-              <Link
-                href={`mailto:${CONTACT_EMAIL}`}
-                color="limosen.text.primary"
-                onClick={handleNavLinkClick}
-              >
-                {CONTACT_EMAIL}
-              </Link>
-              <Text color="limosen.text.muted">
-                <Field.Text
-                  as={chakra.span}
-                  name="TopNavCityCountry"
-                  defaultValue="Wien, Österreich"
-                />
-              </Text>
-            </VStack>
+            <Flex justify="space-between" align="flex-start" gap={6}>
+              <Box flex="1" minW={0}>
+                <Text
+                  color="limosen.text.primary"
+                  fontWeight="bold"
+                  fontSize="lg"
+                  pb={2}
+                >
+                  <Field.Text
+                    as={chakra.span}
+                    name="TopNavAlwaysReachable"
+                    defaultValue="Immer erreichbar"
+                  />
+                </Text>
+                <VStack
+                  align="flex-start"
+                  spacing={2}
+                  color="limosen.text.secondary"
+                  fontSize="md"
+                >
+                  <Link
+                    href={`tel:${CONTACT_PHONE_TEL}`}
+                    color="limosen.text.primary"
+                    onClick={handleNavLinkClick}
+                  >
+                    {CONTACT_PHONE}
+                  </Link>
+                  <Link
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    color="limosen.text.primary"
+                    onClick={handleNavLinkClick}
+                  >
+                    {CONTACT_EMAIL}
+                  </Link>
+                  <Text color="limosen.text.muted">
+                    <Field.Text
+                      as={chakra.span}
+                      name="TopNavCityCountry"
+                      defaultValue="Wien, Österreich"
+                    />
+                  </Text>
+                </VStack>
+              </Box>
+            </Flex>
           </Box>
+
+          {/* === SOCIAL === */}
           <Box
             gridArea="social"
             pt={{ base: 8 }}
@@ -567,33 +593,189 @@ export function TopNavigation({ path }: { path?: string }) {
             borderLeft="0"
             borderColor="limosen.border.faint"
           >
-            <Text
-              color="limosen.text.primary"
-              fontWeight="bold"
-              fontSize="lg"
-              mb={3}
+            {/* MOBILE: 2x2 grid to align rows:
+                Row 1: Immer erreichbar | Konto
+                Row 2: Folgen Sie uns  | Sprache */}
+            <Grid
+              display={{ base: 'grid', md: 'none' }}
+              templateColumns="1fr auto"
+              templateRows="auto auto"
+              gap={6}
+              alignItems="start"
             >
-              <Field.Text
-                as={chakra.span}
-                name="TopNavFollowUs"
-                defaultValue="Folgen Sie uns"
-              />
-            </Text>
-            <HStack spacing={6}>
-              {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  isExternal
+              {/* Row 1, Col 1: Immer erreichbar */}
+              <Box gridColumn="1" gridRow="1" minW={0}>
+                <Text
                   color="limosen.text.primary"
-                  transition="color 0.2s"
-                  _hover={{ color: 'limosen.accent' }}
-                  onClick={handleNavLinkClick}
+                  fontWeight="bold"
+                  fontSize="lg"
+                  pb={2}
                 >
-                  <Icon as={IconComponent} boxSize={6} />
-                </Link>
-              ))}
-            </HStack>
+                  <Field.Text
+                    as={chakra.span}
+                    name="TopNavAlwaysReachable_mobile"
+                    defaultValue="Immer erreichbar"
+                  />
+                </Text>
+                <VStack
+                  align="flex-start"
+                  spacing={2}
+                  color="limosen.text.secondary"
+                  fontSize="md"
+                >
+                  <Link
+                    href={`tel:${CONTACT_PHONE_TEL}`}
+                    color="limosen.text.primary"
+                    onClick={handleNavLinkClick}
+                  >
+                    {CONTACT_PHONE}
+                  </Link>
+                  <Link
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    color="limosen.text.primary"
+                    onClick={handleNavLinkClick}
+                  >
+                    {CONTACT_EMAIL}
+                  </Link>
+                  <Text color="limosen.text.muted">
+                    <Field.Text
+                      as={chakra.span}
+                      name="TopNavCityCountry_mobile"
+                      defaultValue="Wien, Österreich"
+                    />
+                  </Text>
+                </VStack>
+              </Box>
+
+              {/* Row 1, Col 2: Konto */}
+              <Box gridColumn="2" gridRow="1" pr="32px">
+                <VStack spacing={3} align="flex-start" minW="auto">
+                  <Text
+                    color="limosen.text.primary"
+                    fontWeight="bold"
+                    fontSize="lg"
+                    mb={1}
+                  >
+                    Konto
+                  </Text>
+                  <Button
+                    size="sm"
+                    variant="limosen"
+                    onClick={() => void signinRedirect()}
+                  >
+                    Login
+                  </Button>
+                </VStack>
+              </Box>
+
+              {/* Row 2, Col 1: Folgen Sie uns */}
+              <Box gridColumn="1" gridRow="2" minW={0}>
+                <Text
+                  color="limosen.text.primary"
+                  fontWeight="bold"
+                  fontSize="lg"
+                  mb={3}
+                >
+                  <Field.Text
+                    as={chakra.span}
+                    name="TopNavFollowUs"
+                    defaultValue="Folgen Sie uns"
+                  />
+                </Text>
+                <HStack spacing={6}>
+                  {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      isExternal
+                      color="limosen.text.primary"
+                      transition="color 0.2s"
+                      _hover={{ color: 'limosen.accent' }}
+                      onClick={handleNavLinkClick}
+                    >
+                      <Icon as={IconComponent} boxSize={6} />
+                    </Link>
+                  ))}
+                </HStack>
+              </Box>
+
+              {/* Row 2, Col 2: Sprache */}
+              <Box gridColumn="2" gridRow="2" pr="32px">
+                <VStack spacing={3} align="flex-start" minW="auto">
+                  <Text
+                    color="limosen.text.primary"
+                    fontWeight="bold"
+                    fontSize="lg"
+                    mb={0}
+                  >
+                    Sprache
+                  </Text>
+                  <Button
+                    variant="ghost"
+                    color="limosen.text.primary"
+                    px={2}
+                    rightIcon={<ChevronDownIcon color="limosen.text.primary" />}
+                    _hover={{ bg: 'whiteAlpha.200' }}
+                    onClick={langModal.onOpen}
+                  >
+                    <HStack spacing={2}>
+                      <Image
+                        src={FLAG_DE}
+                        alt="Deutsch"
+                        width="24px"
+                        height="24px"
+                        objectFit="cover"
+                      />
+                      <Text fontWeight="semibold" color="limosen.text.primary">
+                        <Field.Text
+                          as={chakra.span}
+                          name="LangCodeDE"
+                          defaultValue="DE"
+                        />
+                      </Text>
+                    </HStack>
+                  </Button>
+                </VStack>
+              </Box>
+            </Grid>
+
+            {/* DESKTOP/TABLET: original layout unchanged */}
+            <Flex
+              justify="space-between"
+              align="flex-start"
+              gap={6}
+              display={{ base: 'none', md: 'flex' }}
+            >
+              <Box flex="1" minW={0}>
+                <Text
+                  color="limosen.text.primary"
+                  fontWeight="bold"
+                  fontSize="lg"
+                  mb={3}
+                >
+                  <Field.Text
+                    as={chakra.span}
+                    name="TopNavFollowUs_desktop"
+                    defaultValue="Folgen Sie uns"
+                  />
+                </Text>
+                <HStack spacing={6}>
+                  {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      isExternal
+                      color="limosen.text.primary"
+                      transition="color 0.2s"
+                      _hover={{ color: 'limosen.accent' }}
+                      onClick={handleNavLinkClick}
+                    >
+                      <Icon as={IconComponent} boxSize={6} />
+                    </Link>
+                  ))}
+                </HStack>
+              </Box>
+            </Flex>
           </Box>
         </Grid>
       </Box>
@@ -650,7 +832,7 @@ export function TopNavigation({ path }: { path?: string }) {
               })}
             </Flex>
 
-            {/* Language button opens Chakra UI Modal */}
+            {/* Language button opens Chakra UI Modal (desktop/tablet only) */}
             <Button
               variant="ghost"
               color="limosen.text.primary"
@@ -658,6 +840,7 @@ export function TopNavigation({ path }: { path?: string }) {
               rightIcon={<ChevronDownIcon color="limosen.text.primary" />}
               _hover={{ bg: 'whiteAlpha.200' }}
               onClick={langModal.onOpen}
+              display={{ base: 'none', md: 'inline-flex' }}
             >
               <HStack spacing={2}>
                 <Tooltip
@@ -691,12 +874,9 @@ export function TopNavigation({ path }: { path?: string }) {
 
             {/* Booking */}
             <Button
-              //as={Link}
-              //href="https://limosen.at/de/booking"
               size="sm"
               variant="limosen"
-              //onClick={handleNavLinkClick}
-              onClick={handleOnContactClick}
+              onClick={handleOnBookingClick}
             >
               Jetzt Buchen
             </Button>
@@ -1324,6 +1504,14 @@ function FleetSection() {
 }
 
 function OnlineBookingSection() {
+  const contactModal = useContactModal();
+  const handleOnContactClick = () => {
+    console.log('contactModal', contactModal);
+    contactModal.onOpen({
+      meta: {}
+    });
+  };
+
   return (
     <Box
       as="section"
@@ -1397,15 +1585,10 @@ function OnlineBookingSection() {
             </HStack>
           </Stack>
           <Button
-            as={Link}
-            href="https://limosen.at/de/page/contact"
             variant="limosen"
+            onClick={handleOnContactClick}
           >
-            <Field.Text
-              as={chakra.span}
-              name="BookingContactCta"
-              defaultValue="Kontakt"
-            />
+            Kontakt
           </Button>
         </VStack>
       </Container>

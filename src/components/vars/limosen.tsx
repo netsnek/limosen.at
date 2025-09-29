@@ -245,7 +245,7 @@ export const FOOTER_LINK_GROUPS = [
       // { label: 'Hauptseite', href: 'https://limosen.at/de' },
       { label: 'Fahrzeugflotte', href: '#fahrzeuge' },
       { label: 'Rezensionen', href: '#rezensionen' },
-      { label: 'Kontakt', href: '/imprint' },
+      { label: 'Kontakt', href: '?contact' },
     ],
   },
   {
@@ -262,7 +262,7 @@ export const FOOTER_LINK_GROUPS = [
     links: [
       { label: CONTACT_PHONE, href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}` },
       { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
-      { label: 'Schreiben Sie uns', href: '/imprint' },
+      { label: 'Schreiben Sie uns', href: '/?contact' },
     ],
   },
 ];

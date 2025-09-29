@@ -4,6 +4,7 @@ import { CMSManagement, useJaenFrameMenuContext } from 'gatsby-plugin-jaen';
 import AppLayout from '../../components/AppLayout';
 import { Footer } from '../../components/Everything';
 import { ContactModalProvider } from '../../services/contact';
+import { BookingModalProvider } from '../../services/booking';
 
 const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
   const path = useLocation().pathname;
@@ -31,9 +32,11 @@ const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
   return (
     <CMSManagement>
       <ContactModalProvider location={{ pathname: path, search: '' }}>
-        <AppLayout footer={Footer} isDocs={isDocs} path={path}>
-          {children}
-        </AppLayout>
+        <BookingModalProvider location={{ pathname: path, search: '' }}>
+          <AppLayout footer={Footer} isDocs={isDocs} path={path}>
+            {children}
+          </AppLayout>
+        </BookingModalProvider>
       </ContactModalProvider>
     </CMSManagement>
   );
