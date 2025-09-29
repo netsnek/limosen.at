@@ -899,7 +899,7 @@ export function Footer() {
           <Flex direction={{ base: 'column', md: 'row' }} align="flex-start" gap={{ base: 8, md: 14 }}>
             <Box flexShrink={0}>
               <Box h={{ base: 14, md: 16 }} display="flex" alignItems="center">
-                <Logo />
+                <Logo width="auto" />
               </Box>
               <Text mt={4} color="limosen.text.muted">
                 <Field.Text as={chakra.span} name="FooterTagline" defaultValue="Premium Chauffeur-Service in Wien und darüber hinaus." />
