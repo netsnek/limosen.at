@@ -105,7 +105,7 @@ const DocsLayout: FC<DocsLayoutProps> = ({ children, path, isCommunity }) => {
                     },
                     {
                       name: 'Registrieren',
-                      href: '/#services'
+                      href: '/signup'
                     },
                     {
                       name: 'Kontakt',

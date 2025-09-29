@@ -251,7 +251,7 @@ export const FOOTER_LINK_GROUPS = [
   {
     title: 'Services',
     links: [
-      { label: 'Registrieren', href: 'https://limosen.at/de/register/driver' },
+      { label: 'Registrieren', href: '/signup' },
       { label: 'Jetzt buchen', href: 'https://limosen.at/de/booking' },
       { label: 'Impressum', href: 'https://limosen.at/de/page/imprint' },
       { label: 'Datenschutz', href: 'https://limosen.at/de/page/privacy' },

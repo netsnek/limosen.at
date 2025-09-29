@@ -43,6 +43,12 @@ const colors = {
   },
 };
 
+// ✅ Add Segoe UI for headings & body
+const fonts = {
+  heading: '"Segoe UI", sans-serif',
+  body: '"Segoe UI", sans-serif',
+};
+
 const semanticTokens = {
   colors: {
     // ---- App-wide (light) defaults you already had ----
@@ -117,7 +123,6 @@ const components = {
       },
     },
   },
-  // If using Card from Chakra v2, a helpful variant
   Card: {
     variants: {
       limosen: {
@@ -153,6 +158,7 @@ const layerStyles = {
 export const theme = extendTheme({
   config,
   colors,
+  fonts, // ← added here
   semanticTokens,
   components,
   layerStyles,
