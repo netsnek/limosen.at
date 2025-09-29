@@ -676,6 +676,7 @@ export function TopNavigation({ path }: { path?: string }) {
                     width="24px"
                     height="24px"
                     objectFit="cover"
+                    display={{ base: 'none', sm: 'block' }}
                   />
                 </Tooltip>
                 <Text fontWeight="semibold" color="limosen.text.primary">

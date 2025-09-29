@@ -432,7 +432,8 @@ const DriverSignupForm: React.FC<DriverSignupFormProps> = ({ welcomeText, onSucc
               isRequired
               error={errors.docs?.registrationForm as any}
             />
-            <HStack>
+            {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
+            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
               <FileField
                 control={control}
                 name="docs.drivingFront"
@@ -449,7 +450,8 @@ const DriverSignupForm: React.FC<DriverSignupFormProps> = ({ welcomeText, onSucc
                 isRequired
                 error={errors.docs?.drivingBack as any}
               />
-            </HStack>
+            </Stack>
+            {/* ▲▲ */}
             <FileField
               control={control}
               name="docs.criminalRecord"
@@ -494,7 +496,8 @@ const DriverSignupForm: React.FC<DriverSignupFormProps> = ({ welcomeText, onSucc
               accept={ACCEPTED}
               error={errors.docs?.passport as any}
             />
-            <HStack>
+            {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
+            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
               <FileField
                 control={control}
                 name="docs.taxiFront"
@@ -509,7 +512,8 @@ const DriverSignupForm: React.FC<DriverSignupFormProps> = ({ welcomeText, onSucc
                 accept={ACCEPTED}
                 error={errors.docs?.taxiBack as any}
               />
-            </HStack>
+            </Stack>
+            {/* ▲▲ */}
 
             {step === DriverStep.OptionalDocs && (
               <HStack justify="space-between">
