@@ -477,7 +477,7 @@ export function TopNavigation({ path }: { path?: string }) {
             _hover={{ color: 'limosen.accent' }}
           >
             <LinkOverlay
-              href="https://limosen.at/de/booking"
+              //href="https://limosen.at/de/booking"
               //onClick={handleNavLinkClick}
               onClick={handleOnContactClick}
             >
@@ -690,8 +690,8 @@ export function TopNavigation({ path }: { path?: string }) {
 
             {/* Booking */}
             <Button
-              as={Link}
-              href="https://limosen.at/de/booking"
+              //as={Link}
+              //href="https://limosen.at/de/booking"
               size="sm"
               variant="limosen"
               //onClick={handleNavLinkClick}
