@@ -72,17 +72,17 @@ const DocsLayout: FC<DocsLayoutProps> = ({ children, path, isCommunity }) => {
               isExpanded={isExpanded}
               path={path}
               baseMenuItems={[
-                {
-                  name: 'Rezept Etnwicklung',
-                  icon: <TbBooks />,
-                  items: [
-                    {
-                      name: 'Rezepte',
-                      href: '/recipes',
-                      isActive: path?.startsWith('/experiments')
-                    }
-                  ]
-                },
+                // {
+                //   name: 'Rezept Etnwicklung',
+                //   icon: <TbBooks />,
+                //   items: [
+                //     {
+                //       name: 'Rezepte',
+                //       href: '/recipes',
+                //       isActive: path?.startsWith('/experiments')
+                //     }
+                //   ]
+                // },
                 {
                   name: 'Mehr',
                   icon: <FaLink />,
@@ -90,7 +90,27 @@ const DocsLayout: FC<DocsLayoutProps> = ({ children, path, isCommunity }) => {
                     {
                       name: 'Hauptseite',
                       href: '/'
-                    }
+                    },
+                    {
+                      name: 'Services',
+                      href: '/#services'
+                    },
+                    {
+                      name: 'Unsere Fahrzeuge',
+                      href: '/#fahrzeuge'
+                    },
+                    {
+                      name: 'Kundenfeedback',
+                      href: '/#kundenfeedback'
+                    },
+                    {
+                      name: 'Registrieren',
+                      href: '/#services'
+                    },
+                    {
+                      name: 'Kontakt',
+                      href: '/?contact'
+                    },
                   ]
                 }
               ]}
