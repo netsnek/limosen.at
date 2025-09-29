@@ -16,10 +16,10 @@ export const CONTACT_PHONE = '+43 660 876 06 06';
 export const CONTACT_PHONE_TEL = '+436608760606';
 
 export const NAV_LINKS = [
-  { label: 'Hauptseite', href: '/' },
+  // { label: 'Hauptseite', href: '/' },
   { label: 'Service', href: '#services' },
-  { label: 'Unsere Fahrzeuge', href: '#fahrzeuge' },
-  { label: 'Kundenfeedback', href: '#kundenfeedback' }, // stay on page
+  { label: 'Fahrzeugflotte', href: '#fahrzeuge' },
+  { label: 'Rezensionen', href: '#rezensionen' }, // stay on page
   { label: 'Registrieren', href: '/signup' },
   { label: 'Kontakt', href: '?contact' },
 ];
@@ -242,10 +242,10 @@ export const FOOTER_LINK_GROUPS = [
   {
     title: 'Navigation',
     links: [
-      { label: 'Hauptseite', href: 'https://limosen.at/de' },
-      { label: 'Unsere Fahrzeuge', href: 'https://limosen.at/de/cars' },
-      { label: 'Kundenfeedback', href: '#kundenfeedback' },
-      { label: 'Kontakt', href: 'https://limosen.at/de/page/contact' },
+      // { label: 'Hauptseite', href: 'https://limosen.at/de' },
+      { label: 'Fahrzeugflotte', href: '#fahrzeuge' },
+      { label: 'Rezensionen', href: '#rezensionen' },
+      { label: 'Kontakt', href: '?contact' },
     ],
   },
   {
