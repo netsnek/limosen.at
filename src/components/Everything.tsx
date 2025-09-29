@@ -36,13 +36,13 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
+  chakra
 } from '@chakra-ui/react';
 import { Field } from 'jaen';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   FaEnvelopeOpen,
   FaEnvelopeOpenText,
-  FaBars,
   FaFacebookF,
   FaInstagram,
   FaPhone,
@@ -53,6 +53,7 @@ import {
 } from 'react-icons/fa';
 
 import { Link } from 'gatsby-plugin-jaen';
+import Logo from '../gatsby-plugin-jaen/components/Logo';
 
 import {
   ABOUT_IMAGE,
@@ -64,7 +65,6 @@ import {
   FLAG_EN,
   FLAG_TR,
   HERO_SLIDES,
-  LOGO_SRC,
   NAV_LINKS,
   FAQ_ITEMS,
   SERVICES_CONTENT,
@@ -262,27 +262,41 @@ export function TopNavigation({ path }: { path?: string }) {
         <Grid as={Container} maxW="6xl" minH="max(600px, calc(100vh + 15px))" templateRows={{ base: 'auto repeat(7, 1fr)', md: 'auto repeat(3, 1fr)' }} templateColumns={{ base: '1fr', md: '1fr 1fr' }} templateAreas={{ base: '"empty" "services" "team" "portfolio" "blog" "offices" "social"', md: '"empty empty" "services team" "portfolio blog" "offices social"', }} fontSize={{ base: 'xl', md: '2xl' }} h="full" w="full" gap={0}>
           <Box gridArea="empty" h={{ base: '12vh', md: '15vh' }} minH="100px" />
           <LinkBox gridArea="services" display="flex" alignItems="center" pl={{ base: 8, md: 16 }} borderWidth="1px" borderLeft="0" borderBottom="0" borderColor="limosen.border.faint" transition="color 0.2s" _hover={{ color: 'limosen.accent' }}>
-            <LinkOverlay href="#fahrzeuge">Unsere Fahrzeuge</LinkOverlay>
+            <LinkOverlay href="#fahrzeuge">
+              <Field.Text as={chakra.span} name="TopNavVehicles" defaultValue="Unsere Fahrzeuge" />
+            </LinkOverlay>
           </LinkBox>
           <LinkBox gridArea="team" display="flex" alignItems="center" pl={{ base: 8, md: 16 }} borderWidth="1px" borderBottom="0" borderRight="0" borderLeft={{ base: '1px', md: '0' }} borderColor="limosen.border.faint" transition="color 0.2s" _hover={{ color: 'limosen.accent' }}>
-            <LinkOverlay href="#kundenfeedback">Kundenfeedback</LinkOverlay>
+            <LinkOverlay href="#kundenfeedback">
+              <Field.Text as={chakra.span} name="TopNavFeedback" defaultValue="Kundenfeedback" />
+            </LinkOverlay>
           </LinkBox>
           <LinkBox gridArea="portfolio" display="flex" alignItems="center" pl={{ base: 8, md: 16 }} borderWidth="1px" borderLeft="0" borderBottom="0" borderColor="limosen.border.faint" transition="color 0.2s" _hover={{ color: 'limosen.accent' }}>
-            <LinkOverlay href="https://limosen.at/de/booking">Jetzt buchen</LinkOverlay>
+            <LinkOverlay href="https://limosen.at/de/booking">
+              <Field.Text as={chakra.span} name="TopNavBookNow" defaultValue="Jetzt buchen" />
+            </LinkOverlay>
           </LinkBox>
           <LinkBox gridArea="blog" display="flex" alignItems="center" pl={{ base: 8, md: 16 }} borderWidth="1px" borderBottom="1px" borderRight="0" borderLeft={{ base: '1px', md: '0' }} borderColor="limosen.border.faint" transition="color 0.2s" _hover={{ color: 'limosen.accent' }}>
-            <LinkOverlay href="https://limosen.at/de/page/contact">Kontakt</LinkOverlay>
+            <LinkOverlay href="https://limosen.at/de/page/contact">
+              <Field.Text as={chakra.span} name="TopNavContact" defaultValue="Kontakt" />
+            </LinkOverlay>
           </LinkBox>
           <Box gridArea="offices" pt={{ base: 8 }} pl={{ base: 8, md: 16 }} borderWidth="1px" borderTop="1px" borderBottom="0" borderLeft="0" borderRight={{ base: '1px', md: '0' }} borderColor={{ base: 'transparent', md: 'limosen.border.faint' }}>
-            <Text color="limosen.text.primary" fontWeight="bold" fontSize="lg" pb={2}>Immer erreichbar</Text>
+            <Text color="limosen.text.primary" fontWeight="bold" fontSize="lg" pb={2}>
+              <Field.Text as={chakra.span} name="TopNavAlwaysReachable" defaultValue="Immer erreichbar" />
+            </Text>
             <VStack align="flex-start" spacing={2} color="limosen.text.secondary" fontSize="md">
               <Link href={`tel:${CONTACT_PHONE_TEL}`} color="limosen.text.primary">{CONTACT_PHONE}</Link>
               <Link href={`mailto:${CONTACT_EMAIL}`} color="limosen.text.primary">{CONTACT_EMAIL}</Link>
-              <Text color="limosen.text.muted">Wien, Österreich</Text>
+              <Text color="limosen.text.muted">
+                <Field.Text as={chakra.span} name="TopNavCityCountry" defaultValue="Wien, Österreich" />
+              </Text>
             </VStack>
           </Box>
           <Box gridArea="social" pt={{ base: 8 }} pl={{ base: 8, md: 16 }} borderWidth="1px" borderTop="0" borderBottom="0" borderRight="0" borderLeft="0" borderColor="limosen.border.faint">
-            <Text color="limosen.text.primary" fontWeight="bold" fontSize="lg" mb={3}>Folgen Sie uns</Text>
+            <Text color="limosen.text.primary" fontWeight="bold" fontSize="lg" mb={3}>
+              <Field.Text as={chakra.span} name="TopNavFollowUs" defaultValue="Folgen Sie uns" />
+            </Text>
             <HStack spacing={6}>
               {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                 <Link key={label} href={href} isExternal color="limosen.text.primary" transition="color 0.2s" _hover={{ color: 'limosen.accent' }}>
@@ -296,7 +310,9 @@ export function TopNavigation({ path }: { path?: string }) {
       <Container maxW="6xl" pos="absolute" inset={0} pointerEvents="none">
         <Flex h={{ base: '12vh', md: '15vh' }} minH="100px" align="center" px={{ base: 4, md: 6 }} py={{ base: 2, md: 4 }} justify="space-between" pointerEvents="auto">
           <Link href="https://limosen.at" display="flex" alignItems="center" height="100%">
-            <Image src={LOGO_SRC} alt="Limosen KG" height={{ base: 16, md: 20 }} objectFit="contain" />
+            <Box height={{ base: 16, md: 20 }} display="flex" alignItems="center">
+              <Logo />
+            </Box>
           </Link>
           <Flex align="center" gap={{ base: 2, lg: 4 }}>
             <Flex display={{ base: 'none', lg: 'flex' }} align="center" gap={2}>
@@ -330,20 +346,43 @@ export function TopNavigation({ path }: { path?: string }) {
               onClick={langModal.onOpen}
             >
               <HStack spacing={2}>
-                <Tooltip label="Deutsch" hasArrow>
-                  <Field.Image name="flag-de" defaultValue={FLAG_DE} alt="Deutsch" style={{ width: '24px', height: '24px' }} objectFit="cover" />
+                <Tooltip label={<Field.Text as={chakra.span} name="LangTooltipDE" defaultValue="Deutsch" />} hasArrow>
+                  <Image
+                    src={FLAG_DE}
+                    alt="Deutsch"
+                    width="24px"
+                    height="24px"
+                    objectFit="cover"
+                  />
                 </Tooltip>
-                <Text fontWeight="semibold" color="limosen.text.primary">DE</Text>
+                <Text fontWeight="semibold" color="limosen.text.primary">
+                  <Field.Text as={chakra.span} name="LangCodeDE" defaultValue="DE" />
+                </Text>
               </HStack>
             </Button>
 
             {/* Booking */}
             <Button as={Link} href="https://limosen.at/de/booking" size="sm" variant="limosen">
-              Jetzt Buchen
+              <Field.Text as={chakra.span} name="TopNavBookCta" defaultValue="Jetzt Buchen" />
             </Button>
 
-            {/* Mobile menu */}
-            <IconButton aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'} icon={<FaBars />} variant="ghost" onClick={toggleMenu} display={{ base: 'flex', lg: 'none' }} color="limosen.text.primary" _hover={{ bg: 'whiteAlpha.200' }} />
+            {/* Mobile menu (HamburgerMenuIcon) */}
+            <IconButton
+              aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'}
+              icon={
+                <HamburgerMenuIcon
+                  handleClick={toggleMenu}
+                  wrapperProps={{ className: menuActive ? 'open' : '' }}
+                  iconProps={{
+                    backgroundColor: "limosen.text.primary",
+                  }}
+                />
+              }
+              variant="ghost"
+              onClick={toggleMenu}
+              display={{ base: 'flex', lg: 'none' }}
+              _hover={{ bg: "limosen.border.subtle" }}
+            />
           </Flex>
         </Flex>
       </Container>
@@ -352,7 +391,9 @@ export function TopNavigation({ path }: { path?: string }) {
       <Modal isOpen={langModal.isOpen} onClose={langModal.onClose} isCentered>
         <ModalOverlay />
         <ModalContent bg="limosen.bg.surface" color="limosen.text.primary">
-          <ModalHeader>Sprache wählen</ModalHeader>
+          <ModalHeader>
+            <Field.Text as={chakra.span} name="LangModalTitle" defaultValue="Sprache wählen" />
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack align="stretch" spacing={3}>
@@ -366,8 +407,14 @@ export function TopNavigation({ path }: { path?: string }) {
                 _hover={{ bg: 'whiteAlpha.200' }}
               >
                 <HStack spacing={3}>
-                  <Field.Image name="modal-flag-de" defaultValue={FLAG_DE} alt="Deutsch" style={{ width: '28px', height: '28px' }} objectFit="cover" />
-                  <Text>Deutsch</Text>
+                  <Image
+                    src={FLAG_DE}
+                    alt="Deutsch"
+                    width="28px"
+                    height="28px"
+                    objectFit="cover"
+                  />
+                  <Text><Field.Text as={chakra.span} name="LangDE" defaultValue="Deutsch" /></Text>
                 </HStack>
               </Button>
               <Button
@@ -380,8 +427,14 @@ export function TopNavigation({ path }: { path?: string }) {
                 _hover={{ bg: 'whiteAlpha.200' }}
               >
                 <HStack spacing={3}>
-                  <Field.Image name="modal-flag-en" defaultValue={FLAG_EN} alt="English" style={{ width: '28px', height: '28px' }} objectFit="cover" />
-                  <Text>English</Text>
+                  <Image
+                    src={FLAG_EN}
+                    alt="English"
+                    width="28px"
+                    height="28px"
+                    objectFit="cover"
+                  />
+                  <Text><Field.Text as={chakra.span} name="LangEN" defaultValue="English" /></Text>
                 </HStack>
               </Button>
               <Button
@@ -394,8 +447,14 @@ export function TopNavigation({ path }: { path?: string }) {
                 _hover={{ bg: 'whiteAlpha.200' }}
               >
                 <HStack spacing={3}>
-                  <Field.Image name="modal-flag-tr" defaultValue={FLAG_TR} alt="Türkçe" style={{ width: '28px', height: '28px' }} objectFit="cover" />
-                  <Text>Türkçe</Text>
+                  <Image
+                    src={FLAG_TR}
+                    alt="Türkçe"
+                    width="28px"
+                    height="28px"
+                    objectFit="cover"
+                  />
+                  <Text><Field.Text as={chakra.span} name="LangTR" defaultValue="Türkçe" /></Text>
                 </HStack>
               </Button>
             </VStack>
@@ -418,11 +477,31 @@ function AboutSection() {
       <Container maxW="6xl">
         <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 8, md: 12 }} align="stretch">
           <VStack align="flex-start" spacing={6} flex="1" className="about-text">
-            <Heading size="lg" className="about-text__title" color="limosen.text.primary">Über uns</Heading>
+            <Heading size="lg" className="about-text__title" color="limosen.text.primary">
+              <Field.Text as={chakra.span} name="AboutTitle" defaultValue="Über uns" />
+            </Heading>
             <Stack spacing={4} fontSize="lg" className="about-description" color="limosen.text.secondary">
-              <Text>LIMOSEN KG verfolgt seit 2016 die sektoralen und technologischen Entwicklungen und ist das ganze Jahr rund um die Uhr erreichbar.</Text>
-              <Text>Unsere Flotte bestehend aus den modernsten Mercedes-Benz-Fahrzeugen mit unseren freundlichen, professionellen und erfahrenen Fahrern und einer zuverlässigen, wirtschaftlichen und komfortablen Serviceauffassung steigern wir die Servicequalität permanent und wachsen kontinuierlich weiter.</Text>
-              <Text>Kundenzufriedenheit ist unsere oberste Priorität und unser Unternehmen übt die Destinationen in unserem Portfolio in bester Weise aus, um unseren Kunden die höchste Qualität zu bieten.</Text>
+              <Text>
+                <Field.Text
+                  as={chakra.span}
+                  name="AboutP1"
+                  defaultValue="LIMOSEN KG verfolgt seit 2016 die sektoralen und technologischen Entwicklungen und ist das ganze Jahr rund um die Uhr erreichbar."
+                />
+              </Text>
+              <Text>
+                <Field.Text
+                  as={chakra.span}
+                  name="AboutP2"
+                  defaultValue="Unsere Flotte bestehend aus den modernsten Mercedes-Benz-Fahrzeugen mit unseren freundlichen, professionellen und erfahrenen Fahrern und einer zuverlässigen, wirtschaftlichen und komfortablen Serviceauffassung steigern wir die Servicequalität permanent und wachsen kontinuierlich weiter."
+                />
+              </Text>
+              <Text>
+                <Field.Text
+                  as={chakra.span}
+                  name="AboutP3"
+                  defaultValue="Kundenzufriedenheit ist unsere oberste Priorität und unser Unternehmen übt die Destinationen in unserem Portfolio in bester Weise aus, um unseren Kunden die höchste Qualität zu bieten."
+                />
+              </Text>
             </Stack>
           </VStack>
 
@@ -470,8 +549,16 @@ function ServicesSection() {
       <Container maxW="6xl">
         <VStack spacing={{ base: 12, md: 16 }} align="stretch">
           <VStack spacing={3} textAlign="center">
-            <Heading size="lg" color="limosen.text.primary">Unsere Services</Heading>
-            <Text color="limosen.text.muted" maxW="3xl">Erhalten Sie einen schnellen Überblick über unser Angebot und vertiefen Sie sich bei Bedarf in die detaillierten Beschreibungen unserer Premium-Services.</Text>
+            <Heading size="lg" color="limosen.text.primary">
+              <Field.Text as={chakra.span} name="ServicesTitle" defaultValue="Unsere Services" />
+            </Heading>
+            <Text color="limosen.text.muted" maxW="3xl">
+              <Field.Text
+                as={chakra.span}
+                name="ServicesSubtitle"
+                defaultValue="Erhalten Sie einen schnellen Überblick über unser Angebot und vertiefen Sie sich bei Bedarf in die detaillierten Beschreibungen unserer Premium-Services."
+              />
+            </Text>
             <Divider w={{ base: '80px', md: '120px' }} borderColor="limosen.border.subtle" />
           </VStack>
 
@@ -510,7 +597,9 @@ function ServicesSection() {
                         <Text color="limosen.text.secondary" fontSize="sm" noOfLines={3}>
                           {summaryText(service.paragraphs)}
                         </Text>
-                        <Text fontWeight="semibold" color="limosen.accent">Mehr erfahren →</Text>
+                        <Text fontWeight="semibold" color="limosen.accent">
+                          <Field.Text as={chakra.span} name={`ServiceCardMore_${service.id}`} defaultValue="Mehr erfahren →" />
+                        </Text>
                       </Stack>
                     </LinkOverlay>
                   </Box>
@@ -520,7 +609,9 @@ function ServicesSection() {
           </SimpleGrid>
 
           <Box>
-            <Heading size="md" mb={4} textAlign="center" color="limosen.text.primary">Details zu unseren Leistungen</Heading>
+            <Heading size="md" mb={4} textAlign="center" color="limosen.text.primary">
+              <Field.Text as={chakra.span} name="ServicesDetailsTitle" defaultValue="Details zu unseren Leistungen" />
+            </Heading>
             <Accordion allowMultiple reduceMotion index={expandedIndices} onChange={handleAccordionChange}>
               {SERVICES_CONTENT.map((service) => {
                 const blocks = createContentBlocks(service.paragraphs);
@@ -586,8 +677,16 @@ function FAQSection() {
       <Container maxW="5xl">
         <VStack spacing={{ base: 8, md: 10 }} align="stretch">
           <VStack spacing={3} textAlign="center">
-            <Heading size="lg" color="limosen.text.primary">Häufig gestellte Fragen</Heading>
-            <Text color="limosen.text.muted" maxW="3xl">Antworten auf die wichtigsten Fragen zu Buchung, Fahrzeugen und unserem Premium-Service.</Text>
+            <Heading size="lg" color="limosen.text.primary">
+              <Field.Text as={chakra.span} name="FaqTitle" defaultValue="Häufig gestellte Fragen" />
+            </Heading>
+            <Text color="limosen.text.muted" maxW="3xl">
+              <Field.Text
+                as={chakra.span}
+                name="FaqSubtitle"
+                defaultValue="Antworten auf die wichtigsten Fragen zu Buchung, Fahrzeugen und unserem Premium-Service."
+              />
+            </Text>
             <Divider w={{ base: '80px', md: '120px' }} borderColor="limosen.border.subtle" />
           </VStack>
           <Accordion allowToggle reduceMotion>
@@ -623,7 +722,7 @@ function FleetSection() {
       <Container maxW="6xl">
         <VStack spacing={10} align="stretch">
           <Heading size="lg" textAlign="center" color="limosen.text.primary">
-            Unsere Fahrzeugflotte
+            <Field.Text as={chakra.span} name="FleetTitle" defaultValue="Unsere Fahrzeugflotte" />
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 10 }}>
             {FLEET_VEHICLES.map((vehicle) => (
@@ -660,7 +759,7 @@ function FleetSection() {
                       <HStack spacing={2}>
                         <Icon as={FaUser} color="limosen.accent" />
                         <Text color="limosen.text.secondary" fontWeight="medium">
-                          Passagieranzahl: {vehicle.passengers}
+                          <Field.Text as={chakra.span} name={`FleetPassengersLabel_${vehicle.name}`} defaultValue="Passagieranzahl:" /> {vehicle.passengers}
                         </Text>
                       </HStack>
                     </WrapItem>
@@ -668,7 +767,7 @@ function FleetSection() {
                       <HStack spacing={2}>
                         <Icon as={FaSuitcaseRolling} color="limosen.accent" />
                         <Text color="limosen.text.secondary" fontWeight="medium">
-                          Gepäckanzahl: {vehicle.luggage}
+                          <Field.Text as={chakra.span} name={`FleetLuggageLabel_${vehicle.name}`} defaultValue="Gepäckanzahl:" /> {vehicle.luggage}
                         </Text>
                       </HStack>
                     </WrapItem>
@@ -698,23 +797,33 @@ function OnlineBookingSection() {
       <Container maxW="4xl">
         <VStack spacing={5} textAlign="center">
           <Heading size="md" className="online-booking__title" color="limosen.text.primary">
-            Buchen sie heute und lassen Sie uns den Komfort Ihrer Reise berücksichtigen.
+            <Field.Text
+              as={chakra.span}
+              name="BookingTitle"
+              defaultValue="Buchen sie heute und lassen Sie uns den Komfort Ihrer Reise berücksichtigen."
+            />
           </Heading>
           <Stack spacing={3} fontSize="lg" className="online-booking__sub-title" color="limosen.text.secondary">
-            <Text>Sie können uns telefonisch</Text>
+            <Text>
+              <Field.Text as={chakra.span} name="BookingReachPhone" defaultValue="Sie können uns telefonisch" />
+            </Text>
             <HStack justify="center" spacing={2}>
               <Icon as={FaPhone} color="limosen.accent" />
               <Link href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`} color="limosen.text.primary">{CONTACT_PHONE}</Link>
             </HStack>
-            <Text>und</Text>
-            <Text>auch mit einer E-Mail erreichen</Text>
+            <Text>
+              <Field.Text as={chakra.span} name="BookingAnd" defaultValue="und" />
+            </Text>
+            <Text>
+              <Field.Text as={chakra.span} name="BookingReachEmail" defaultValue="auch mit einer E-Mail erreichen" />
+            </Text>
             <HStack justify="center" spacing={2}>
               <Icon as={FaEnvelopeOpen} color="limosen.accent" />
               <Link href={`mailto:${CONTACT_EMAIL}`} color="limosen.text.primary">{CONTACT_EMAIL}</Link>
             </HStack>
           </Stack>
           <Button as={Link} href="https://limosen.at/de/page/contact" variant="limosen">
-            Kontakt
+            <Field.Text as={chakra.span} name="BookingContactCta" defaultValue="Kontakt" />
           </Button>
         </VStack>
       </Container>
@@ -728,21 +837,35 @@ function KundenfeedbackSection() {
       <Container maxW="6xl">
         <VStack spacing={{ base: 8, md: 12 }} align="stretch">
           <VStack spacing={3} textAlign="center">
-            <Heading size="lg" color="limosen.text.primary">Kundenfeedback</Heading>
-            <Text color="limosen.text.muted" maxW="3xl">Ihre aktuelle Google-Bewertung & Rezensionen sehen Sie direkt in der Karte – live von Google.</Text>
+            <Heading size="lg" color="limosen.text.primary">
+              <Field.Text as={chakra.span} name="FeedbackTitle" defaultValue="Kundenfeedback" />
+            </Heading>
+            <Text color="limosen.text.muted" maxW="3xl">
+              <Field.Text
+                as={chakra.span}
+                name="FeedbackSubtitle"
+                defaultValue="Ihre aktuelle Google-Bewertung &amp; Rezensionen sehen Sie direkt in der Karte – live von Google."
+              />
+            </Text>
             <Divider w={{ base: '80px', md: '120px' }} borderColor="limosen.border.subtle" />
           </VStack>
 
           <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={{ base: 6, md: 10 }}>
             <Box bg="limosen.bg.card" border="1px solid" borderColor="limosen.border.faint" borderRadius="xl" p={{ base: 6, md: 8 }} boxShadow="lg">
               <VStack align="flex-start" spacing={4}>
-                <Heading size="md" color="limosen.text.primary">Bewertung auf Google</Heading>
+                <Heading size="md" color="limosen.text.primary">
+                  <Field.Text as={chakra.span} name="FeedbackBoxTitle" defaultValue="Bewertung auf Google" />
+                </Heading>
                 <Text color="limosen.text.secondary">
-                  Öffnen Sie LIMOSEN VIP auf Google Maps, um <strong>aktuelle Sterne</strong> und <strong>Rezensionen</strong> zu sehen oder eine Bewertung abzugeben.
+                  <Field.Text
+                    as={chakra.span}
+                    name="FeedbackBoxText"
+                    defaultValue="Öffnen Sie LIMOSEN VIP auf Google Maps, um <strong>aktuelle Sterne</strong> und <strong>Rezensionen</strong> zu sehen oder eine Bewertung abzugeben."
+                  />
                 </Text>
                 <HStack pt={2} spacing={3} wrap="wrap">
                   <Button as={Link} href={GOOGLE_MAPS_OPEN} isExternal variant="limosen">
-                    Auf Google Maps ansehen
+                    <Field.Text as={chakra.span} name="FeedbackMapsCta" defaultValue="Auf Google Maps ansehen" />
                   </Button>
                 </HStack>
               </VStack>
@@ -775,8 +898,12 @@ export function Footer() {
         <VStack spacing={{ base: 10, md: 14 }} align="stretch">
           <Flex direction={{ base: 'column', md: 'row' }} align="flex-start" gap={{ base: 8, md: 14 }}>
             <Box flexShrink={0}>
-              <Image src={LOGO_SRC} alt="Limosen KG" h={{ base: 14, md: 16 }} objectFit="contain" />
-              <Text mt={4} color="limosen.text.muted">Premium Chauffeur-Service in Wien und darüber hinaus.</Text>
+              <Box h={{ base: 14, md: 16 }} display="flex" alignItems="center">
+                <Logo />
+              </Box>
+              <Text mt={4} color="limosen.text.muted">
+                <Field.Text as={chakra.span} name="FooterTagline" defaultValue="Premium Chauffeur-Service in Wien und darüber hinaus." />
+              </Text>
             </Box>
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 8, md: 10 }} flex="1">
               {FOOTER_LINK_GROUPS.map((group) => (
@@ -795,7 +922,9 @@ export function Footer() {
           </Flex>
           <Divider borderColor="limosen.border.subtle" />
           <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between" gap={4}>
-            <Text fontSize="sm" color="limosen.text.muted">© {new Date().getFullYear()} LIMOSEN KG. Alle Rechte vorbehalten.</Text>
+            <Text fontSize="sm" color="limosen.text.muted">
+              © {new Date().getFullYear()} LIMOSEN KG. <Field.Text as={chakra.span} name="FooterRights" defaultValue="Alle Rechte vorbehalten." />
+            </Text>
             <Wrap spacing={3}>
               {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                 <WrapItem key={label}>

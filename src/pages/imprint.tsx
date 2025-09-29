@@ -20,7 +20,7 @@ const ImprintPage: React.FC<PageProps> = () => {
         py={{ base: '6', md: '8', lg: '12' }}
         px={{ base: '4', md: '8', lg: '12' }}
       >
-        <MdxEditor onMdast={toc.setValue} />;
+        <MdxEditor onMdast={toc.setValue} />
       </Container>
     </Box>
   );
