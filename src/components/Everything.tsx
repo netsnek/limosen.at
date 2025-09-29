@@ -498,7 +498,7 @@ export function TopNavigation({ path }: { path?: string }) {
             _hover={{ color: 'limosen.accent' }}
           >
             <LinkOverlay
-              href="https://limosen.at/de/page/contact"
+              href="/imprint"
               onClick={handleNavLinkClick}
             >
               Kontakt
