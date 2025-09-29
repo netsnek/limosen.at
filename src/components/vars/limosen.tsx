@@ -20,7 +20,7 @@ export const NAV_LINKS = [
   { label: 'Service', href: '#services' },
   { label: 'Unsere Fahrzeuge', href: '#fahrzeuge' },
   { label: 'Kundenfeedback', href: '#kundenfeedback' }, // stay on page
-  { label: 'Registrieren', href: 'https://limosen.at/de/register/driver' },
+  { label: 'Registrieren', href: '/signup' },
   { label: 'Kontakt', href: '?contact' },
 ];
 
