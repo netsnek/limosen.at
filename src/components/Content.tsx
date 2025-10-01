@@ -64,19 +64,18 @@ import {
   FLAG_DE,
   FLAG_EN,
   FLAG_TR,
+  FLAG_AR,
   HERO_SLIDES,
-  NAV_LINKS,
-  FAQ_ITEMS,
-  SERVICES_CONTENT,
-  FLEET_VEHICLES,
   SOCIAL_LINKS,
   SERVICE_NAVIGATION_EVENT,
-  FOOTER_LINK_GROUPS,
   GOOGLE_MAPS_EMBED,
   GOOGLE_MAPS_OPEN
-} from './vars/limosen';
+} from '../vars/limosen';
+
 import { useContactModal } from '../services/contact';
 import { useBookingModal } from '../services/booking';
+import { useIntl } from 'react-intl';
+import ChakraLanguageSwitcher from './ChakraLanguageSwitcher';
 
 function emitServiceNavigation(target: string) {
   if (typeof window === 'undefined' || !target) return;
@@ -247,7 +246,7 @@ function useServiceAccordionNavigation(serviceIds: string[]) {
   return { expandedIndices, handleAccordionChange, btnRefs };
 }
 
-export default function App() {
+export default function Content({ language }: { language: string }) {
   const [slideIndex, setSlideIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -272,12 +271,12 @@ export default function App() {
         className="homepage"
       >
         <HeroSection background={HERO_SLIDES[slideIndex]} />
-        <AboutSection />
-        <FleetSection />
-        <ServicesSection />
-        <RezensionenSection />
-        <FAQSection />
-        <OnlineBookingSection />
+        <AboutSection language={language} />
+        <FleetSection language={language} />
+        <ServicesSection language={language} />
+        <ReviewsSection language={language} />
+        <FAQSection language={language} />
+        <OnlineBookingSection language={language} />
       </Box>
     </Box>
   );
@@ -347,16 +346,58 @@ export function HeaderBar() {
   );
 }
 
-export function TopNavigation({ path }: { path?: string }) {
+export function TopNavigation({
+  path
+}: {
+  path?: string;
+  language: string;
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
   const { signinRedirect } = useAuth();
+  const intl = useIntl();
+
+  // 'de' | 'en' | 'tr' for flag display
+  const normalized = useMemo<'de' | 'en' | 'tr' | 'ar' >(() => {
+    const l = (intl.locale || '').toLowerCase();
+    if (l.startsWith('de')) return 'de';
+    if (l.startsWith('tr')) return 'tr';
+    if (l.startsWith('ar')) return 'ar';
+    return 'en';
+  }, [intl.locale]);
+
+  const currentFlag =
+    normalized === 'de' ? FLAG_DE : normalized === 'en' ? FLAG_EN : normalized === 'tr' ? FLAG_TR : FLAG_AR;
+
+  // optional normalization for localized hashes
+  const normalizeHash = useCallback((href: string) => {
+    if (!href?.startsWith('#')) return href;
+    if (href === '#fahrzeuge') return '#fleet';
+    if (href === '#rezensionen') return '#reviews';
+    return href;
+  }, []);
+
+  // top nav links from messages, fallback to static labels
+  const messageNavLinks =
+    (intl.messages as any)?.navLinks as Array<{ label: string; href: string }> | undefined;
+
+  const navLinks = useMemo(
+    () =>
+      messageNavLinks?.map(l => ({ ...l, href: normalizeHash(l.href) })) ?? [
+        { label: intl.formatMessage({ id: 'TopNavFleet' }), href: '#fleet' },
+        { label: intl.formatMessage({ id: 'TopNavReviews' }), href: '#reviews' },
+        { label: intl.formatMessage({ id: 'TopNavContact' }), href: '?contact' }
+      ],
+    [messageNavLinks, normalizeHash, intl]
+  );
 
   const [menuActive, setMenuActive] = useState(false);
+
   const closeMenu = useCallback(() => {
     setMenuActive(false);
     onClose();
   }, [onClose]);
+
   const toggleMenu = () => {
     if (isOpen) {
       closeMenu();
@@ -366,7 +407,6 @@ export function TopNavigation({ path }: { path?: string }) {
     }
   };
 
-  // close nav after ANY link click (mobile overlay or desktop links)
   const handleNavLinkClick = useCallback(() => {
     if (isOpen) closeMenu();
   }, [isOpen, closeMenu]);
@@ -381,36 +421,45 @@ export function TopNavigation({ path }: { path?: string }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [onClose]);
-  const normalize = (p: string) => {
+
+  const normalizePath = (p: string) => {
     const trimmed = p.split('#')[0].trim();
     if (!trimmed) return '';
     return trimmed.replace(/\/+$/, '') || '/';
   };
-  const currentPath = useMemo(() => normalize(path || ''), [path]);
+  const currentPath = useMemo(() => normalizePath(path || ''), [path]);
   const linkPathname = (href: string) => {
     try {
       const u = new URL(href);
-      return normalize(u.pathname || '/');
+      return normalizePath(u.pathname || '/');
     } catch {
-      return normalize(href);
+      return normalizePath(href);
     }
   };
 
   const contactModal = useContactModal();
   const handleOnContactClick = () => {
-    console.log('contactModal', contactModal);
-    contactModal.onOpen({
-      meta: {}
-    });
+    contactModal.onOpen({ meta: {} });
   };
 
   const bookingModal = useBookingModal();
   const handleOnBookingClick = () => {
-    console.log('cbookingModal', bookingModal);
-    bookingModal.onOpen({
-      meta: {}
-    });
+    bookingModal.onOpen({ meta: {} });
   };
+
+  const labelVehicleFleet = intl.formatMessage({ id: 'TopNavFleet' });
+  const labelReviews = intl.formatMessage({ id: 'TopNavReviews' });
+  const labelBookNow = intl.formatMessage({ id: 'TopNavBookNow' });
+  const labelContact = intl.formatMessage({ id: 'TopNavContact' });
+  const labelFollowUs = intl.formatMessage({ id: 'TopNavFollowUs' });
+  const labelAlwaysReachable = intl.formatMessage({ id: 'TopNavAlwaysReachable' });
+  const labelCityCountry = intl.formatMessage({ id: 'TopNavCityCountry' });
+  const labelAccount = intl.formatMessage({ id: 'TopNavAccount' });
+  const labelLanguage = intl.formatMessage({ id: 'TopNavLanguage' });
+
+  const languageCodeDisplay = normalized.toUpperCase();
+
+  console.log(intl.messages);
 
   return (
     <Box
@@ -462,8 +511,8 @@ export function TopNavigation({ path }: { path?: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay href="#fahrzeuge" onClick={handleNavLinkClick}>
-              Fahrzeugflotte
+            <LinkOverlay href="#fleet" onClick={handleNavLinkClick}>
+              {labelVehicleFleet}
             </LinkOverlay>
           </LinkBox>
           <LinkBox
@@ -479,8 +528,8 @@ export function TopNavigation({ path }: { path?: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay href="#rezensionen" onClick={handleNavLinkClick}>
-              Rezensionen
+            <LinkOverlay href="#reviews" onClick={handleNavLinkClick}>
+              {labelReviews}
             </LinkOverlay>
           </LinkBox>
           <LinkBox
@@ -495,10 +544,8 @@ export function TopNavigation({ path }: { path?: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay
-              onClick={handleOnBookingClick}
-            >
-              Jetzt buchen
+            <LinkOverlay onClick={handleOnBookingClick}>
+              {labelBookNow}
             </LinkOverlay>
           </LinkBox>
           <LinkBox
@@ -514,15 +561,12 @@ export function TopNavigation({ path }: { path?: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay
-              onClick={handleOnContactClick}
-            >
-              Kontakt
+            <LinkOverlay onClick={handleOnContactClick}>
+              {labelContact}
             </LinkOverlay>
           </LinkBox>
 
-          {/* === OFFICES: Left "Immer erreichbar" ===
-              (Hide entirely on mobile to avoid duplication; we re-render it in the "social" grid for mobile) */}
+          {/* OFFICES */}
           <Box
             gridArea="offices"
             pt={{ base: 8 }}
@@ -546,7 +590,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   <Field.Text
                     as={chakra.span}
                     name="TopNavAlwaysReachable"
-                    defaultValue="Immer erreichbar"
+                    defaultValue={labelAlwaysReachable}
                   />
                 </Text>
                 <VStack
@@ -573,7 +617,7 @@ export function TopNavigation({ path }: { path?: string }) {
                     <Field.Text
                       as={chakra.span}
                       name="TopNavCityCountry"
-                      defaultValue="Wien, Österreich"
+                      defaultValue={labelCityCountry}
                     />
                   </Text>
                 </VStack>
@@ -581,7 +625,7 @@ export function TopNavigation({ path }: { path?: string }) {
             </Flex>
           </Box>
 
-          {/* === SOCIAL === */}
+          {/* SOCIAL */}
           <Box
             gridArea="social"
             pt={{ base: 8 }}
@@ -593,9 +637,7 @@ export function TopNavigation({ path }: { path?: string }) {
             borderLeft="0"
             borderColor="limosen.border.faint"
           >
-            {/* MOBILE: 2x2 grid to align rows:
-                Row 1: Immer erreichbar | Konto
-                Row 2: Folgen Sie uns  | Sprache */}
+            {/* MOBILE */}
             <Grid
               display={{ base: 'grid', md: 'none' }}
               templateColumns="1fr auto"
@@ -603,7 +645,6 @@ export function TopNavigation({ path }: { path?: string }) {
               gap={6}
               alignItems="start"
             >
-              {/* Row 1, Col 1: Immer erreichbar */}
               <Box gridColumn="1" gridRow="1" minW={0}>
                 <Text
                   color="limosen.text.primary"
@@ -614,7 +655,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   <Field.Text
                     as={chakra.span}
                     name="TopNavAlwaysReachable_mobile"
-                    defaultValue="Immer erreichbar"
+                    defaultValue={labelAlwaysReachable}
                   />
                 </Text>
                 <VStack
@@ -641,13 +682,12 @@ export function TopNavigation({ path }: { path?: string }) {
                     <Field.Text
                       as={chakra.span}
                       name="TopNavCityCountry_mobile"
-                      defaultValue="Wien, Österreich"
+                      defaultValue={labelCityCountry}
                     />
                   </Text>
                 </VStack>
               </Box>
 
-              {/* Row 1, Col 2: Konto */}
               <Box gridColumn="2" gridRow="1" pr="32px">
                 <VStack spacing={3} align="flex-start" minW="auto">
                   <Text
@@ -656,7 +696,7 @@ export function TopNavigation({ path }: { path?: string }) {
                     fontSize="lg"
                     mb={1}
                   >
-                    Konto
+                    {labelAccount}
                   </Text>
                   <Button
                     size="sm"
@@ -668,7 +708,6 @@ export function TopNavigation({ path }: { path?: string }) {
                 </VStack>
               </Box>
 
-              {/* Row 2, Col 1: Folgen Sie uns */}
               <Box gridColumn="1" gridRow="2" minW={0}>
                 <Text
                   color="limosen.text.primary"
@@ -679,7 +718,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   <Field.Text
                     as={chakra.span}
                     name="TopNavFollowUs"
-                    defaultValue="Folgen Sie uns"
+                    defaultValue={intl.formatMessage({ id: 'TopNavFollowUs' })}
                   />
                 </Text>
                 <HStack spacing={6}>
@@ -699,7 +738,7 @@ export function TopNavigation({ path }: { path?: string }) {
                 </HStack>
               </Box>
 
-              {/* Row 2, Col 2: Sprache */}
+              {/* LANGUAGE (mobile) */}
               <Box gridColumn="2" gridRow="2" pr="32px">
                 <VStack spacing={3} align="flex-start" minW="auto">
                   <Text
@@ -708,7 +747,7 @@ export function TopNavigation({ path }: { path?: string }) {
                     fontSize="lg"
                     mb={0}
                   >
-                    Sprache
+                    {labelLanguage}
                   </Text>
                   <Button
                     variant="ghost"
@@ -720,18 +759,14 @@ export function TopNavigation({ path }: { path?: string }) {
                   >
                     <HStack spacing={2}>
                       <Image
-                        src={FLAG_DE}
-                        alt="Deutsch"
+                        src={currentFlag}
+                        alt={labelLanguage}
                         width="24px"
                         height="24px"
                         objectFit="cover"
                       />
                       <Text fontWeight="semibold" color="limosen.text.primary">
-                        <Field.Text
-                          as={chakra.span}
-                          name="LangCodeDE"
-                          defaultValue="DE"
-                        />
+                        {languageCodeDisplay}
                       </Text>
                     </HStack>
                   </Button>
@@ -739,7 +774,7 @@ export function TopNavigation({ path }: { path?: string }) {
               </Box>
             </Grid>
 
-            {/* DESKTOP/TABLET: original layout unchanged */}
+            {/* DESKTOP/TABLET */}
             <Flex
               justify="space-between"
               align="flex-start"
@@ -756,7 +791,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   <Field.Text
                     as={chakra.span}
                     name="TopNavFollowUs_desktop"
-                    defaultValue="Folgen Sie uns"
+                    defaultValue={labelFollowUs}
                   />
                 </Text>
                 <HStack spacing={6}>
@@ -779,6 +814,7 @@ export function TopNavigation({ path }: { path?: string }) {
           </Box>
         </Grid>
       </Box>
+
       <Container maxW="6xl" pos="absolute" inset={0} pointerEvents="none">
         <Flex
           h={{ base: '12vh', md: '15vh' }}
@@ -804,9 +840,10 @@ export function TopNavigation({ path }: { path?: string }) {
               <Logo />
             </Box>
           </Link>
+
           <Flex align="center" gap={{ base: 2, lg: 4 }}>
             <Flex display={{ base: 'none', lg: 'flex' }} align="center" gap={2}>
-              {NAV_LINKS.map(link => {
+              {navLinks.map(link => {
                 const isActive =
                   currentPath && currentPath === linkPathname(link.href);
                 return (
@@ -832,7 +869,7 @@ export function TopNavigation({ path }: { path?: string }) {
               })}
             </Flex>
 
-            {/* Language button opens Chakra UI Modal (desktop/tablet only) */}
+            {/* Language button opens modal */}
             <Button
               variant="ghost"
               color="limosen.text.primary"
@@ -843,19 +880,10 @@ export function TopNavigation({ path }: { path?: string }) {
               display={{ base: 'none', md: 'inline-flex' }}
             >
               <HStack spacing={2}>
-                <Tooltip
-                  label={
-                    <Field.Text
-                      as={chakra.span}
-                      name="LangTooltipDE"
-                      defaultValue="Deutsch"
-                    />
-                  }
-                  hasArrow
-                >
+                <Tooltip label={labelLanguage} hasArrow>
                   <Image
-                    src={FLAG_DE}
-                    alt="Deutsch"
+                    src={currentFlag}
+                    alt={labelLanguage}
                     width="24px"
                     height="24px"
                     objectFit="cover"
@@ -863,34 +891,24 @@ export function TopNavigation({ path }: { path?: string }) {
                   />
                 </Tooltip>
                 <Text fontWeight="semibold" color="limosen.text.primary">
-                  <Field.Text
-                    as={chakra.span}
-                    name="LangCodeDE"
-                    defaultValue="DE"
-                  />
+                  {languageCodeDisplay}
                 </Text>
               </HStack>
             </Button>
 
             {/* Booking */}
-            <Button
-              size="sm"
-              variant="limosen"
-              onClick={handleOnBookingClick}
-            >
-              Jetzt Buchen
+            <Button size="sm" variant="limosen" onClick={handleOnBookingClick}>
+              {intl.formatMessage({ id: 'BookNowCta' })}
             </Button>
 
-            {/* Mobile menu (HamburgerMenuIcon) */}
+            {/* Mobile menu */}
             <IconButton
-              aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
               icon={
                 <HamburgerMenuIcon
                   handleClick={toggleMenu}
                   wrapperProps={{ className: menuActive ? 'open' : '' }}
-                  iconProps={{
-                    backgroundColor: 'limosen.text.primary'
-                  }}
+                  iconProps={{ backgroundColor: 'limosen.text.primary' }}
                 />
               }
               variant="ghost"
@@ -915,86 +933,24 @@ export function TopNavigation({ path }: { path?: string }) {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <VStack align="stretch" spacing={3}>
-              <Button
-                as={Link}
-                href="https://limosen.at/de"
-                justifyContent="flex-start"
-                variant="ghost"
-                onClick={langModal.onClose}
-                color="limosen.text.primary"
-                _hover={{ bg: 'whiteAlpha.200' }}
-              >
-                <HStack spacing={3}>
-                  <Image
-                    src={FLAG_DE}
-                    alt="Deutsch"
-                    width="28px"
-                    height="28px"
-                    objectFit="cover"
-                  />
-                  <Text>
-                    <Field.Text
-                      as={chakra.span}
-                      name="LangDE"
-                      defaultValue="Deutsch"
-                    />
-                  </Text>
-                </HStack>
-              </Button>
-              <Button
-                as={Link}
-                href="https://limosen.at/en"
-                justifyContent="flex-start"
-                variant="ghost"
-                onClick={langModal.onClose}
-                color="limosen.text.primary"
-                _hover={{ bg: 'whiteAlpha.200' }}
-              >
-                <HStack spacing={3}>
-                  <Image
-                    src={FLAG_EN}
-                    alt="English"
-                    width="28px"
-                    height="28px"
-                    objectFit="cover"
-                  />
-                  <Text>
-                    <Field.Text
-                      as={chakra.span}
-                      name="LangEN"
-                      defaultValue="English"
-                    />
-                  </Text>
-                </HStack>
-              </Button>
-              <Button
-                as={Link}
-                href="https://limosen.at/tr"
-                justifyContent="flex-start"
-                variant="ghost"
-                onClick={langModal.onClose}
-                color="limosen.text.primary"
-                _hover={{ bg: 'whiteAlpha.200' }}
-              >
-                <HStack spacing={3}>
-                  <Image
-                    src={FLAG_TR}
-                    alt="Türkçe"
-                    width="28px"
-                    height="28px"
-                    objectFit="cover"
-                  />
-                  <Text>
-                    <Field.Text
-                      as={chakra.span}
-                      name="LangTR"
-                      defaultValue="Türkçe"
-                    />
-                  </Text>
-                </HStack>
-              </Button>
-            </VStack>
+            <ChakraLanguageSwitcher
+              onSelect={langModal.onClose}
+              // Names come from react-intl messages (no hardcoding):
+              // Tries languages.<exact-locale> then languages.<base>
+              buttonProps={{
+                justifyContent: 'flex-start',
+                variant: 'ghost',
+                color: 'limosen.text.primary',
+                _hover: { bg: 'whiteAlpha.200' }
+              }}
+              // Optional: provide flags; omit this prop to show no flags
+              flags={{
+                'de-AT': FLAG_DE,
+                'en-US': FLAG_EN,
+                'tr-TR': FLAG_TR,
+                'ar-EG': FLAG_AR
+              }}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -1016,7 +972,9 @@ function HeroSection({ background }: { background: string }) {
   );
 }
 
-function AboutSection() {
+function AboutSection({ language }: { language: string }) {
+  const intl = useIntl();
+
   return (
     <Box
       as="section"
@@ -1044,7 +1002,7 @@ function AboutSection() {
               <Field.Text
                 as={chakra.span}
                 name="AboutTitle"
-                defaultValue="Über uns"
+                defaultValue={intl.formatMessage({ id: 'AboutTitle' })}
               />
             </Heading>
             <Stack
@@ -1057,27 +1015,26 @@ function AboutSection() {
                 <Field.Text
                   as={chakra.span}
                   name="AboutP1"
-                  defaultValue="LIMOSEN KG verfolgt seit 2016 die sektoralen und technologischen Entwicklungen und ist das ganze Jahr rund um die Uhr erreichbar."
+                  defaultValue={intl.formatMessage({ id: 'AboutP1' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
                   name="AboutP2"
-                  defaultValue="Unsere Flotte bestehend aus den modernsten Mercedes-Benz-Fahrzeugen mit unseren freundlichen, professionellen und erfahrenen Fahrern und einer zuverlässigen, wirtschaftlichen und komfortablen Serviceauffassung steigern wir die Servicequalität permanent und wachsen kontinuierlich weiter."
+                  defaultValue={intl.formatMessage({ id: 'AboutP2' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
                   name="AboutP3"
-                  defaultValue="Kundenzufriedenheit ist unsere oberste Priorität und unser Unternehmen übt die Destinationen in unserem Portfolio in bester Weise aus, um unseren Kunden die höchste Qualität zu bieten."
+                  defaultValue={intl.formatMessage({ id: 'AboutP3' })}
                 />
               </Text>
             </Stack>
           </VStack>
 
-          {/* sized wrapper + fill image */}
           <Box
             flex={{ base: 'none', md: '0 0 40%' }}
             minH={{ base: '240px', md: '320px' }}
@@ -1090,7 +1047,7 @@ function AboutSection() {
             <Field.Image
               name="about-image"
               defaultValue={ABOUT_IMAGE}
-              alt="Über uns"
+              alt={intl.formatMessage({ id: 'AboutImageAlt' })}
               style={{ width: '100%', height: '100%' }}
               objectFit="cover"
             />
@@ -1101,10 +1058,18 @@ function AboutSection() {
   );
 }
 
-function ServicesSection() {
+function ServicesSection({ language }: { language: string }) {
+  const intl = useIntl();
+  const services: Array<{
+    id: string;
+    title: string;
+    image?: string;
+    paragraphs: string[];
+  }> = ((intl.messages as any)?.services as any) ?? [];
+
   const serviceIds = useMemo(
-    () => SERVICES_CONTENT.map(service => service.id),
-    []
+    () => services.map(service => service.id as string),
+    [services]
   );
   const { expandedIndices, handleAccordionChange, btnRefs } =
     useServiceAccordionNavigation(serviceIds);
@@ -1146,14 +1111,14 @@ function ServicesSection() {
               <Field.Text
                 as={chakra.span}
                 name="ServicesTitle"
-                defaultValue="Unsere Services"
+                defaultValue={intl.formatMessage({ id: 'ServicesTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
                 name="ServicesSubtitle"
-                defaultValue="Erhalten Sie einen schnellen Überblick über unser Angebot und vertiefen Sie sich bei Bedarf in die detaillierten Beschreibungen unserer Premium-Services."
+                defaultValue={intl.formatMessage({ id: 'ServicesSubtitle' })}
               />
             </Text>
             <Divider
@@ -1166,7 +1131,7 @@ function ServicesSection() {
             columns={{ base: 1, md: 2, lg: 3 }}
             spacing={{ base: 6, md: 8 }}
           >
-            {SERVICES_CONTENT.map(service => {
+            {services.map(service => {
               const targetHref = `#${service.id}`;
               return (
                 <LinkBox
@@ -1186,8 +1151,8 @@ function ServicesSection() {
                     <AspectRatio ratio={5 / 3} w="100%">
                       <Field.Image
                         name={`service-card-${service.id}`}
-                        defaultValue={service.image}
-                        alt={service.title}
+                        defaultValue={service.image as string}
+                        alt={service.title as string}
                         objectFit="cover"
                         style={{ width: '100%', height: '100%' }}
                       />
@@ -1197,9 +1162,7 @@ function ServicesSection() {
                     <LinkOverlay
                       href={targetHref}
                       display="block"
-                      onClick={e => {
-                        handleServiceLinkClick(e, targetHref);
-                      }}
+                      onClick={e => handleServiceLinkClick(e, targetHref)}
                     >
                       <Stack spacing={3}>
                         <Heading size="sm" color="limosen.text.primary">
@@ -1210,10 +1173,10 @@ function ServicesSection() {
                           fontSize="sm"
                           noOfLines={3}
                         >
-                          {summaryText(service.paragraphs)}
+                          {summaryText(service.paragraphs as string[])}
                         </Text>
                         <Text fontWeight="semibold" color="limosen.accent">
-                          Mehr erfahren →
+                          {intl.formatMessage({ id: 'MoreDetails' })} →
                         </Text>
                       </Stack>
                     </LinkOverlay>
@@ -1233,7 +1196,7 @@ function ServicesSection() {
               <Field.Text
                 as={chakra.span}
                 name="ServicesDetailsTitle"
-                defaultValue="Details zu unseren Leistungen"
+                defaultValue={intl.formatMessage({ id: 'ServicesDetailsTitle' })}
               />
             </Heading>
             <Accordion
@@ -1242,20 +1205,22 @@ function ServicesSection() {
               index={expandedIndices}
               onChange={handleAccordionChange}
             >
-              {SERVICES_CONTENT.map(service => {
-                const blocks = createContentBlocks(service.paragraphs);
+              {services.map(service => {
+                const blocks = createContentBlocks(
+                  service.paragraphs as string[]
+                );
                 const hasImage = Boolean(service.image);
                 return (
                   <AccordionItem
                     key={service.id}
-                    id={service.id}
+                    id={service.id as string}
                     border="none"
                     mb={4}
                   >
                     <h3>
                       <AccordionButton
                         ref={el => {
-                          btnRefs.current[service.id] = el;
+                          btnRefs.current[service.id as string] = el;
                         }}
                         scrollMarginTop={{ base: '120px', md: '160px' }}
                         bg="whiteAlpha.50"
@@ -1296,7 +1261,7 @@ function ServicesSection() {
                             <Field.Image
                               name={`service-panel-${service.id}`}
                               defaultValue={service.image as string}
-                              alt={service.title}
+                              alt={service.title as string}
                               objectFit="cover"
                               style={{ width: '100%', height: '100%' }}
                             />
@@ -1335,7 +1300,11 @@ function ServicesSection() {
   );
 }
 
-function FAQSection() {
+function FAQSection({ language }: { language: string }) {
+  const intl = useIntl();
+  const items: Array<{ question: string; answer: string }> =
+    ((intl.messages as any)?.faq as any) ?? [];
+
   return (
     <Box as="section" bg="limosen.bg.section" py={{ base: 12, md: 20 }}>
       <Container maxW="5xl">
@@ -1345,14 +1314,14 @@ function FAQSection() {
               <Field.Text
                 as={chakra.span}
                 name="FaqTitle"
-                defaultValue="Häufig gestellte Fragen"
+                defaultValue={intl.formatMessage({ id: 'FaqTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
                 name="FaqSubtitle"
-                defaultValue="Antworten auf die wichtigsten Fragen zu Buchung, Fahrzeugen und unserem Premium-Service."
+                defaultValue={intl.formatMessage({ id: 'FaqSubtitle' })}
               />
             </Text>
             <Divider
@@ -1361,7 +1330,7 @@ function FAQSection() {
             />
           </VStack>
           <Accordion allowToggle reduceMotion>
-            {FAQ_ITEMS.map(item => (
+            {items.map(item => (
               <AccordionItem key={item.question} border="none" mb={3}>
                 <h3>
                   <AccordionButton
@@ -1400,11 +1369,21 @@ function FAQSection() {
   );
 }
 
-function FleetSection() {
+function FleetSection({ language }: { language: string }) {
+  const intl = useIntl();
+  const vehicles: Array<{
+    image: string;
+    category: string;
+    name: string;
+    description: string;
+    passengers: number;
+    luggage: number;
+  }> = ((intl.messages as any)?.fleet as any) ?? [];
+
   return (
     <Box
       as="section"
-      id="fahrzeuge"
+      id="fleet"
       bg="limosen.bg.fleet"
       py={{ base: 12, md: 20 }}
     >
@@ -1414,16 +1393,16 @@ function FleetSection() {
             <Field.Text
               as={chakra.span}
               name="FleetTitle"
-              defaultValue="Unsere Fahrzeugflotte"
+              defaultValue={intl.formatMessage({ id: 'FleetTitle' })}
             />
           </Heading>
           <SimpleGrid
             columns={{ base: 1, md: 2 }}
             spacing={{ base: 8, md: 10 }}
           >
-            {FLEET_VEHICLES.map(vehicle => (
+            {vehicles.map(vehicle => (
               <Box
-                key={vehicle.image}
+                key={vehicle.name}
                 bg="limosen.bg.card"
                 borderRadius="lg"
                 overflow="hidden"
@@ -1431,7 +1410,6 @@ function FleetSection() {
                 border="1px solid"
                 borderColor="limosen.border.faint"
               >
-                {/* fixed-height wrapper so the CMS image cannot collapse */}
                 <Box
                   w="100%"
                   h={{ base: '220px', md: '260px' }}
@@ -1440,8 +1418,8 @@ function FleetSection() {
                 >
                   <Field.Image
                     name={`fleet-${vehicle.name}`}
-                    defaultValue={vehicle.image}
-                    alt={vehicle.name}
+                    defaultValue={vehicle.image as string}
+                    alt={vehicle.name as string}
                     style={{ width: '100%', height: '100%' }}
                     objectFit="cover"
                   />
@@ -1458,7 +1436,6 @@ function FleetSection() {
                     {vehicle.description}
                   </Text>
 
-                  {/* specs row — stay inside the card */}
                   <Wrap spacing={6} pt={2}>
                     <WrapItem>
                       <HStack spacing={2}>
@@ -1470,7 +1447,7 @@ function FleetSection() {
                           <Field.Text
                             as={chakra.span}
                             name={`FleetPassengersLabel_${vehicle.name}`}
-                            defaultValue="Passagieranzahl:"
+                            defaultValue={intl.formatMessage({ id: 'FleetPassengersLabel' })}
                           />{' '}
                           {vehicle.passengers}
                         </Text>
@@ -1486,7 +1463,7 @@ function FleetSection() {
                           <Field.Text
                             as={chakra.span}
                             name={`FleetLuggageLabel_${vehicle.name}`}
-                            defaultValue="Gepäckanzahl:"
+                            defaultValue={intl.formatMessage({ id: 'FleetLuggageLabel' })}
                           />{' '}
                           {vehicle.luggage}
                         </Text>
@@ -1503,13 +1480,12 @@ function FleetSection() {
   );
 }
 
-function OnlineBookingSection() {
+function OnlineBookingSection({ language }: { language: string }) {
   const contactModal = useContactModal();
+  const intl = useIntl();
+
   const handleOnContactClick = () => {
-    console.log('contactModal', contactModal);
-    contactModal.onOpen({
-      meta: {}
-    });
+    contactModal.onOpen({ meta: {} });
   };
 
   return (
@@ -1533,7 +1509,7 @@ function OnlineBookingSection() {
             <Field.Text
               as={chakra.span}
               name="BookingTitle"
-              defaultValue="Buchen sie heute und lassen Sie uns den Komfort Ihrer Reise berücksichtigen."
+              defaultValue={intl.formatMessage({ id: 'BookingTitle' })}
             />
           </Heading>
           <Stack
@@ -1546,7 +1522,7 @@ function OnlineBookingSection() {
               <Field.Text
                 as={chakra.span}
                 name="BookingReachPhone"
-                defaultValue="Sie können uns telefonisch"
+                defaultValue={intl.formatMessage({ id: 'BookingReachPhone' })}
               />
             </Text>
             <HStack justify="center" spacing={2}>
@@ -1564,14 +1540,14 @@ function OnlineBookingSection() {
               <Field.Text
                 as={chakra.span}
                 name="BookingAnd"
-                defaultValue="und"
+                defaultValue={intl.formatMessage({ id: 'BookingAnd' })}
               />
             </Text>
             <Text>
               <Field.Text
                 as={chakra.span}
                 name="BookingReachEmail"
-                defaultValue="auch mit einer E-Mail erreichen"
+                defaultValue={intl.formatMessage({ id: 'BookingReachEmail' })}
               />
             </Text>
             <HStack justify="center" spacing={2}>
@@ -1584,11 +1560,8 @@ function OnlineBookingSection() {
               </Link>
             </HStack>
           </Stack>
-          <Button
-            variant="limosen"
-            onClick={handleOnContactClick}
-          >
-            Kontakt
+          <Button variant="limosen" onClick={handleOnContactClick}>
+            {intl.formatMessage({ id: 'ContactCta' })}
           </Button>
         </VStack>
       </Container>
@@ -1596,11 +1569,13 @@ function OnlineBookingSection() {
   );
 }
 
-function RezensionenSection() {
+function ReviewsSection({ language }: { language: string }) {
+  const intl = useIntl();
+
   return (
     <Box
       as="section"
-      id="rezensionen"
+      id="reviews"
       bg="limosen.bg.section"
       py={{ base: 12, md: 20 }}
     >
@@ -1611,14 +1586,14 @@ function RezensionenSection() {
               <Field.Text
                 as={chakra.span}
                 name="FeedbackTitle"
-                defaultValue="Rezensionen"
+                defaultValue={intl.formatMessage({ id: 'FeedbackTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
                 name="FeedbackSubtitle"
-                defaultValue="Ihre aktuelle Google-Bewertung &amp; Rezensionen sehen Sie direkt in der Karte – live von Google."
+                defaultValue={intl.formatMessage({ id: 'FeedbackSubtitle' })}
               />
             </Text>
             <Divider
@@ -1644,14 +1619,14 @@ function RezensionenSection() {
                   <Field.Text
                     as={chakra.span}
                     name="FeedbackBoxTitle"
-                    defaultValue="Bewertung auf Google"
+                    defaultValue={intl.formatMessage({ id: 'FeedbackBoxTitle' })}
                   />
                 </Heading>
                 <Text color="limosen.text.secondary">
                   <Field.Text
                     as={chakra.span}
                     name="FeedbackBoxText"
-                    defaultValue="Öffnen Sie LIMOSEN VIP auf Google Maps, um <strong>aktuelle Sterne</strong> und <strong>Rezensionen</strong> zu sehen oder eine Bewertung abzugeben."
+                    defaultValue={intl.formatMessage({ id: 'FeedbackBoxText' })}
                   />
                 </Text>
                 <HStack pt={2} spacing={3} wrap="wrap">
@@ -1664,7 +1639,7 @@ function RezensionenSection() {
                     <Field.Text
                       as={chakra.span}
                       name="FeedbackMapsCta"
-                      defaultValue="Auf Google Maps ansehen"
+                      defaultValue={intl.formatMessage({ id: 'FeedbackMapsCta' })}
                     />
                   </Button>
                 </HStack>
@@ -1704,7 +1679,13 @@ function RezensionenSection() {
   );
 }
 
-export function Footer() {
+export function Footer({ language }: { language?: string }) {
+  const intl = useIntl();
+  const footerGroups: Array<{
+    title: string;
+    links: { label: string; href: string }[];
+  }> = ((intl.messages as any)?.footer as any) ?? [];
+
   return (
     <Box as="footer" bg="limosen.bg.footer" py={{ base: 12, md: 16 }}>
       <Container maxW="6xl">
@@ -1722,7 +1703,7 @@ export function Footer() {
                 <Field.Text
                   as={chakra.span}
                   name="FooterTagline"
-                  defaultValue="Premium Chauffeur-Service in Wien und darüber hinaus."
+                  defaultValue={intl.formatMessage({ id: 'FooterTagline' })}
                 />
               </Text>
             </Box>
@@ -1731,7 +1712,7 @@ export function Footer() {
               spacing={{ base: 8, md: 10 }}
               flex="1"
             >
-              {FOOTER_LINK_GROUPS.map(group => (
+              {footerGroups.map(group => (
                 <VStack key={group.title} spacing={4} align="flex-start">
                   <Text
                     fontWeight="bold"
@@ -1744,7 +1725,7 @@ export function Footer() {
                   <VStack spacing={2} align="flex-start">
                     {group.links.map(link => (
                       <Link
-                        key={link.label}
+                        key={`${group.title}-${link.label}`}
                         href={link.href}
                         color="limosen.text.muted"
                         _hover={{ color: 'limosen.text.primary' }}
@@ -1769,7 +1750,7 @@ export function Footer() {
               <Field.Text
                 as={chakra.span}
                 name="FooterRights"
-                defaultValue="Alle Rechte vorbehalten."
+                defaultValue={intl.formatMessage({ id: 'FooterRights' })}
               />
             </Text>
             <Wrap spacing={3}>

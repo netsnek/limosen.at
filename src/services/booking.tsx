@@ -1,4 +1,4 @@
-// booking.tsx
+// src/services/booking.tsx
 import React, { useMemo } from "react"
 import { useToast } from "@chakra-ui/react"
 import { sendTemplateMail } from "gatsby-jaen-mailpress"
@@ -6,6 +6,8 @@ import { useLocation } from "@reach/router"
 import { BookingFormValues, BookingModal } from "../components/BookingModal/BookingModal"
 import { useAuth } from "jaen"
 import { useQueryRouter } from "../hooks/use-query-router"
+import { useT } from "../contexts/language"
+import { useIntl } from "react-intl"
 
 export interface BookingModalContextProps {
   onOpen: (args?: { meta?: Record<string, any> }) => void
@@ -31,6 +33,8 @@ export interface BookingModalDrawerProps {
 }
 
 export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({ children }) => {
+  const t = useT()
+  const { locale } = useIntl()
   const location = useLocation()
   const { isCalled, paramValue } = useQueryRouter(location, "booking")
 
@@ -86,7 +90,7 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({ childr
           replyTo: data.email,
         },
         values: {
-          // Kontakt
+          // Contact
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
@@ -94,7 +98,7 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({ childr
           flightNumber: data.flightNumber || "",
           message: data.message,
 
-          // Fahrt-Details
+          // Ride details
           rideCategory: data.rideCategory || "",
           rideType: data.rideType || "",
           date: data.date || "",
@@ -106,12 +110,13 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({ childr
           childSeats: data.childSeats ?? "",
           extraTime: data.extraTime ?? "",
 
-          // Fahrzeug/Preis
+          // Vehicle & Payment
           carClass: data.carClass || "",
           carTitle: data.carTitle || "",
-          price: data.price ?? "",
+          paymentOption: data.paymentOption || "",
 
           // Meta
+          locale,          // helpful in your email template
           invokedOnUrl,
         },
       }
@@ -119,16 +124,16 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({ childr
 
     if (errors) {
       toast({
-        title: "Fehler",
-        description: "Es ist ein Fehler aufgetreten.",
+        title: t("ToastErrorTitle", "Error"),
+        description: t("ToastErrorDesc", "Something went wrong."),
         status: "error",
         duration: 5000,
         isClosable: true,
       })
     } else {
       toast({
-        title: "Erfolg",
-        description: "Ihre Reservierungsanfrage wurde erfolgreich versendet.",
+        title: t("ToastSuccessTitle", "Success"),
+        description: t("ToastSuccessDesc", "Your reservation request has been sent successfully."),
         status: "success",
         duration: 5000,
         isClosable: true,

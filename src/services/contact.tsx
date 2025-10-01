@@ -1,4 +1,4 @@
-// contact.tsx
+// src/services/contact.tsx
 import React, { useMemo } from "react"
 import { useToast } from "@chakra-ui/react"
 import { sendTemplateMail } from "gatsby-jaen-mailpress"
@@ -6,6 +6,7 @@ import { useLocation } from "@reach/router"
 import { ContactFormValues, ContactModal } from "../components/ContactModal/ContactModal"
 import { useAuth } from "jaen"
 import { useQueryRouter } from "../hooks/use-query-router"
+import { useT } from "../contexts/language"
 
 export interface ContactModalContextProps {
   onOpen: (args?: { meta?: Record<string, any> }) => void
@@ -13,10 +14,7 @@ export interface ContactModalContextProps {
 }
 
 export const ContactModalContext =
-  React.createContext<ContactModalContextProps>({
-    onOpen: () => {},
-    onClose: () => {},
-  })
+  React.createContext<ContactModalContextProps | undefined>(undefined)
 
 export const useContactModal = () => {
   const context = React.useContext(ContactModalContext)
@@ -31,6 +29,7 @@ export interface ContactModalDrawerProps {
 }
 
 export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ children }) => {
+  const t = useT()
   const location = useLocation()
   const { isCalled, paramValue } = useQueryRouter(location, "contact")
 
@@ -86,30 +85,12 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
           replyTo: data.email,
         },
         values: {
-          // Kontakt
+          // Contact
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
           phone: data.phone || "",
-          flightNumber: data.flightNumber || "",
           message: data.message,
-
-          // Fahrt-Details
-          rideCategory: data.rideCategory || "",
-          rideType: data.rideType || "",
-          date: data.date || "",
-          time: data.time || "",
-          pickupAddress: data.pickupAddress || "",
-          destinationAddress: data.destinationAddress || "",
-          passengers: data.passengers ?? "",
-          luggage: data.luggage ?? "",
-          childSeats: data.childSeats ?? "",
-          extraTime: data.extraTime ?? "",
-
-          // Fahrzeug/Preis
-          carClass: data.carClass || "",
-          carTitle: data.carTitle || "",
-          price: data.price ?? "",
 
           // Meta
           invokedOnUrl,
@@ -119,16 +100,16 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
 
     if (errors) {
       toast({
-        title: "Fehler",
-        description: "Es ist ein Fehler aufgetreten.",
+        title: t("ToastErrorTitle", "Error"),
+        description: t("ToastErrorDesc", "Something went wrong."),
         status: "error",
         duration: 5000,
         isClosable: true,
       })
     } else {
       toast({
-        title: "Erfolg",
-        description: "Ihre Reservierungsanfrage wurde erfolgreich versendet.",
+        title: t("ToastSuccessTitle", "Success"),
+        description: t("ToastSuccessDesc", "Your reservation request has been sent successfully."),
         status: "success",
         duration: 5000,
         isClosable: true,

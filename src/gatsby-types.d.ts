@@ -2404,6 +2404,7 @@ type Query = {
   readonly allSiteFunction: SiteFunctionConnection;
   readonly allSitePage: SitePageConnection;
   readonly allSitePlugin: SitePluginConnection;
+  readonly allTranslation: TranslationConnection;
   readonly directory: Maybe<Directory>;
   readonly file: Maybe<File>;
   readonly imageSharp: Maybe<ImageSharp>;
@@ -2418,6 +2419,7 @@ type Query = {
   readonly siteFunction: Maybe<SiteFunction>;
   readonly sitePage: Maybe<SitePage>;
   readonly sitePlugin: Maybe<SitePlugin>;
+  readonly translation: Maybe<Translation>;
 };
 
 
@@ -2530,6 +2532,14 @@ type Query_allSitePluginArgs = {
   limit: InputMaybe<Scalars['Int']>;
   skip: InputMaybe<Scalars['Int']>;
   sort: InputMaybe<ReadonlyArray<InputMaybe<SitePluginSortInput>>>;
+};
+
+
+type Query_allTranslationArgs = {
+  filter: InputMaybe<TranslationFilterInput>;
+  limit: InputMaybe<Scalars['Int']>;
+  skip: InputMaybe<Scalars['Int']>;
+  sort: InputMaybe<ReadonlyArray<InputMaybe<TranslationSortInput>>>;
 };
 
 
@@ -2755,6 +2765,7 @@ type Query_sitePageArgs = {
   children: InputMaybe<NodeFilterListInput>;
   component: InputMaybe<StringQueryOperatorInput>;
   componentChunkName: InputMaybe<StringQueryOperatorInput>;
+  context: InputMaybe<SitePageContextFilterInput>;
   id: InputMaybe<StringQueryOperatorInput>;
   internal: InputMaybe<InternalFilterInput>;
   internalComponentName: InputMaybe<StringQueryOperatorInput>;
@@ -2780,6 +2791,16 @@ type Query_sitePluginArgs = {
   resolve: InputMaybe<StringQueryOperatorInput>;
   ssrAPIs: InputMaybe<StringQueryOperatorInput>;
   version: InputMaybe<StringQueryOperatorInput>;
+};
+
+
+type Query_translationArgs = {
+  children: InputMaybe<NodeFilterListInput>;
+  id: InputMaybe<StringQueryOperatorInput>;
+  internal: InputMaybe<InternalFilterInput>;
+  key: InputMaybe<StringQueryOperatorInput>;
+  locale: InputMaybe<StringQueryOperatorInput>;
+  parent: InputMaybe<NodeFilterInput>;
 };
 
 type Site = Node & {
@@ -3242,6 +3263,7 @@ type SitePage = Node & {
   readonly children: ReadonlyArray<Node>;
   readonly component: Scalars['String'];
   readonly componentChunkName: Scalars['String'];
+  readonly context: Maybe<SitePageContext>;
   readonly id: Scalars['ID'];
   readonly internal: Internal;
   readonly internalComponentName: Scalars['String'];
@@ -3291,6 +3313,30 @@ type SitePageConnection_sumArgs = {
   field: SitePageFieldSelector;
 };
 
+type SitePageContext = {
+  readonly locale: Maybe<Scalars['String']>;
+  readonly localePagesId: Maybe<Scalars['String']>;
+  readonly prefix: Maybe<Scalars['String']>;
+};
+
+type SitePageContextFieldSelector = {
+  readonly locale: InputMaybe<FieldSelectorEnum>;
+  readonly localePagesId: InputMaybe<FieldSelectorEnum>;
+  readonly prefix: InputMaybe<FieldSelectorEnum>;
+};
+
+type SitePageContextFilterInput = {
+  readonly locale: InputMaybe<StringQueryOperatorInput>;
+  readonly localePagesId: InputMaybe<StringQueryOperatorInput>;
+  readonly prefix: InputMaybe<StringQueryOperatorInput>;
+};
+
+type SitePageContextSortInput = {
+  readonly locale: InputMaybe<SortOrderEnum>;
+  readonly localePagesId: InputMaybe<SortOrderEnum>;
+  readonly prefix: InputMaybe<SortOrderEnum>;
+};
+
 type SitePageEdge = {
   readonly next: Maybe<SitePage>;
   readonly node: SitePage;
@@ -3301,6 +3347,7 @@ type SitePageFieldSelector = {
   readonly children: InputMaybe<NodeFieldSelector>;
   readonly component: InputMaybe<FieldSelectorEnum>;
   readonly componentChunkName: InputMaybe<FieldSelectorEnum>;
+  readonly context: InputMaybe<SitePageContextFieldSelector>;
   readonly id: InputMaybe<FieldSelectorEnum>;
   readonly internal: InputMaybe<InternalFieldSelector>;
   readonly internalComponentName: InputMaybe<FieldSelectorEnum>;
@@ -3315,6 +3362,7 @@ type SitePageFilterInput = {
   readonly children: InputMaybe<NodeFilterListInput>;
   readonly component: InputMaybe<StringQueryOperatorInput>;
   readonly componentChunkName: InputMaybe<StringQueryOperatorInput>;
+  readonly context: InputMaybe<SitePageContextFilterInput>;
   readonly id: InputMaybe<StringQueryOperatorInput>;
   readonly internal: InputMaybe<InternalFilterInput>;
   readonly internalComponentName: InputMaybe<StringQueryOperatorInput>;
@@ -3370,6 +3418,7 @@ type SitePageSortInput = {
   readonly children: InputMaybe<NodeSortInput>;
   readonly component: InputMaybe<SortOrderEnum>;
   readonly componentChunkName: InputMaybe<SortOrderEnum>;
+  readonly context: InputMaybe<SitePageContextSortInput>;
   readonly id: InputMaybe<SortOrderEnum>;
   readonly internal: InputMaybe<InternalSortInput>;
   readonly internalComponentName: InputMaybe<SortOrderEnum>;
@@ -3592,6 +3641,128 @@ type TransformOptions = {
   readonly grayscale: InputMaybe<Scalars['Boolean']>;
   readonly rotate: InputMaybe<Scalars['Int']>;
   readonly trim: InputMaybe<Scalars['Float']>;
+};
+
+type Translation = Node & {
+  readonly children: ReadonlyArray<Node>;
+  readonly id: Scalars['ID'];
+  readonly internal: Internal;
+  readonly key: Maybe<Scalars['String']>;
+  readonly locale: Maybe<Scalars['String']>;
+  readonly parent: Maybe<Node>;
+};
+
+type TranslationConnection = {
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly edges: ReadonlyArray<TranslationEdge>;
+  readonly group: ReadonlyArray<TranslationGroupConnection>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly nodes: ReadonlyArray<Translation>;
+  readonly pageInfo: PageInfo;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly totalCount: Scalars['Int'];
+};
+
+
+type TranslationConnection_distinctArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationConnection_groupArgs = {
+  field: TranslationFieldSelector;
+  limit: InputMaybe<Scalars['Int']>;
+  skip: InputMaybe<Scalars['Int']>;
+};
+
+
+type TranslationConnection_maxArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationConnection_minArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationConnection_sumArgs = {
+  field: TranslationFieldSelector;
+};
+
+type TranslationEdge = {
+  readonly next: Maybe<Translation>;
+  readonly node: Translation;
+  readonly previous: Maybe<Translation>;
+};
+
+type TranslationFieldSelector = {
+  readonly children: InputMaybe<NodeFieldSelector>;
+  readonly id: InputMaybe<FieldSelectorEnum>;
+  readonly internal: InputMaybe<InternalFieldSelector>;
+  readonly key: InputMaybe<FieldSelectorEnum>;
+  readonly locale: InputMaybe<FieldSelectorEnum>;
+  readonly parent: InputMaybe<NodeFieldSelector>;
+};
+
+type TranslationFilterInput = {
+  readonly children: InputMaybe<NodeFilterListInput>;
+  readonly id: InputMaybe<StringQueryOperatorInput>;
+  readonly internal: InputMaybe<InternalFilterInput>;
+  readonly key: InputMaybe<StringQueryOperatorInput>;
+  readonly locale: InputMaybe<StringQueryOperatorInput>;
+  readonly parent: InputMaybe<NodeFilterInput>;
+};
+
+type TranslationGroupConnection = {
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly edges: ReadonlyArray<TranslationEdge>;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+  readonly group: ReadonlyArray<TranslationGroupConnection>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly nodes: ReadonlyArray<Translation>;
+  readonly pageInfo: PageInfo;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly totalCount: Scalars['Int'];
+};
+
+
+type TranslationGroupConnection_distinctArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationGroupConnection_groupArgs = {
+  field: TranslationFieldSelector;
+  limit: InputMaybe<Scalars['Int']>;
+  skip: InputMaybe<Scalars['Int']>;
+};
+
+
+type TranslationGroupConnection_maxArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationGroupConnection_minArgs = {
+  field: TranslationFieldSelector;
+};
+
+
+type TranslationGroupConnection_sumArgs = {
+  field: TranslationFieldSelector;
+};
+
+type TranslationSortInput = {
+  readonly children: InputMaybe<NodeSortInput>;
+  readonly id: InputMaybe<SortOrderEnum>;
+  readonly internal: InputMaybe<InternalSortInput>;
+  readonly key: InputMaybe<SortOrderEnum>;
+  readonly locale: InputMaybe<SortOrderEnum>;
+  readonly parent: InputMaybe<NodeSortInput>;
 };
 
 type WebPOptions = {

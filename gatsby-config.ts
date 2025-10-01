@@ -1,4 +1,5 @@
 import type { GatsbyConfig } from 'gatsby';
+import { messagesByLocale } from './src/locales/messages';
 
 require('dotenv').config({
   path: `.env.public`
@@ -30,11 +31,9 @@ const config: GatsbyConfig = {
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
-              ? 'https://new.limosen.at'
+              ? 'https://limosen.at'
               : 'https://psychic-dollop-6vwv6x9vq9jf464g-8000.app.github.dev',
-          projectIds: [
-            '2268283277977065078'
-          ]
+          projectIds: ['2268283277977065078']
         },
         // sentry: {
         //   org: 'photonq',
@@ -53,6 +52,40 @@ const config: GatsbyConfig = {
       }
     },
     //`gatsby-jaen-lens`
+    {
+      resolve: 'gatsby-plugin-i18n-l10n',
+      options: {
+        siteUrl: 'https://limosen.at/',
+        defaultLocale: 'en-US',
+        locales: [
+          {
+            locale: 'en-US',
+            prefix: 'en',
+            messages: messagesByLocale['en-US'], // <-- plain object from TS
+            slugs: {}
+          },
+          {
+            locale: 'de-AT',
+            prefix: 'de',
+            messages: messagesByLocale['de-AT'],
+            slugs: {}
+          },
+          {
+            locale: 'tr-TR',
+            prefix: 'tr',
+            messages: messagesByLocale['tr-TR'],
+            slugs: {}
+          },
+          {
+            locale: 'ar-EG',
+            prefix: 'ar',
+            messages: messagesByLocale['ar-EG'],
+            slugs: {}
+          }
+        ],
+        trailingSlash: 'always'
+      }
+    }
   ]
 };
 

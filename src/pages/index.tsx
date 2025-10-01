@@ -1,24 +1,19 @@
-import { PageConfig, PageProps } from 'jaen';
-
-import { graphql } from 'gatsby';
-import Everything from '../components/Everything';
+import { PageConfig, PageProps } from 'jaen'
+import React from 'react'
+import { graphql } from 'gatsby'
+import Content from '../components/Content'
 
 const IndexPage: React.FC<PageProps> = () => {
-  return (
-    <>
-      <Everything />
-    </>
-  );
-};
+  return <Content />
+}
 
-
-export default IndexPage;
+export default IndexPage
 
 export const pageConfig: PageConfig = {
   label: 'Home Page',
   icon: 'FaHome',
   childTemplates: ['BlogPage']
-};
+}
 
 export const query = graphql`
   query ($jaenPageId: String!) {
@@ -42,6 +37,6 @@ export const query = graphql`
       }
     }
   }
-`;
+`
 
-export { Head } from 'jaen';
+export { Head } from 'jaen'

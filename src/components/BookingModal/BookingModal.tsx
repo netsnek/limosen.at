@@ -22,12 +22,14 @@ import {
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { CheckboxStyled } from './CheckboxStyled'
+import { useT } from '../../contexts/language'
 
 export type RideCategory = 'DISTANCE' | 'HOURLY' | 'FLATRATE'
 export type RideType = 'ONEWAY' | 'RETURN'
+export type PaymentOption = 'CASH' | 'CARD' | 'TRANSFER'
 
 export interface BookingFormValues {
-  // Kontakt
+  // Contact
   firstName: string
   lastName: string
   email: string
@@ -35,10 +37,10 @@ export interface BookingFormValues {
   flightNumber?: string
   message: string
 
-  // Zustimmung
+  // Consent
   agreeToTerms: boolean
 
-  // Fahrt-Details
+  // Ride details
   rideCategory?: RideCategory
   rideType?: RideType
   date?: string
@@ -51,10 +53,10 @@ export interface BookingFormValues {
   childSeats?: number
   extraTime?: number
 
-  // Fahrzeug/Preis (optional)
+  // Vehicle & Payment (optional)
   carClass?: string
   carTitle?: string
-  price?: number
+  paymentOption?: PaymentOption
 }
 
 export interface BookingModalProps {
@@ -79,6 +81,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   fixedValues,
   defaultValues
 }) => {
+  const t = useT()
+
   const {
     register,
     control,
@@ -92,7 +96,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       passengers: undefined,
       luggage: undefined,
       childSeats: undefined,
-      extraTime: undefined
+      extraTime: undefined,
+      paymentOption: undefined
     }
   })
 
@@ -130,51 +135,70 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             p={{
               base: 4,
               md: 8,
-              lg: 10,
+              lg: 10
             }}
           >
             <Stack spacing={8}>
               <Stack spacing={2}>
                 <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
-                  Reservierungsanfrage
+                  {t('BookingHeading', 'Booking request')}
                 </Heading>
                 <Text color="black">
-                  Bitte fülle die Fahrtdetails und deine Kontaktdaten aus. Wir melden uns schnellstmöglich.
+                  {t(
+                    'BookingIntro',
+                    'Please fill in your ride details and contact info. We’ll get back to you shortly.'
+                  )}
                 </Text>
               </Stack>
 
-              {/* Fahrt-Details */}
+              {/* Ride details */}
               <Stack spacing={4}>
                 <Heading as="h3" size="sm">
-                  Fahrt
+                  {t('SectionRide', 'Ride')}
                 </Heading>
 
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                   <FormControl>
-                    <FormLabel fontSize="sm">Kategorie</FormLabel>
+                    <FormLabel fontSize="sm">
+                      {t('LabelCategory', 'Category')}
+                    </FormLabel>
                     <Select
                       {...register('rideCategory')}
                       focusBorderColor="brand.500"
                     >
-                      <option value="DISTANCE">Distanz</option>
-                      <option value="HOURLY">Stündlich</option>
-                      <option value="FLATRATE">Flatrate</option>
+                      <option value="DISTANCE">
+                        {t('CategoryDistance', 'Distance')}
+                      </option>
+                      <option value="HOURLY">
+                        {t('CategoryHourly', 'Hourly')}
+                      </option>
+                      <option value="FLATRATE">
+                        {t('CategoryFlatrate', 'Flat rate')}
+                      </option>
                     </Select>
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel fontSize="sm">Art</FormLabel>
+                    <FormLabel fontSize="sm">
+                      {t('LabelType', 'Type')}
+                    </FormLabel>
                     <Select
                       {...register('rideType')}
                       focusBorderColor="brand.500"
                     >
-                      <option value="ONEWAY">Einweg</option>
-                      <option value="RETURN">Rückkehr</option>
+                      <option value="ONEWAY">
+                        {t('TypeOneWay', 'One-way')}
+                      </option>
+                      <option value="RETURN">
+                        {t('TypeReturn', 'Return')}
+                      </option>
                     </Select>
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="date" fontSize="sm">Datum</FormLabel>
+                    <FormLabel htmlFor="date" fontSize="sm">
+                      {t('LabelDate', 'Date')}
+                    </FormLabel>
                     <Input
                       id="date"
                       type="date"
@@ -187,7 +211,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="time" fontSize="sm">Abholzeit</FormLabel>
+                    <FormLabel htmlFor="time" fontSize="sm">
+                      {t('LabelTime', 'Pickup time')}
+                    </FormLabel>
                     <Input
                       id="time"
                       type="time"
@@ -200,27 +226,33 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="pickupAddress" fontSize="sm">Abholadresse</FormLabel>
+                    <FormLabel htmlFor="pickupAddress" fontSize="sm">
+                      {t('LabelPickup', 'Pickup address')}
+                    </FormLabel>
                     <Input
                       id="pickupAddress"
-                      placeholder="Abholadresse"
+                      placeholder={t('LabelPickup', 'Pickup address')}
                       {...register('pickupAddress')}
                       focusBorderColor="brand.500"
                     />
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="destinationAddress" fontSize="sm">Zieladresse</FormLabel>
+                    <FormLabel htmlFor="destinationAddress" fontSize="sm">
+                      {t('LabelDestination', 'Destination address')}
+                    </FormLabel>
                     <Input
                       id="destinationAddress"
-                      placeholder="Zieladresse"
+                      placeholder={t('LabelDestination', 'Destination address')}
                       {...register('destinationAddress')}
                       focusBorderColor="brand.500"
                     />
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="passengers" fontSize="sm">Passagieranzahl</FormLabel>
+                    <FormLabel htmlFor="passengers" fontSize="sm">
+                      {t('LabelPassengers', 'Passengers')}
+                    </FormLabel>
                     <Input
                       id="passengers"
                       type="number"
@@ -231,7 +263,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="luggage" fontSize="sm">Gepäckanzahl</FormLabel>
+                    <FormLabel htmlFor="luggage" fontSize="sm">
+                      {t('LabelLuggage', 'Luggage')}
+                    </FormLabel>
                     <Input
                       id="luggage"
                       type="number"
@@ -242,7 +276,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="childSeats" fontSize="sm">Kindersitz</FormLabel>
+                    <FormLabel htmlFor="childSeats" fontSize="sm">
+                      {t('LabelChildSeats', 'Child seat')}
+                    </FormLabel>
                     <Input
                       id="childSeats"
                       type="number"
@@ -253,7 +289,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel htmlFor="extraTime" fontSize="sm">Zusätzliche Zeit (Std.)</FormLabel>
+                    <FormLabel htmlFor="extraTime" fontSize="sm">
+                      {t('LabelExtraTime', 'Extra time (hrs)')}
+                    </FormLabel>
                     <Input
                       id="extraTime"
                       type="number"
@@ -267,50 +305,60 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                 <Divider />
 
+                {/* Vehicle & Payment */}
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
                   <FormControl>
-                    <FormLabel fontSize="sm">Fahrzeugklasse</FormLabel>
+                    <FormLabel fontSize="sm">
+                      {t('LabelCarClass', 'Vehicle class')}
+                    </FormLabel>
                     <Input
-                      placeholder="z. B. Business Class"
+                      placeholder={t('LabelCarClass', 'Vehicle class')}
                       {...register('carClass')}
                       focusBorderColor="brand.500"
                     />
                   </FormControl>
                   <FormControl>
-                    <FormLabel fontSize="sm">Fahrzeug</FormLabel>
+                    <FormLabel fontSize="sm">
+                      {t('LabelCarTitle', 'Vehicle')}
+                    </FormLabel>
                     <Input
-                      placeholder="z. B. Mercedes-Benz E Klasse"
+                      placeholder={t('LabelCarTitle', 'Vehicle')}
                       {...register('carTitle')}
                       focusBorderColor="brand.500"
                     />
                   </FormControl>
                   <FormControl>
-                    <FormLabel fontSize="sm">Preis (€)</FormLabel>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="z. B. 10.00"
-                      {...register('price', { valueAsNumber: true })}
+                    <FormLabel fontSize="sm">
+                      {t('LabelPaymentOption', 'Payment option')}
+                    </FormLabel>
+                    <Select
+                      {...register('paymentOption')}
                       focusBorderColor="brand.500"
-                    />
+                    >
+                      <option value="CASH">{t('PaymentCash', 'Cash')}</option>
+                      <option value="CARD">{t('PaymentCard', 'Card')}</option>
+                      <option value="TRANSFER">
+                        {t('PaymentTransfer', 'Überweisung')}
+                      </option>
+                    </Select>
                   </FormControl>
                 </SimpleGrid>
               </Stack>
 
-              {/* Kontaktdaten */}
+              {/* Contact details */}
               <Stack spacing={4}>
                 <Heading as="h3" size="sm">
-                  Kontaktdetails
+                  {t('SectionContact', 'Contact details')}
                 </Heading>
 
                 <HStack>
                   <FormControl isRequired isInvalid={!!errors.firstName}>
                     <FormLabel htmlFor="firstName" fontSize="sm">
-                      Passagier Vorname*
+                      {t('LabelFirstName', 'First name')}
                     </FormLabel>
                     <Input
                       id="firstName"
-                      placeholder="Max"
+                      placeholder={t('LabelFirstName', 'First name')}
                       {...register('firstName', { required: true })}
                       isDisabled={!!fixedValues?.firstName}
                       focusBorderColor="brand.500"
@@ -321,11 +369,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </FormControl>
                   <FormControl isRequired isInvalid={!!errors.lastName}>
                     <FormLabel htmlFor="lastName" fontSize="sm">
-                      Passagier Nachname*
+                      {t('LabelLastName', 'Last name')}
                     </FormLabel>
                     <Input
                       id="lastName"
-                      placeholder="Mustermann"
+                      placeholder={t('LabelLastName', 'Last name')}
                       {...register('lastName', { required: true })}
                       isDisabled={!!fixedValues?.lastName}
                       focusBorderColor="brand.500"
@@ -339,11 +387,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <HStack>
                   <FormControl isRequired isInvalid={!!errors.email}>
                     <FormLabel htmlFor="email" fontSize="sm">
-                      E-Mail*
+                      {t('LabelEmail', 'Email')}
                     </FormLabel>
                     <Input
                       id="email"
-                      placeholder="max.mustermann@example.com"
+                      placeholder="john.doe@example.com"
                       type="email"
                       {...register('email', { required: true })}
                       isDisabled={!!fixedValues?.email}
@@ -356,7 +404,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                   <FormControl isInvalid={!!errors.phone}>
                     <FormLabel htmlFor="phone" fontSize="sm">
-                      Telefon*
+                      {t('LabelPhone', 'Phone')}
                     </FormLabel>
                     <Input
                       id="phone"
@@ -375,11 +423,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <HStack>
                   <FormControl isInvalid={!!errors.flightNumber}>
                     <FormLabel htmlFor="flightNumber" fontSize="sm">
-                      Flugnummer
+                      {t('LabelFlightNumber', 'Flight number')}
                     </FormLabel>
                     <Input
                       id="flightNumber"
-                      placeholder="z. B. OS123"
+                      placeholder="e.g. OS123"
                       {...register('flightNumber')}
                       focusBorderColor="brand.500"
                     />
@@ -391,11 +439,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                 <FormControl isRequired isInvalid={!!errors.message}>
                   <FormLabel htmlFor="message" fontSize="sm">
-                    Wünsche
+                    {t('LabelWishes', 'Wishes')}
                   </FormLabel>
                   <Textarea
                     id="message"
-                    placeholder="Wünsche oder Hinweise"
+                    placeholder={t('WishesPlaceholder', 'Wishes or note')}
                     defaultValue={defaultValues?.message}
                     {...register('message', { required: true })}
                     focusBorderColor="brand.500"
@@ -407,6 +455,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                 <FormControl isRequired isInvalid={!!errors.agreeToTerms}>
                   <Controller
+                    name="agreeToTerms"
+                    control={control}
+                    rules={{
+                      required: t('ConsentError', 'Please confirm the contact permission')
+                    }}
                     render={({ field }) => (
                       <CheckboxStyled
                         ref={field.ref}
@@ -415,24 +468,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         checked={field.value}
                         roundedFull
                       >
-                        <Text
-                          color="black"
-                          fontSize={{
-                            base: 'xs',
-                            md: 'sm'
-                          }}
-                        >
-                          Ich bin damit einverstanden, dass meine Angaben zur
-                          Kontaktaufnahme und für Rückfragen gespeichert werden.
+                        <Text color="black" fontSize={{ base: 'xs', md: 'sm' }}>
+                          {t(
+                            'ConsentText',
+                            'I agree that my details may be stored for contacting me and for follow-up questions.'
+                          )}
                         </Text>
                       </CheckboxStyled>
                     )}
-                    name="agreeToTerms"
-                    control={control}
-                    rules={{
-                      required:
-                        'Bitte bestätige die Bedingungen zur Kontaktaufnahme'
-                    }}
                   />
                   <FormErrorMessage fontSize="sm">
                     {errors.agreeToTerms?.message}
@@ -444,7 +487,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
           <ModalFooter borderTop="1px solid" color="gray.200">
             <Button isLoading={isSubmitting} type="submit">
-              Reservieren
+              {t('SubmitCta', 'Reserve')}
             </Button>
           </ModalFooter>
         </form>
