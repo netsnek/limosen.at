@@ -62,37 +62,33 @@ const config: GatsbyConfig = {
             locale: 'en-US',
             prefix: 'en',
             messages: messagesByLocale['en-US'], // <-- plain object from TS
-            slugs: {},
-            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
+            slugs: {}
           },
           {
             locale: 'de-AT',
             prefix: 'de',
             messages: messagesByLocale['de-AT'],
-            slugs: {},
-            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
+            slugs: {}
           },
           {
             locale: 'tr-TR',
             prefix: 'tr',
             messages: messagesByLocale['tr-TR'],
-            slugs: {},
-            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
+            slugs: {}
           },
           {
             locale: 'ar-EG',
             prefix: 'ar',
             messages: messagesByLocale['ar-EG'],
-            slugs: {},
-            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
+            slugs: {}
           }
         ],
-        // omit certain path segments (relative directories)
-        pathBlacklist: [
-          '/pages/cms', // /pages/products/gummibears/ becomes /products/gummibears/
-          '/pages/login',
-          '/pages/mailpress',
-        ],
+        // omit certain path and subpaths segments from translation (urls not relative directories)
+        // urlBlacklist: [
+        //   '/cms',
+        //   '/login',
+        //   '/mailpress',
+        // ],
         trailingSlash: 'always'
       }
     }
