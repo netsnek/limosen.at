@@ -254,6 +254,18 @@ export default function Content({ language }: { language: string }) {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  const intl = useIntl();
+
+  // 'de' | 'en' | 'tr' for flag display
+  const normalized = useMemo<'de' | 'en' | 'tr' | 'ar'>(() => {
+    const l = (intl.locale || '').toLowerCase();
+    if (l.startsWith('de')) return 'de';
+    if (l.startsWith('tr')) return 'tr';
+    if (l.startsWith('ar')) return 'ar';
+    return 'en';
+  }, [intl.locale]);
+
   return (
     <Box
       minH="100vh"
@@ -270,13 +282,28 @@ export default function Content({ language }: { language: string }) {
         gap={0}
         className="homepage"
       >
-        <HeroSection background={HERO_SLIDES[slideIndex]} />
-        <AboutSection language={language} />
-        <FleetSection language={language} />
-        <ServicesSection language={language} />
-        <ReviewsSection language={language} />
-        <FAQSection language={language} />
-        <OnlineBookingSection language={language} />
+        <HeroSection
+          fieldNamePrefix={normalized}
+          background={HERO_SLIDES[slideIndex]}
+        />
+        <AboutSection
+          fieldNamePrefix={normalized}
+        />
+        <FleetSection
+          fieldNamePrefix={normalized}
+        />
+        <ServicesSection
+          fieldNamePrefix={normalized}
+        />
+        <ReviewsSection
+          fieldNamePrefix={normalized}
+        />
+        <FAQSection
+          fieldNamePrefix={normalized}
+        />
+        <OnlineBookingSection
+          fieldNamePrefix={normalized}
+        />
       </Box>
     </Box>
   );
@@ -346,19 +373,14 @@ export function HeaderBar() {
   );
 }
 
-export function TopNavigation({
-  path
-}: {
-  path?: string;
-  language: string;
-}) {
+export function TopNavigation({ path }: { path?: string; language: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
   const { signinRedirect } = useAuth();
   const intl = useIntl();
 
   // 'de' | 'en' | 'tr' for flag display
-  const normalized = useMemo<'de' | 'en' | 'tr' | 'ar' >(() => {
+  const normalized = useMemo<'de' | 'en' | 'tr' | 'ar'>(() => {
     const l = (intl.locale || '').toLowerCase();
     if (l.startsWith('de')) return 'de';
     if (l.startsWith('tr')) return 'tr';
@@ -367,7 +389,13 @@ export function TopNavigation({
   }, [intl.locale]);
 
   const currentFlag =
-    normalized === 'de' ? FLAG_DE : normalized === 'en' ? FLAG_EN : normalized === 'tr' ? FLAG_TR : FLAG_AR;
+    normalized === 'de'
+      ? FLAG_DE
+      : normalized === 'en'
+      ? FLAG_EN
+      : normalized === 'tr'
+      ? FLAG_TR
+      : FLAG_AR;
 
   // optional normalization for localized hashes
   const normalizeHash = useCallback((href: string) => {
@@ -378,14 +406,18 @@ export function TopNavigation({
   }, []);
 
   // top nav links from messages, fallback to static labels
-  const messageNavLinks =
-    (intl.messages as any)?.navLinks as Array<{ label: string; href: string }> | undefined;
+  const messageNavLinks = (intl.messages as any)?.navLinks as
+    | Array<{ label: string; href: string }>
+    | undefined;
 
   const navLinks = useMemo(
     () =>
       messageNavLinks?.map(l => ({ ...l, href: normalizeHash(l.href) })) ?? [
         { label: intl.formatMessage({ id: 'TopNavFleet' }), href: '#fleet' },
-        { label: intl.formatMessage({ id: 'TopNavReviews' }), href: '#reviews' },
+        {
+          label: intl.formatMessage({ id: 'TopNavReviews' }),
+          href: '#reviews'
+        },
         { label: intl.formatMessage({ id: 'TopNavContact' }), href: '?contact' }
       ],
     [messageNavLinks, normalizeHash, intl]
@@ -452,7 +484,9 @@ export function TopNavigation({
   const labelBookNow = intl.formatMessage({ id: 'TopNavBookNow' });
   const labelContact = intl.formatMessage({ id: 'TopNavContact' });
   const labelFollowUs = intl.formatMessage({ id: 'TopNavFollowUs' });
-  const labelAlwaysReachable = intl.formatMessage({ id: 'TopNavAlwaysReachable' });
+  const labelAlwaysReachable = intl.formatMessage({
+    id: 'TopNavAlwaysReachable'
+  });
   const labelCityCountry = intl.formatMessage({ id: 'TopNavCityCountry' });
   const labelAccount = intl.formatMessage({ id: 'TopNavAccount' });
   const labelLanguage = intl.formatMessage({ id: 'TopNavLanguage' });
@@ -587,11 +621,7 @@ export function TopNavigation({
                   fontSize="lg"
                   pb={2}
                 >
-                  <Field.Text
-                    as={chakra.span}
-                    name="TopNavAlwaysReachable"
-                    defaultValue={labelAlwaysReachable}
-                  />
+                  {labelAlwaysReachable}
                 </Text>
                 <VStack
                   align="flex-start"
@@ -614,11 +644,7 @@ export function TopNavigation({
                     {CONTACT_EMAIL}
                   </Link>
                   <Text color="limosen.text.muted">
-                    <Field.Text
-                      as={chakra.span}
-                      name="TopNavCityCountry"
-                      defaultValue={labelCityCountry}
-                    />
+                    {labelCityCountry}
                   </Text>
                 </VStack>
               </Box>
@@ -652,11 +678,7 @@ export function TopNavigation({
                   fontSize="lg"
                   pb={2}
                 >
-                  <Field.Text
-                    as={chakra.span}
-                    name="TopNavAlwaysReachable_mobile"
-                    defaultValue={labelAlwaysReachable}
-                  />
+                  {labelAlwaysReachable}
                 </Text>
                 <VStack
                   align="flex-start"
@@ -679,11 +701,7 @@ export function TopNavigation({
                     {CONTACT_EMAIL}
                   </Link>
                   <Text color="limosen.text.muted">
-                    <Field.Text
-                      as={chakra.span}
-                      name="TopNavCityCountry_mobile"
-                      defaultValue={labelCityCountry}
-                    />
+                    {labelCityCountry}
                   </Text>
                 </VStack>
               </Box>
@@ -715,11 +733,7 @@ export function TopNavigation({
                   fontSize="lg"
                   mb={3}
                 >
-                  <Field.Text
-                    as={chakra.span}
-                    name="TopNavFollowUs"
-                    defaultValue={intl.formatMessage({ id: 'TopNavFollowUs' })}
-                  />
+                  {intl.formatMessage({ id: 'TopNavFollowUs' })}
                 </Text>
                 <HStack spacing={6}>
                   {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
@@ -788,11 +802,7 @@ export function TopNavigation({
                   fontSize="lg"
                   mb={3}
                 >
-                  <Field.Text
-                    as={chakra.span}
-                    name="TopNavFollowUs_desktop"
-                    defaultValue={labelFollowUs}
-                  />
+                  {labelFollowUs}
                 </Text>
                 <HStack spacing={6}>
                   {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
@@ -925,11 +935,7 @@ export function TopNavigation({
         <ModalOverlay />
         <ModalContent bg="limosen.bg.surface" color="limosen.text.primary">
           <ModalHeader>
-            <Field.Text
-              as={chakra.span}
-              name="LangModalTitle"
-              defaultValue="Sprache wählen"
-            />
+            {intl.formatMessage({ id: 'LangModalTitle' })}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
@@ -958,7 +964,7 @@ export function TopNavigation({
   );
 }
 
-function HeroSection({ background }: { background: string }) {
+function HeroSection({ fieldNamePrefix, background }: { fieldNamePrefix:string, background: string }) {
   return (
     <Box
       as="section"
@@ -972,7 +978,7 @@ function HeroSection({ background }: { background: string }) {
   );
 }
 
-function AboutSection({ language }: { language: string }) {
+function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
 
   return (
@@ -1001,7 +1007,7 @@ function AboutSection({ language }: { language: string }) {
             >
               <Field.Text
                 as={chakra.span}
-                name="AboutTitle"
+                name={`${fieldNamePrefix}AboutTitle`}
                 defaultValue={intl.formatMessage({ id: 'AboutTitle' })}
               />
             </Heading>
@@ -1014,21 +1020,21 @@ function AboutSection({ language }: { language: string }) {
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name="AboutP1"
+                  name={`${fieldNamePrefix}AboutP1`}
                   defaultValue={intl.formatMessage({ id: 'AboutP1' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name="AboutP2"
+                  name={`${fieldNamePrefix}AboutP2`}
                   defaultValue={intl.formatMessage({ id: 'AboutP2' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name="AboutP3"
+                  name={`${fieldNamePrefix}AboutP3`}
                   defaultValue={intl.formatMessage({ id: 'AboutP3' })}
                 />
               </Text>
@@ -1058,7 +1064,7 @@ function AboutSection({ language }: { language: string }) {
   );
 }
 
-function ServicesSection({ language }: { language: string }) {
+function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
   const services: Array<{
     id: string;
@@ -1110,14 +1116,14 @@ function ServicesSection({ language }: { language: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name="ServicesTitle"
+                name={`${fieldNamePrefix}ServicesTitle`}
                 defaultValue={intl.formatMessage({ id: 'ServicesTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name="ServicesSubtitle"
+                name={`${fieldNamePrefix}ServicesSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'ServicesSubtitle' })}
               />
             </Text>
@@ -1195,8 +1201,10 @@ function ServicesSection({ language }: { language: string }) {
             >
               <Field.Text
                 as={chakra.span}
-                name="ServicesDetailsTitle"
-                defaultValue={intl.formatMessage({ id: 'ServicesDetailsTitle' })}
+                name={`${fieldNamePrefix}ServicesDetailsTitle`}
+                defaultValue={intl.formatMessage({
+                  id: 'ServicesDetailsTitle'
+                })}
               />
             </Heading>
             <Accordion
@@ -1300,7 +1308,7 @@ function ServicesSection({ language }: { language: string }) {
   );
 }
 
-function FAQSection({ language }: { language: string }) {
+function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
   const items: Array<{ question: string; answer: string }> =
     ((intl.messages as any)?.faq as any) ?? [];
@@ -1313,14 +1321,14 @@ function FAQSection({ language }: { language: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name="FaqTitle"
+                name={`${fieldNamePrefix}FaqTitle`}
                 defaultValue={intl.formatMessage({ id: 'FaqTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name="FaqSubtitle"
+                name={`${fieldNamePrefix}FaqSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'FaqSubtitle' })}
               />
             </Text>
@@ -1369,7 +1377,7 @@ function FAQSection({ language }: { language: string }) {
   );
 }
 
-function FleetSection({ language }: { language: string }) {
+function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
   const vehicles: Array<{
     image: string;
@@ -1392,7 +1400,7 @@ function FleetSection({ language }: { language: string }) {
           <Heading size="lg" textAlign="center" color="limosen.text.primary">
             <Field.Text
               as={chakra.span}
-              name="FleetTitle"
+              name={`${fieldNamePrefix}FleetTitle`}
               defaultValue={intl.formatMessage({ id: 'FleetTitle' })}
             />
           </Heading>
@@ -1447,7 +1455,9 @@ function FleetSection({ language }: { language: string }) {
                           <Field.Text
                             as={chakra.span}
                             name={`FleetPassengersLabel_${vehicle.name}`}
-                            defaultValue={intl.formatMessage({ id: 'FleetPassengersLabel' })}
+                            defaultValue={intl.formatMessage({
+                              id: 'FleetPassengersLabel'
+                            })}
                           />{' '}
                           {vehicle.passengers}
                         </Text>
@@ -1463,7 +1473,9 @@ function FleetSection({ language }: { language: string }) {
                           <Field.Text
                             as={chakra.span}
                             name={`FleetLuggageLabel_${vehicle.name}`}
-                            defaultValue={intl.formatMessage({ id: 'FleetLuggageLabel' })}
+                            defaultValue={intl.formatMessage({
+                              id: 'FleetLuggageLabel'
+                            })}
                           />{' '}
                           {vehicle.luggage}
                         </Text>
@@ -1480,7 +1492,7 @@ function FleetSection({ language }: { language: string }) {
   );
 }
 
-function OnlineBookingSection({ language }: { language: string }) {
+function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const contactModal = useContactModal();
   const intl = useIntl();
 
@@ -1508,7 +1520,7 @@ function OnlineBookingSection({ language }: { language: string }) {
           >
             <Field.Text
               as={chakra.span}
-              name="BookingTitle"
+              name={`${fieldNamePrefix}BookingTitle`}
               defaultValue={intl.formatMessage({ id: 'BookingTitle' })}
             />
           </Heading>
@@ -1521,7 +1533,7 @@ function OnlineBookingSection({ language }: { language: string }) {
             <Text>
               <Field.Text
                 as={chakra.span}
-                name="BookingReachPhone"
+                name={`${fieldNamePrefix}BookingReachPhone`}
                 defaultValue={intl.formatMessage({ id: 'BookingReachPhone' })}
               />
             </Text>
@@ -1539,14 +1551,14 @@ function OnlineBookingSection({ language }: { language: string }) {
             <Text>
               <Field.Text
                 as={chakra.span}
-                name="BookingAnd"
+                name={`${fieldNamePrefix}BookingAnd`}
                 defaultValue={intl.formatMessage({ id: 'BookingAnd' })}
               />
             </Text>
             <Text>
               <Field.Text
                 as={chakra.span}
-                name="BookingReachEmail"
+                name={`${fieldNamePrefix}BookingReachEmail`}
                 defaultValue={intl.formatMessage({ id: 'BookingReachEmail' })}
               />
             </Text>
@@ -1569,7 +1581,7 @@ function OnlineBookingSection({ language }: { language: string }) {
   );
 }
 
-function ReviewsSection({ language }: { language: string }) {
+function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
 
   return (
@@ -1585,14 +1597,14 @@ function ReviewsSection({ language }: { language: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name="FeedbackTitle"
+                name={`${fieldNamePrefix}FeedbackTitle`}
                 defaultValue={intl.formatMessage({ id: 'FeedbackTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name="FeedbackSubtitle"
+                name={`${fieldNamePrefix}FeedbackSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'FeedbackSubtitle' })}
               />
             </Text>
@@ -1618,14 +1630,16 @@ function ReviewsSection({ language }: { language: string }) {
                 <Heading size="md" color="limosen.text.primary">
                   <Field.Text
                     as={chakra.span}
-                    name="FeedbackBoxTitle"
-                    defaultValue={intl.formatMessage({ id: 'FeedbackBoxTitle' })}
+                    name={`${fieldNamePrefix}FeedbackBoxTitle`}
+                    defaultValue={intl.formatMessage({
+                      id: 'FeedbackBoxTitle'
+                    })}
                   />
                 </Heading>
                 <Text color="limosen.text.secondary">
                   <Field.Text
                     as={chakra.span}
-                    name="FeedbackBoxText"
+                    name={`${fieldNamePrefix}FeedbackBoxText`}
                     defaultValue={intl.formatMessage({ id: 'FeedbackBoxText' })}
                   />
                 </Text>
@@ -1638,8 +1652,10 @@ function ReviewsSection({ language }: { language: string }) {
                   >
                     <Field.Text
                       as={chakra.span}
-                      name="FeedbackMapsCta"
-                      defaultValue={intl.formatMessage({ id: 'FeedbackMapsCta' })}
+                      name={`${fieldNamePrefix}FeedbackMapsCta`}
+                      defaultValue={intl.formatMessage({
+                        id: 'FeedbackMapsCta'
+                      })}
                     />
                   </Button>
                 </HStack>
@@ -1679,7 +1695,7 @@ function ReviewsSection({ language }: { language: string }) {
   );
 }
 
-export function Footer({ language }: { language?: string }) {
+export function Footer({fieldNamePrefix }: { fieldNamePrefix: string }) {
   const intl = useIntl();
   const footerGroups: Array<{
     title: string;
@@ -1702,7 +1718,7 @@ export function Footer({ language }: { language?: string }) {
               <Text mt={4} color="limosen.text.muted">
                 <Field.Text
                   as={chakra.span}
-                  name="FooterTagline"
+                  name={`${fieldNamePrefix}FooterTagline`}
                   defaultValue={intl.formatMessage({ id: 'FooterTagline' })}
                 />
               </Text>
@@ -1749,7 +1765,7 @@ export function Footer({ language }: { language?: string }) {
               © {new Date().getFullYear()} LIMOSEN KG.{' '}
               <Field.Text
                 as={chakra.span}
-                name="FooterRights"
+                name={`${fieldNamePrefix}FooterRights`}
                 defaultValue={intl.formatMessage({ id: 'FooterRights' })}
               />
             </Text>

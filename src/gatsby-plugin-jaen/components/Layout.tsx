@@ -5,6 +5,7 @@ import AppLayout from '../../components/AppLayout';
 import { Footer } from '../../components/Content';
 import { ContactModalProvider } from '../../services/contact';
 import { BookingModalProvider } from '../../services/booking';
+import { useIntl } from 'react-intl';
 
 const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
   const location = useLocation();
@@ -15,6 +16,8 @@ const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
 
   const isDocs = docsPaths.some(docsPath => path.startsWith(docsPath));
 
+   const intl = useIntl();
+
   if (path.startsWith('/admin')) {
     return children;
   }
@@ -23,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
     <CMSManagement>
       <ContactModalProvider location={{ pathname: path, search: '' }}>
         <BookingModalProvider location={{ pathname: path, search: '' }}>
-          <AppLayout footer={Footer} isDocs={isDocs} path={path}>
+          <AppLayout footer={Footer({fieldNamePrefix=`${fieldNamePrefix}ServicesSubtitle`})} isDocs={isDocs} path={path}>
             {children}
           </AppLayout>
         </BookingModalProvider>
