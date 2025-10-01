@@ -85,9 +85,9 @@ const config: GatsbyConfig = {
         ],
         // omit certain path segments (relative directories)
         pathBlacklist: [
-          '/cms', // /pages/products/gummibears/ becomes /products/gummibears/
-          '/login',
-          '/mailpress',
+          '/pages/cms', // /pages/products/gummibears/ becomes /products/gummibears/
+          '/pages/login',
+          '/pages/mailpress',
         ],
         trailingSlash: 'always'
       }
