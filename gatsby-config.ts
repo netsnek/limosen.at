@@ -62,25 +62,29 @@ const config: GatsbyConfig = {
             locale: 'en-US',
             prefix: 'en',
             messages: messagesByLocale['en-US'], // <-- plain object from TS
-            slugs: {}
+            slugs: {},
+            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
           },
           {
             locale: 'de-AT',
             prefix: 'de',
             messages: messagesByLocale['de-AT'],
-            slugs: {}
+            slugs: {},
+            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
           },
           {
             locale: 'tr-TR',
             prefix: 'tr',
             messages: messagesByLocale['tr-TR'],
-            slugs: {}
+            slugs: {},
+            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
           },
           {
             locale: 'ar-EG',
             prefix: 'ar',
             messages: messagesByLocale['ar-EG'],
-            slugs: {}
+            slugs: {},
+            pageBlacklist: ['/cms/', '/cms/pages/', '/cms/media/', '/cms/media/', '/cms/settings/'],
           }
         ],
         // omit certain path segments (relative directories)
