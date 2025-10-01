@@ -32,12 +32,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const docsPaths = ['/docs'];
   const isDocs = docsPaths.some(docsPath => path.startsWith(docsPath));
 
+  // IMPORTANT: AppLayout expects a Component, not an element.
+  // Wrap Footer so it gets fieldNamePrefix while preserving the expected type.
+  const FooterWithLocale: React.FC = () => <Footer fieldNamePrefix={localePrefix} />;
+
   return (
     <CMSManagement>
       <ContactModalProvider location={{ pathname: path, search: '' }}>
         <BookingModalProvider location={{ pathname: path, search: '' }}>
           <AppLayout
-            footer={<Footer fieldNamePrefix={localePrefix} />}
+            footer={FooterWithLocale}
             isDocs={isDocs}
             path={path}
           >
