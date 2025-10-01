@@ -1,32 +1,46 @@
+import React from 'react';
 import { LayoutProps } from 'jaen';
 import { useLocation } from '@reach/router';
-import { CMSManagement, useJaenFrameMenuContext } from 'gatsby-plugin-jaen';
+import { CMSManagement } from 'gatsby-plugin-jaen';
 import AppLayout from '../../components/AppLayout';
 import { Footer } from '../../components/Content';
 import { ContactModalProvider } from '../../services/contact';
 import { BookingModalProvider } from '../../services/booking';
 import { useIntl } from 'react-intl';
 
-const Layout: React.FC<LayoutProps> = ({ children, pageProps }) => {
+const getLocalePrefix = (localeRaw: string | undefined | null) => {
+  // extract base language (2 letters) via regex; default to 'en'
+  const m = (localeRaw || '').match(/^[a-z]{2}/i);
+  const base = (m?.[0] || 'en').toLowerCase();
+  // ensure only letters/numbers/hyphen; no underscores
+  return base.replace(/[^a-z0-9-]/gi, '');
+};
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const path = location.pathname;
 
-  const docsPaths = ['/docs'];
-  const jaenFrame = useJaenFrameMenuContext();
+  const intl = useIntl();
+  const localePrefix = getLocalePrefix(intl?.locale);
 
-  const isDocs = docsPaths.some(docsPath => path.startsWith(docsPath));
-
-   const intl = useIntl();
-
+  // Admin pages render raw
   if (path.startsWith('/admin')) {
-    return children;
+    return <>{children}</>;
   }
+
+  // Optional: flag for docs view
+  const docsPaths = ['/docs'];
+  const isDocs = docsPaths.some(docsPath => path.startsWith(docsPath));
 
   return (
     <CMSManagement>
       <ContactModalProvider location={{ pathname: path, search: '' }}>
         <BookingModalProvider location={{ pathname: path, search: '' }}>
-          <AppLayout footer={Footer({fieldNamePrefix=`${fieldNamePrefix}ServicesSubtitle`})} isDocs={isDocs} path={path}>
+          <AppLayout
+            footer={<Footer fieldNamePrefix={localePrefix} />}
+            isDocs={isDocs}
+            path={path}
+          >
             {children}
           </AppLayout>
         </BookingModalProvider>
