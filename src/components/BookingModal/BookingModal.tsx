@@ -1,3 +1,4 @@
+// BookingModal.tsx
 import {
   Button,
   FormControl,
@@ -18,60 +19,61 @@ import {
   Select,
   SimpleGrid,
   Divider
-} from '@chakra-ui/react'
-import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { CheckboxStyled } from './CheckboxStyled'
-import { useT } from '../../contexts/language'
+} from '@chakra-ui/react';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { CheckboxStyled } from './CheckboxStyled';
+import { useT } from '../../contexts/language';
+import { useIntl } from 'react-intl';
 
-export type RideCategory = 'DISTANCE' | 'HOURLY' | 'FLATRATE'
-export type RideType = 'ONEWAY' | 'RETURN'
-export type PaymentOption = 'CASH' | 'CARD' | 'TRANSFER'
+export type RideCategory = 'DISTANCE' | 'HOURLY' | 'FLATRATE';
+export type RideType = 'ONEWAY' | 'RETURN';
+export type PaymentOption = 'CASH' | 'CARD' | 'TRANSFER';
 
 export interface BookingFormValues {
   // Contact
-  firstName: string
-  lastName: string
-  email: string
-  phone?: string
-  flightNumber?: string
-  message: string
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  flightNumber?: string;
+  message: string;
 
   // Consent
-  agreeToTerms: boolean
+  agreeToTerms: boolean;
 
   // Ride details
-  rideCategory?: RideCategory
-  rideType?: RideType
-  date?: string
-  time?: string
-  pickupAddress?: string
-  destinationAddress?: string
+  rideCategory?: RideCategory;
+  rideType?: RideType;
+  date?: string;
+  time?: string;
+  pickupAddress?: string;
+  destinationAddress?: string;
 
-  passengers?: number
-  luggage?: number
-  childSeats?: number
-  extraTime?: number
+  passengers?: number;
+  luggage?: number;
+  childSeats?: number;
+  extraTime?: number;
 
   // Vehicle & Payment (optional)
-  carClass?: string
-  carTitle?: string
-  paymentOption?: PaymentOption
+  carClass?: string;
+  carTitle?: string;
+  paymentOption?: PaymentOption;
 }
 
 export interface BookingModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: BookingFormValues) => Promise<void>
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: BookingFormValues) => Promise<void>;
   fixedValues?: {
-    firstName?: string
-    lastName?: string
-    email?: string
-    phone?: string
-  }
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  };
   defaultValues?: {
-    message?: string
-  }
+    message?: string;
+  };
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
@@ -81,13 +83,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   fixedValues,
   defaultValues
 }) => {
-  const t = useT()
+  const t = useT();
+  const intl = useIntl();
 
   const {
     register,
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting }
   } = useForm<BookingFormValues>({
     defaultValues: {
@@ -99,22 +104,113 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       extraTime: undefined,
       paymentOption: undefined
     }
-  })
+  });
+
+  // --- Debug: log all react-intl messages once ---
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[intl.messages]', intl.messages);
+  }, [intl]);
+
+  // --- Pull fleet and categories primarily from react-intl, fallback to useT() ---
+  const rawFleetFromIntl = (intl.messages as any)?.fleet;
+  const rawFleetCategoriesMsg = (intl.messages as any)?.fleetCategories;
+
+  const fleetFromIntl: any[] = React.useMemo(() => {
+    if (Array.isArray(rawFleetFromIntl)) return rawFleetFromIntl;
+    if (typeof rawFleetFromIntl === 'string') {
+      try {
+        const parsed = JSON.parse(rawFleetFromIntl);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // ignore invalid JSON
+      }
+    }
+    return [];
+  }, [rawFleetFromIntl]);
+
+  const fleetCategoriesFromIntl: string[] = React.useMemo(() => {
+    if (Array.isArray(rawFleetCategoriesMsg)) {
+      return rawFleetCategoriesMsg.filter(Boolean);
+    }
+    if (typeof rawFleetCategoriesMsg === 'string') {
+      try {
+        const parsed = JSON.parse(rawFleetCategoriesMsg);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean);
+      } catch {
+        return rawFleetCategoriesMsg
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+    }
+    if (fleetFromIntl.length) {
+      return Array.from(
+        new Set(fleetFromIntl.map((v: any) => v?.category).filter(Boolean))
+      );
+    }
+    return [];
+  }, [rawFleetCategoriesMsg, fleetFromIntl]);
+
+  const fleetData: any[] = fleetFromIntl.length
+    ? fleetFromIntl
+    : (t as any).fleet ?? [];
+
+  const fleetCategories: string[] = fleetCategoriesFromIntl.length
+    ? fleetCategoriesFromIntl
+    : Array.from(
+        new Set(
+          (Array.isArray(fleetData) ? fleetData : [])
+            .map((v: any) => v?.category)
+            .filter(Boolean)
+        )
+      );
+
+  // Build vehicle names per category from comma-separated description
+  const vehiclesByCategory: Record<string, string[]> = React.useMemo(() => {
+    const map: Record<string, string[]> = {};
+    (fleetData as any[]).forEach((item: any) => {
+      const cat = item?.category;
+      if (!cat) return;
+      const desc: string = item?.description || '';
+      const models =
+        desc
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean) || [];
+      const list = models.length > 0 ? models : item?.name ? [item.name] : [];
+      if (!map[cat]) map[cat] = [];
+      list.forEach(m => {
+        if (!map[cat].includes(m)) map[cat].push(m);
+      });
+    });
+    return map;
+  }, [fleetData]);
+
+  const selectedCarClass = watch('carClass');
+  const vehicleOptions = selectedCarClass
+    ? vehiclesByCategory[selectedCarClass] ?? []
+    : [];
 
   React.useEffect(() => {
     reset({
       ...fixedValues,
       message: defaultValues?.message
-    })
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fixedValues, defaultValues])
+  }, [fixedValues, defaultValues]);
 
   React.useEffect(() => {
     if (!isOpen) {
-      reset()
+      reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen])
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    // Clear vehicle selection when class changes
+    setValue('carTitle', undefined);
+  }, [selectedCarClass, setValue]);
 
   return (
     <Modal
@@ -126,8 +222,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <ModalOverlay />
       <ModalContent>
         <form
-          onSubmit={(event) => {
-            void handleSubmit(onSubmit)(event)
+          onSubmit={event => {
+            void handleSubmit(onSubmit)(event);
           }}
         >
           <ModalCloseButton />
@@ -311,22 +407,40 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <FormLabel fontSize="sm">
                       {t('LabelCarClass', 'Vehicle class')}
                     </FormLabel>
-                    <Input
-                      placeholder={t('LabelCarClass', 'Vehicle class')}
+                    <Select
+                      placeholder={t('SelectCarClass', 'Select a class')}
                       {...register('carClass')}
                       focusBorderColor="brand.500"
-                    />
+                    >
+                      {fleetCategories.map(cat => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </Select>
                   </FormControl>
-                  <FormControl>
+
+                  <FormControl isDisabled={!selectedCarClass}>
                     <FormLabel fontSize="sm">
                       {t('LabelCarTitle', 'Vehicle')}
                     </FormLabel>
-                    <Input
-                      placeholder={t('LabelCarTitle', 'Vehicle')}
+                    <Select
+                      placeholder={
+                        selectedCarClass
+                          ? t('SelectVehicle', 'Select a vehicle')
+                          : t('SelectClassFirst', 'Select a class first')
+                      }
                       {...register('carTitle')}
                       focusBorderColor="brand.500"
-                    />
+                    >
+                      {vehicleOptions.map(model => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                    </Select>
                   </FormControl>
+
                   <FormControl>
                     <FormLabel fontSize="sm">
                       {t('LabelPaymentOption', 'Payment option')}
@@ -458,7 +572,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     name="agreeToTerms"
                     control={control}
                     rules={{
-                      required: t('ConsentError', 'Please confirm the contact permission')
+                      required: t(
+                        'ConsentError',
+                        'Please confirm the contact permission'
+                      )
                     }}
                     render={({ field }) => (
                       <CheckboxStyled
@@ -485,7 +602,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </Stack>
           </ModalBody>
 
-          <ModalFooter borderTop="1px solid" color="gray.200">
+          <ModalFooter borderTop="1px solid" color="gray.2 00">
             <Button isLoading={isSubmitting} type="submit">
               {t('SubmitCta', 'Reserve')}
             </Button>
@@ -493,5 +610,5 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         </form>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

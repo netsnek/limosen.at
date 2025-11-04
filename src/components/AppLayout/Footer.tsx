@@ -49,11 +49,11 @@ const Footer: FC = () => {
       },
       {
         label: 'Instagram',
-        href: 'https://www.instagram.com/kleberbaum/'
+        href: 'https://www.instagram.com/limosenvip'
       },
       {
         label: 'Impressum',
-        href: '/impressum'
+        href: '/imprint'
       }
     ],
     [
@@ -184,7 +184,7 @@ const Footer: FC = () => {
               color="#ffffff"
               icon={<FaInstagram />}
               aria-label="Instagram"
-              href="https://www.instagram.com/barbara.mauz/"
+              href="https://www.instagram.com/limosenvip"
               isExternal
             />
             <IconButton

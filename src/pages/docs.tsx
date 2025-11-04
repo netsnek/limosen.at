@@ -81,11 +81,11 @@ export const pageConfig: PageConfig = {
   icon: 'FaApple',
   childTemplates: ['DocPage'],
   withoutJaenFrameStickyHeader: true,
-  menu: {
-    type: 'app',
-    order: 100,
-    group: 'photonq'
-  }
+  // menu: {
+  //   type: 'app',
+  //   order: 100,
+  //   group: 'photonq'
+  // }
 };
 
 export const query = graphql`

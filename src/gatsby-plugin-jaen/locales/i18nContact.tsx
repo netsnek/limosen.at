@@ -22,11 +22,7 @@ export function getI18nContact(code: I18nCode) {
         ToastErrorTitle: 'Fehler',
         ToastErrorDesc: 'Es ist ein Fehler aufgetreten.',
         ToastSuccessTitle: 'Erfolg',
-        ToastSuccessDesc: 'Ihre Reservierungsanfrage wurde erfolgreich versendet.',
-        // --- Added for BookingModal dropdown placeholders ---
-        SelectCarClass: 'Fahrzeugklasse auswählen',
-        SelectVehicle: 'Fahrzeug auswählen',
-        SelectClassFirst: 'Zuerst Klasse wählen'
+        ToastSuccessDesc: 'Ihre Reservierungsanfrage wurde erfolgreich versendet.'
       }
     }
   }
@@ -49,11 +45,7 @@ export function getI18nContact(code: I18nCode) {
         ToastErrorTitle: 'Hata',
         ToastErrorDesc: 'Bir hata oluştu.',
         ToastSuccessTitle: 'Başarılı',
-        ToastSuccessDesc: 'Rezervasyon talebiniz başarıyla gönderildi.',
-        // --- Added for BookingModal dropdown placeholders ---
-        SelectCarClass: 'Araç sınıfını seçin',
-        SelectVehicle: 'Aracı seçin',
-        SelectClassFirst: 'Önce sınıfı seçin'
+        ToastSuccessDesc: 'Rezervasyon talebiniz başarıyla gönderildi.'
       }
     }
   }
@@ -76,11 +68,7 @@ export function getI18nContact(code: I18nCode) {
       ToastErrorTitle: 'Error',
       ToastErrorDesc: 'Something went wrong.',
       ToastSuccessTitle: 'Success',
-      ToastSuccessDesc: 'Your reservation request has been sent successfully.',
-      // --- Added for BookingModal dropdown placeholders ---
-      SelectCarClass: 'Select a class',
-      SelectVehicle: 'Select a vehicle',
-      SelectClassFirst: 'Select a class first'
+      ToastSuccessDesc: 'Your reservation request has been sent successfully.'
     }
   }
 }

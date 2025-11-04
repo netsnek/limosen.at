@@ -16,9 +16,7 @@ export const BOOKING_BACKGROUND = '/images/everything/booking-background.jpg'
 export const SERVICE_NAVIGATION_EVENT = 'service-accordion:navigate'
 
 export const SOCIAL_LINKS = [
-  { label: 'Facebook', href: 'https://www.facebook.com/exclusiveaustriantransfer', icon: FaFacebookF },
-  { label: 'Instagram', href: 'https://www.instagram.com/exclusive_austrian_transfer', icon: FaInstagram },
-  { label: 'Twitter', href: 'https://www.twitter.com/exclusive_a_t', icon: FaTwitter }
+  { label: 'Instagram', href: 'https://www.instagram.com/limosenvip', icon: FaInstagram },
 ]
 
 export const HERO_SLIDES = [

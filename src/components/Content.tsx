@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Accordion,
   AccordionButton,
@@ -36,7 +36,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  chakra
+  chakra,
+  useBreakpointValue
 } from '@chakra-ui/react';
 import { Field, useAuth } from 'jaen';
 import { ChevronDownIcon } from '@chakra-ui/icons';
@@ -51,10 +52,11 @@ import {
   FaUser,
   FaWhatsapp
 } from 'react-icons/fa';
-
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
+import { graphql, useStaticQuery } from 'gatsby';
+import Marquee from 'react-fast-marquee';
 import { Link } from 'gatsby-plugin-jaen';
 import Logo from '../gatsby-plugin-jaen/components/Logo';
-
 import {
   ABOUT_IMAGE,
   BOOKING_BACKGROUND,
@@ -71,7 +73,6 @@ import {
   GOOGLE_MAPS_EMBED,
   GOOGLE_MAPS_OPEN
 } from '../vars/limosen';
-
 import { useContactModal } from '../services/contact';
 import { useBookingModal } from '../services/booking';
 import { useIntl } from 'react-intl';
@@ -84,7 +85,6 @@ function emitServiceNavigation(target: string) {
     new CustomEvent(SERVICE_NAVIGATION_EVENT, { detail: targetId })
   );
 }
-
 function handleServiceLinkClick(event: React.MouseEvent, targetHref?: string) {
   if (!targetHref || !targetHref.startsWith('#')) return;
   event?.preventDefault();
@@ -92,13 +92,11 @@ function handleServiceLinkClick(event: React.MouseEvent, targetHref?: string) {
 }
 
 export type THamburgerMenuIconStylerProps = BoxProps;
-
 interface IHamburgerMenuIconProps {
   handleClick?: (isOpen: boolean) => void;
   wrapperProps?: BoxProps;
   iconProps?: BoxProps;
 }
-
 const HamburgerMenuIcon: FC<IHamburgerMenuIconProps> = ({
   handleClick,
   wrapperProps,
@@ -119,7 +117,6 @@ const HamburgerMenuIcon: FC<IHamburgerMenuIconProps> = ({
     },
     ...wrapperProps
   };
-
   return (
     <Box
       position="relative"
@@ -246,6 +243,225 @@ function useServiceAccordionNavigation(serviceIds: string[]) {
   return { expandedIndices, handleAccordionChange, btnRefs };
 }
 
+/** *****************************************************************
+ * Helper: resolve local /images/* URL paths to GatsbyImage data
+ * (files are under ../../static/images/ per user; we query all files
+ * beneath /static/images and map by path suffix to the URL format).
+ ****************************************************************** */
+function useImageLookup() {
+  const data = useStaticQuery(graphql`
+    query LocalImagesForThisFile {
+      allFile(filter: { absolutePath: { regex: "/static/images/" } }) {
+        nodes {
+          absolutePath
+          relativePath
+          name
+          extension
+          childImageSharp {
+            gatsbyImageData(
+              placeholder: BLURRED
+              formats: [AUTO, WEBP, AVIF]
+              layout: FULL_WIDTH
+            )
+          }
+        }
+      }
+    }
+  `) as {
+    allFile: {
+      nodes: Array<{
+        absolutePath: string;
+        relativePath: string;
+        name: string;
+        extension: string;
+        childImageSharp?: { gatsbyImageData: IGatsbyImageData };
+      }>;
+    };
+  };
+
+  // Build a lookup that tolerates "/images/..." or just ".../filename.ext"
+  const map = useMemo(() => {
+    const m = new Map<string, IGatsbyImageData>();
+    data.allFile.nodes.forEach(n => {
+      const rel = n.relativePath.replace(/\\/g, '/'); // normalize
+      const lowerRel = rel.toLowerCase();
+      const afterImages = lowerRel.includes('images/')
+        ? lowerRel.substring(lowerRel.lastIndexOf('images/'))
+        : lowerRel;
+      const filename = lowerRel.substring(lowerRel.lastIndexOf('/') + 1);
+
+      const img = n.childImageSharp?.gatsbyImageData;
+      if (!img) return;
+
+      // Keys
+      m.set(lowerRel, img);
+      m.set('/' + lowerRel, img);
+      m.set(afterImages, img);
+      m.set('/' + afterImages, img);
+      m.set(filename, img);
+    });
+    return m;
+  }, [data]);
+
+  const get = useCallback(
+    (urlPath: string | undefined | null): IGatsbyImageData | null => {
+      if (!urlPath) return null;
+      const lower = urlPath.replace(/\\/g, '/').toLowerCase().replace(/^\/+/, '');
+      // try several keys/suffix matches
+      const direct =
+        map.get(lower) ||
+        map.get('/' + lower) ||
+        map.get(lower.startsWith('images/') ? lower : `images/${lower}`) ||
+        map.get('/' + (lower.startsWith('images/') ? lower : `images/${lower}`)) ||
+        map.get(lower.substring(lower.lastIndexOf('/') + 1));
+      if (direct) return direct;
+
+      // suffix scan (fallback)
+      for (const [k, v] of map) {
+        if (k.endsWith(lower)) return v;
+      }
+      return null;
+    },
+    [map]
+  );
+
+  return get;
+}
+
+/** ***********************
+ * Clients Marquee Section
+ **************************/
+interface Client {
+  href: string;
+  name: string;
+  logo: string; // root-relative path like /images/...
+}
+const clients: Client[] = [
+  {
+    href: 'https://www.heinhotel.at/',
+    name: 'Heinhotel',
+    logo: '/images/clients/Heinhotel_logo.png'
+  },
+  {
+    href: 'https://www.dasreinisch.at/',
+    name: 'das Reinisch',
+    logo: '/images/clients/das_Reinisch _logo.png'
+  },
+  // {
+  //   href: 'https://www.citypension.at/',
+  //   name: 'City Pension',
+  //   logo: '/images/clients/citypension.png'
+  // }
+];
+
+interface ClientsMarqueeProps extends BoxProps {}
+const ClientsMarquee: FC<ClientsMarqueeProps> = ({ ...props }) => {
+  const intl = useIntl();
+  const isRtl = (intl.locale || '').toLowerCase().startsWith('ar');
+  const imageFromPath = useImageLookup();
+
+  // wide ratio + fixed height 150px; width is calculated (ratio * height)
+  const ratio = 3;
+  const heightPx = 100;
+
+  return (
+    <Box
+      as="section"
+      bg="white"
+      borderTop="1px solid"
+      borderBottom="1px solid"
+      borderColor="limosen.border.faint"
+      h="120px"
+      py={{ base: 4, md: 6 }}
+      dir="ltr"
+      sx={{
+        '&, & *': { direction: 'ltr !important' }
+      }}
+      {...props}
+    >
+      <Marquee
+        gradient={false}
+        speed={60}
+        direction={isRtl ? 'right' : 'left'}
+        style={{ lineHeight: 0, direction: 'ltr' }}
+      >
+        <Box display="flex" gridGap="32px">
+          {clients.map((client, index) => {
+            const gimg = imageFromPath(client.logo);
+            return (
+              <LinkBox
+                key={index}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                px="16px"
+                sx={{
+                  '& img, .gatsby-image-wrapper, .gatsby-image-wrapper img': {
+                    width: '100% !important',
+                    height: '100% !important',
+                    maxWidth: 'none !important',
+                    maxHeight: 'none !important',
+                    objectFit: 'contain !important',
+                    objectPosition: 'center !important',
+                    display: 'block !important',
+                    inset: '0 !important'
+                  }
+                }}
+              >
+                <LinkOverlay href={client.href} isExternal aria-label={client.name}>
+                  <AspectRatio
+                    ratio={ratio}
+                    h={`${heightPx}px`}
+                    w={`calc(${heightPx}px * ${ratio})`}
+                    bg="white"
+                    overflow="hidden"
+                  >
+                    {gimg ? (
+                      <GatsbyImage
+                        image={gimg}
+                        alt={client.name}
+                        loading="lazy"
+                        decoding="async"
+                        style={{ width: '100%', height: '100%' }}
+                        imgStyle={{
+                          objectFit: 'contain',
+                          objectPosition: 'center'
+                        }}
+                      />
+                    ) : (
+                      // Fallback if a file wasn't resolved (kept optimized attrs)
+                      <Image
+                        src={client.logo}
+                        alt={client.name}
+                        draggable={false}
+                        loading="lazy"
+                        decoding="async"
+                        sizes="(min-width: 768px) 450px, 169px"
+                        htmlWidth={ratio * heightPx}
+                        htmlHeight={heightPx}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: 'none',
+                          maxHeight: 'none',
+                          objectFit: 'contain',
+                          objectPosition: 'center',
+                          display: 'block'
+                        }}
+                      />
+                    )}
+                  </AspectRatio>
+                </LinkOverlay>
+              </LinkBox>
+            );
+          })}
+        </Box>
+      </Marquee>
+    </Box>
+  );
+};
+
+/** *********************/
 export default function Content({ language }: { language: string }) {
   const [slideIndex, setSlideIndex] = useState(0);
   useEffect(() => {
@@ -254,17 +470,17 @@ export default function Content({ language }: { language: string }) {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
-
   const intl = useIntl();
 
-  // 'de' | 'en' | 'tr' for flag display
+  // 'de' | 'en' | 'tr' | 'ar' for flag display and direction
   const normalized = useMemo<'de' | 'en' | 'tr' | 'ar'>(() => {
     const l = (intl.locale || '').toLowerCase();
     if (l.startsWith('de')) return 'de';
     if (l.startsWith('tr')) return 'tr';
-    if (l.startsWith('ar')) return 'ar';
+    if (l.startsWith('ar')) return 'ar'; // ar-EG will match here
     return 'en';
   }, [intl.locale]);
+  const isRtl = normalized === 'ar';
 
   return (
     <Box
@@ -273,6 +489,8 @@ export default function Content({ language }: { language: string }) {
       color="limosen.text.primary"
       display="flex"
       flexDirection="column"
+      dir={isRtl ? 'rtl' : 'ltr'}
+      lang={intl.locale}
     >
       <Box
         as="main"
@@ -282,28 +500,15 @@ export default function Content({ language }: { language: string }) {
         gap={0}
         className="homepage"
       >
-        <HeroSection
-          fieldNamePrefix={normalized}
-          background={HERO_SLIDES[slideIndex]}
-        />
-        <AboutSection
-          fieldNamePrefix={normalized}
-        />
-        <FleetSection
-          fieldNamePrefix={normalized}
-        />
-        <ServicesSection
-          fieldNamePrefix={normalized}
-        />
-        <ReviewsSection
-          fieldNamePrefix={normalized}
-        />
-        <FAQSection
-          fieldNamePrefix={normalized}
-        />
-        <OnlineBookingSection
-          fieldNamePrefix={normalized}
-        />
+        <HeroSection background={HERO_SLIDES[slideIndex] as any} />
+        {/* New marquee band between Hero and About */}
+        <ClientsMarquee />
+        <AboutSection />
+        <FleetSection />
+        <ServicesSection />
+        <ReviewsSection />
+        <FAQSection />
+        <OnlineBookingSection />
       </Box>
     </Box>
   );
@@ -311,7 +516,6 @@ export default function Content({ language }: { language: string }) {
 
 export function HeaderBar() {
   const { signinRedirect } = useAuth();
-
   return (
     <Box
       bg="limosen.bg.banner"
@@ -332,6 +536,7 @@ export function HeaderBar() {
               {CONTACT_EMAIL}
             </Link>
           </HStack>
+
           <HStack spacing={3} className="header-bar__item">
             <Icon as={FaWhatsapp} color="limosen.accent" />
             <Link
@@ -343,6 +548,7 @@ export function HeaderBar() {
               {CONTACT_PHONE}
             </Link>
           </HStack>
+
           <HStack spacing={3} ml={{ base: 0, md: 'auto' }}>
             {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
               <IconButton
@@ -373,20 +579,21 @@ export function HeaderBar() {
   );
 }
 
-export function TopNavigation({ path }: { path?: string; language: string }) {
+export function TopNavigation({ path }: { path?: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
   const { signinRedirect } = useAuth();
   const intl = useIntl();
 
-  // 'de' | 'en' | 'tr' for flag display
+  // 'de' | 'en' | 'tr' | 'ar' for flag display and direction
   const normalized = useMemo<'de' | 'en' | 'tr' | 'ar'>(() => {
     const l = (intl.locale || '').toLowerCase();
     if (l.startsWith('de')) return 'de';
     if (l.startsWith('tr')) return 'tr';
-    if (l.startsWith('ar')) return 'ar';
+    if (l.startsWith('ar')) return 'ar'; // ar-EG will match here
     return 'en';
   }, [intl.locale]);
+  const isRtl = normalized === 'ar';
 
   const currentFlag =
     normalized === 'de'
@@ -397,7 +604,6 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
       ? FLAG_TR
       : FLAG_AR;
 
-  // optional normalization for localized hashes
   const normalizeHash = useCallback((href: string) => {
     if (!href?.startsWith('#')) return href;
     if (href === '#fahrzeuge') return '#fleet';
@@ -405,7 +611,6 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
     return href;
   }, []);
 
-  // top nav links from messages, fallback to static labels
   const messageNavLinks = (intl.messages as any)?.navLinks as
     | Array<{ label: string; href: string }>
     | undefined;
@@ -424,12 +629,10 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
   );
 
   const [menuActive, setMenuActive] = useState(false);
-
   const closeMenu = useCallback(() => {
     setMenuActive(false);
     onClose();
   }, [onClose]);
-
   const toggleMenu = () => {
     if (isOpen) {
       closeMenu();
@@ -438,7 +641,6 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
       onOpen();
     }
   };
-
   const handleNavLinkClick = useCallback(() => {
     if (isOpen) closeMenu();
   }, [isOpen, closeMenu]);
@@ -460,6 +662,7 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
     return trimmed.replace(/\/+$/, '') || '/';
   };
   const currentPath = useMemo(() => normalizePath(path || ''), [path]);
+
   const linkPathname = (href: string) => {
     try {
       const u = new URL(href);
@@ -473,7 +676,6 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
   const handleOnContactClick = () => {
     contactModal.onOpen({ meta: {} });
   };
-
   const bookingModal = useBookingModal();
   const handleOnBookingClick = () => {
     bookingModal.onOpen({ meta: {} });
@@ -490,10 +692,7 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
   const labelCityCountry = intl.formatMessage({ id: 'TopNavCityCountry' });
   const labelAccount = intl.formatMessage({ id: 'TopNavAccount' });
   const labelLanguage = intl.formatMessage({ id: 'TopNavLanguage' });
-
   const languageCodeDisplay = normalized.toUpperCase();
-
-  console.log(intl.messages);
 
   return (
     <Box
@@ -503,6 +702,8 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
       height={isOpen ? 'calc(100vh + 15px)' : { base: '12vh', md: '15vh' }}
       minH={isOpen ? '600px' : '100px'}
       transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
+      dir={isRtl ? 'rtl' : 'ltr'}
+      lang={intl.locale}
     >
       <Box
         pos="relative"
@@ -578,7 +779,8 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay onClick={handleOnBookingClick}>
+            {/* add href for crawlability, keep onClick for modal */}
+            <LinkOverlay href="?booking" onClick={handleOnBookingClick}>
               {labelBookNow}
             </LinkOverlay>
           </LinkBox>
@@ -595,7 +797,8 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
             transition="color 0.2s"
             _hover={{ color: 'limosen.accent' }}
           >
-            <LinkOverlay onClick={handleOnContactClick}>
+            {/* add href for crawlability, keep onClick for modal */}
+            <LinkOverlay href="?contact" onClick={handleOnContactClick}>
               {labelContact}
             </LinkOverlay>
           </LinkBox>
@@ -745,6 +948,7 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
                       transition="color 0.2s"
                       _hover={{ color: 'limosen.accent' }}
                       onClick={handleNavLinkClick}
+                      aria-label={label}
                     >
                       <Icon as={IconComponent} boxSize={6} />
                     </Link>
@@ -814,6 +1018,7 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
                       transition="color 0.2s"
                       _hover={{ color: 'limosen.accent' }}
                       onClick={handleNavLinkClick}
+                      aria-label={label}
                     >
                       <Icon as={IconComponent} boxSize={6} />
                     </Link>
@@ -825,7 +1030,8 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
         </Grid>
       </Box>
 
-      <Container maxW="6xl" pos="absolute" inset={0} pointerEvents="none">
+      {/* Force LTR order for right-edge controls even in Arabic */}
+      <Container maxW="6xl" pos="absolute" inset={0} pointerEvents="none" dir="ltr">
         <Flex
           h={{ base: '12vh', md: '15vh' }}
           minH="100px"
@@ -841,6 +1047,7 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
             alignItems="center"
             height="100%"
             onClick={handleNavLinkClick}
+            aria-label="Home"
           >
             <Box
               height={{ base: 16, md: 20 }}
@@ -941,15 +1148,12 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
           <ModalBody pb={6}>
             <ChakraLanguageSwitcher
               onSelect={langModal.onClose}
-              // Names come from react-intl messages (no hardcoding):
-              // Tries languages.<exact-locale> then languages.<base>
               buttonProps={{
                 justifyContent: 'flex-start',
                 variant: 'ghost',
                 color: 'limosen.text.primary',
                 _hover: { bg: 'whiteAlpha.200' }
               }}
-              // Optional: provide flags; omit this prop to show no flags
               flags={{
                 'de-AT': FLAG_DE,
                 'en-US': FLAG_EN,
@@ -964,23 +1168,78 @@ export function TopNavigation({ path }: { path?: string; language: string }) {
   );
 }
 
-function HeroSection({ fieldNamePrefix, background }: { fieldNamePrefix:string, background: string }) {
+type HeroSectionProps = {
+  background: IGatsbyImageData | string; // accept either gatsby image data or URL
+  objectPosition?: string;       // e.g., 'center', '50% 40%', etc.
+};
+function HeroSection({
+  background,
+  objectPosition = 'center'
+}: HeroSectionProps) {
+  const imageFromPath = useImageLookup();
+
+  // If a URL path string is passed (e.g., from HERO_SLIDES), resolve to Gatsby image if possible
+  const resolved = typeof background === 'string' ? imageFromPath(background) : null;
+
   return (
     <Box
       as="section"
       className="slider-wrapper"
-      bgImage={`url('${background}')`}
-      bgSize="cover"
-      bgPos="center"
-      bgRepeat="no-repeat"
+      position="relative"
+      overflow="hidden"
       minH={{ base: '320px', md: '540px' }}
-    />
+    >
+      {resolved ? (
+        <GatsbyImage
+          image={resolved}
+          alt=""                      // decorative
+          role="presentation"
+          loading="eager"             // LCP eager
+          fetchpriority="high"        // LCP high priority
+          decoding="async"
+          sizes="100vw"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+          imgStyle={{ objectFit: 'cover', objectPosition }}
+        />
+      ) : typeof background !== 'string' ? (
+        <GatsbyImage
+          image={background as IGatsbyImageData}
+          alt=""                      // decorative
+          role="presentation"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          sizes="100vw"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+          imgStyle={{ objectFit: 'cover', objectPosition }}
+        />
+      ) : (
+        // Fallback: render as real <img> (still discoverable for LCP)
+        <img
+          src={background as string}
+          alt=""
+          decoding="async"
+          loading="eager"
+          fetchpriority="high"
+          sizes="100vw"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition,
+            display: 'block'
+          }}
+        />
+      )}
+      {/* place overlay content here if needed */}
+    </Box>
   );
 }
 
-function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function AboutSection() {
   const intl = useIntl();
-
   return (
     <Box
       as="section"
@@ -1007,10 +1266,11 @@ function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             >
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}AboutTitle`}
+                name={`AboutTitle`}
                 defaultValue={intl.formatMessage({ id: 'AboutTitle' })}
               />
             </Heading>
+
             <Stack
               spacing={4}
               fontSize="lg"
@@ -1020,21 +1280,21 @@ function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name={`${fieldNamePrefix}AboutP1`}
+                  name={`AboutP1`}
                   defaultValue={intl.formatMessage({ id: 'AboutP1' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name={`${fieldNamePrefix}AboutP2`}
+                  name={`AboutP2`}
                   defaultValue={intl.formatMessage({ id: 'AboutP2' })}
                 />
               </Text>
               <Text>
                 <Field.Text
                   as={chakra.span}
-                  name={`${fieldNamePrefix}AboutP3`}
+                  name={`AboutP3`}
                   defaultValue={intl.formatMessage({ id: 'AboutP3' })}
                 />
               </Text>
@@ -1050,6 +1310,7 @@ function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             borderColor="limosen.border.faint"
             bg="limosen.bg.card"
           >
+            {/* keep Field.Image unchanged */}
             <Field.Image
               name="about-image"
               defaultValue={ABOUT_IMAGE}
@@ -1064,8 +1325,10 @@ function AboutSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   );
 }
 
-function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function ServicesSection() {
   const intl = useIntl();
+  const isRtl = (intl.locale || '').toLowerCase().startsWith('ar');
+
   const services: Array<{
     id: string;
     title: string;
@@ -1077,31 +1340,13 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
     () => services.map(service => service.id as string),
     [services]
   );
+
   const { expandedIndices, handleAccordionChange, btnRefs } =
     useServiceAccordionNavigation(serviceIds);
 
-  const createContentBlocks = (paragraphs: string[]) => {
-    const blocks: Array<
-      { type: 'text'; text: string } | { type: 'list'; items: string[] }
-    > = [];
-    let listItems: string[] = [];
-    paragraphs.forEach(paragraph => {
-      const trimmed = paragraph.trim();
-      if (trimmed.startsWith('•')) listItems.push(trimmed.replace(/^•\s*/, ''));
-      else {
-        if (listItems.length) {
-          blocks.push({ type: 'list', items: listItems });
-          listItems = [];
-        }
-        blocks.push({ type: 'text', text: paragraph });
-      }
-    });
-    if (listItems.length) blocks.push({ type: 'list', items: listItems });
-    return blocks;
-  };
-
-  const summaryText = (paragraphs: string[]) =>
-    paragraphs.find(p => !p.trim().startsWith('•')) || '';
+  // merged defaults (overview & detail share the exact same fields)
+  const mergedDefaultText = (paragraphs: string[]) =>
+    (paragraphs ?? []).join('\n\n');
 
   return (
     <Box
@@ -1116,14 +1361,14 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}ServicesTitle`}
+                name={`ServicesTitle`}
                 defaultValue={intl.formatMessage({ id: 'ServicesTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}ServicesSubtitle`}
+                name={`ServicesSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'ServicesSubtitle' })}
               />
             </Text>
@@ -1133,12 +1378,17 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             />
           </VStack>
 
+          {/* Services Overview Cards */}
           <SimpleGrid
             columns={{ base: 1, md: 2, lg: 3 }}
             spacing={{ base: 6, md: 8 }}
           >
             {services.map(service => {
               const targetHref = `#${service.id}`;
+              const imageFieldName = `service-${service.id}-image`;
+              const textFieldName = `service-${service.id}-text`;
+              const textDefault = mergedDefaultText(service.paragraphs);
+
               return (
                 <LinkBox
                   key={service.id}
@@ -1155,8 +1405,9 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                 >
                   {service.image && (
                     <AspectRatio ratio={5 / 3} w="100%">
+                      {/* keep Field.Image unchanged */}
                       <Field.Image
-                        name={`service-card-${service.id}`}
+                        name={imageFieldName}
                         defaultValue={service.image as string}
                         alt={service.title as string}
                         objectFit="cover"
@@ -1179,7 +1430,11 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                           fontSize="sm"
                           noOfLines={3}
                         >
-                          {summaryText(service.paragraphs as string[])}
+                          <Field.Text
+                            as={chakra.span}
+                            name={textFieldName}
+                            defaultValue={textDefault}
+                          />
                         </Text>
                         <Text fontWeight="semibold" color="limosen.accent">
                           {intl.formatMessage({ id: 'MoreDetails' })} →
@@ -1192,6 +1447,7 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             })}
           </SimpleGrid>
 
+          {/* Services Details (Accordion) */}
           <Box>
             <Heading
               size="md"
@@ -1201,12 +1457,13 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             >
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}ServicesDetailsTitle`}
+                name={`ServicesDetailsTitle`}
                 defaultValue={intl.formatMessage({
                   id: 'ServicesDetailsTitle'
                 })}
               />
             </Heading>
+
             <Accordion
               allowMultiple
               reduceMotion
@@ -1214,10 +1471,11 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
               onChange={handleAccordionChange}
             >
               {services.map(service => {
-                const blocks = createContentBlocks(
-                  service.paragraphs as string[]
-                );
                 const hasImage = Boolean(service.image);
+                const imageFieldName = `service-${service.id}-image`;
+                const textFieldName = `service-${service.id}-text`;
+                const textDefault = mergedDefaultText(service.paragraphs);
+
                 return (
                   <AccordionItem
                     key={service.id}
@@ -1243,12 +1501,17 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                         border="1px solid"
                         borderColor="limosen.border.faint"
                       >
-                        <Box flex="1" textAlign="left" fontWeight="semibold">
+                        <Box
+                          flex="1"
+                          textAlign={isRtl ? 'right' : 'left'}
+                          fontWeight="semibold"
+                        >
                           {service.title}
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
                     </h3>
+
                     <AccordionPanel px={{ base: 4, md: 6 }} pt={6} pb={2}>
                       <Stack
                         spacing={6}
@@ -1266,8 +1529,9 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                             borderRadius="lg"
                             overflow="hidden"
                           >
+                            {/* keep Field.Image unchanged */}
                             <Field.Image
-                              name={`service-panel-${service.id}`}
+                              name={imageFieldName}
                               defaultValue={service.image as string}
                               alt={service.title as string}
                               objectFit="cover"
@@ -1275,25 +1539,20 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                             />
                           </AspectRatio>
                         )}
+
                         <Stack
                           spacing={4}
                           color="limosen.text.primary"
                           fontSize="md"
                           flex="1"
                         >
-                          {blocks.map((block, i) =>
-                            (block as any).items ? (
-                              <List key={i} spacing={2} pl={4} styleType="disc">
-                                {(block as any).items.map(
-                                  (item: string, j: number) => (
-                                    <ListItem key={j}>{item}</ListItem>
-                                  )
-                                )}
-                              </List>
-                            ) : (
-                              <Text key={i}>{(block as any).text}</Text>
-                            )
-                          )}
+                          <Text whiteSpace="pre-wrap">
+                            <Field.Text
+                              as={chakra.span}
+                              name={textFieldName}
+                              defaultValue={textDefault}
+                            />
+                          </Text>
                         </Stack>
                       </Stack>
                     </AccordionPanel>
@@ -1308,8 +1567,9 @@ function ServicesSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   );
 }
 
-function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function FAQSection() {
   const intl = useIntl();
+  const isRtl = (intl.locale || '').toLowerCase().startsWith('ar');
   const items: Array<{ question: string; answer: string }> =
     ((intl.messages as any)?.faq as any) ?? [];
 
@@ -1321,14 +1581,14 @@ function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}FaqTitle`}
+                name={`FaqTitle`}
                 defaultValue={intl.formatMessage({ id: 'FaqTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}FaqSubtitle`}
+                name={`FaqSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'FaqSubtitle' })}
               />
             </Text>
@@ -1337,6 +1597,7 @@ function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
               borderColor="limosen.border.subtle"
             />
           </VStack>
+
           <Accordion allowToggle reduceMotion>
             {items.map(item => (
               <AccordionItem key={item.question} border="none" mb={3}>
@@ -1354,7 +1615,11 @@ function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                     border="1px solid"
                     borderColor="limosen.border.faint"
                   >
-                    <Box flex="1" textAlign="left" fontWeight="semibold">
+                    <Box
+                      flex="1"
+                      textAlign={isRtl ? 'right' : 'left'}
+                      fontWeight="semibold"
+                    >
                       {item.question}
                     </Box>
                     <AccordionIcon />
@@ -1377,7 +1642,7 @@ function FAQSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   );
 }
 
-function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function FleetSection() {
   const intl = useIntl();
   const vehicles: Array<{
     image: string;
@@ -1400,10 +1665,11 @@ function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
           <Heading size="lg" textAlign="center" color="limosen.text.primary">
             <Field.Text
               as={chakra.span}
-              name={`${fieldNamePrefix}FleetTitle`}
+              name={`FleetTitle`}
               defaultValue={intl.formatMessage({ id: 'FleetTitle' })}
             />
           </Heading>
+
           <SimpleGrid
             columns={{ base: 1, md: 2 }}
             spacing={{ base: 8, md: 10 }}
@@ -1424,6 +1690,7 @@ function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                   overflow="hidden"
                   bg="white"
                 >
+                  {/* keep Field.Image unchanged */}
                   <Field.Image
                     name={`fleet-${vehicle.name}`}
                     defaultValue={vehicle.image as string}
@@ -1463,6 +1730,7 @@ function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                         </Text>
                       </HStack>
                     </WrapItem>
+
                     <WrapItem>
                       <HStack spacing={2}>
                         <Icon as={FaSuitcaseRolling} color="limosen.accent" />
@@ -1492,10 +1760,9 @@ function FleetSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   );
 }
 
-function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function OnlineBookingSection() {
   const contactModal = useContactModal();
   const intl = useIntl();
-
   const handleOnContactClick = () => {
     contactModal.onOpen({ meta: {} });
   };
@@ -1520,10 +1787,11 @@ function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) 
           >
             <Field.Text
               as={chakra.span}
-              name={`${fieldNamePrefix}BookingTitle`}
+              name={`BookingTitle`}
               defaultValue={intl.formatMessage({ id: 'BookingTitle' })}
             />
           </Heading>
+
           <Stack
             spacing={3}
             fontSize="lg"
@@ -1533,7 +1801,7 @@ function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) 
             <Text>
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}BookingReachPhone`}
+                name={`BookingReachPhone`}
                 defaultValue={intl.formatMessage({ id: 'BookingReachPhone' })}
               />
             </Text>
@@ -1551,14 +1819,14 @@ function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) 
             <Text>
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}BookingAnd`}
+                name={`BookingAnd`}
                 defaultValue={intl.formatMessage({ id: 'BookingAnd' })}
               />
             </Text>
             <Text>
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}BookingReachEmail`}
+                name={`BookingReachEmail`}
                 defaultValue={intl.formatMessage({ id: 'BookingReachEmail' })}
               />
             </Text>
@@ -1572,6 +1840,7 @@ function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) 
               </Link>
             </HStack>
           </Stack>
+
           <Button variant="limosen" onClick={handleOnContactClick}>
             {intl.formatMessage({ id: 'ContactCta' })}
           </Button>
@@ -1581,9 +1850,8 @@ function OnlineBookingSection({ fieldNamePrefix }: { fieldNamePrefix: string }) 
   );
 }
 
-function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
+function ReviewsSection() {
   const intl = useIntl();
-
   return (
     <Box
       as="section"
@@ -1597,14 +1865,14 @@ function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}FeedbackTitle`}
+                name={`FeedbackTitle`}
                 defaultValue={intl.formatMessage({ id: 'FeedbackTitle' })}
               />
             </Heading>
             <Text color="limosen.text.muted" maxW="3xl">
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}FeedbackSubtitle`}
+                name={`FeedbackSubtitle`}
                 defaultValue={intl.formatMessage({ id: 'FeedbackSubtitle' })}
               />
             </Text>
@@ -1630,7 +1898,7 @@ function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                 <Heading size="md" color="limosen.text.primary">
                   <Field.Text
                     as={chakra.span}
-                    name={`${fieldNamePrefix}FeedbackBoxTitle`}
+                    name={`FeedbackBoxTitle`}
                     defaultValue={intl.formatMessage({
                       id: 'FeedbackBoxTitle'
                     })}
@@ -1639,7 +1907,7 @@ function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                 <Text color="limosen.text.secondary">
                   <Field.Text
                     as={chakra.span}
-                    name={`${fieldNamePrefix}FeedbackBoxText`}
+                    name={`FeedbackBoxText`}
                     defaultValue={intl.formatMessage({ id: 'FeedbackBoxText' })}
                   />
                 </Text>
@@ -1652,7 +1920,7 @@ function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
                   >
                     <Field.Text
                       as={chakra.span}
-                      name={`${fieldNamePrefix}FeedbackMapsCta`}
+                      name={`FeedbackMapsCta`}
                       defaultValue={intl.formatMessage({
                         id: 'FeedbackMapsCta'
                       })}
@@ -1695,56 +1963,90 @@ function ReviewsSection({ fieldNamePrefix }: { fieldNamePrefix: string }) {
   );
 }
 
-export function Footer({fieldNamePrefix }: { fieldNamePrefix: string }) {
+export function Footer() {
   const intl = useIntl();
+  const isRtl = (intl.locale || '').toLowerCase().startsWith('ar');
+
   const footerGroups: Array<{
     title: string;
     links: { label: string; href: string }[];
   }> = ((intl.messages as any)?.footer as any) ?? [];
 
   return (
-    <Box as="footer" bg="limosen.bg.footer" py={{ base: 12, md: 16 }}>
+    <Box as="footer" bg="limosen.bg.footer" py={{ base: 12, md: 16 }} dir={isRtl ? 'rtl' : 'ltr'}>
       <Container maxW="6xl">
         <VStack spacing={{ base: 10, md: 14 }} align="stretch">
           <Flex
-            direction={{ base: 'column', md: 'row' }}
+            direction={{ base: 'column', md: isRtl ? 'row-reverse' : 'row' }}
             align="flex-start"
             gap={{ base: 8, md: 14 }}
           >
-            <Box flexShrink={0}>
-              <Box h={{ base: 14, md: 16 }} display="flex" alignItems="center">
+            <Box
+              flexShrink={0}
+              textAlign={isRtl ? 'right' : 'left'}
+              w={{ base: 'full', md: 'auto' }}
+              alignSelf={{ base: isRtl ? 'flex-end' : 'flex-start', md: 'auto' }}
+            >
+              <Box
+                h={{ base: 14, md: 16 }}
+                display="flex"
+                alignItems="center"
+                justifyContent={isRtl ? 'flex-end' : 'flex-start'}
+                w="full"
+              >
                 <Logo width="auto" />
               </Box>
               <Text mt={4} color="limosen.text.muted">
                 <Field.Text
                   as={chakra.span}
-                  name={`${fieldNamePrefix}FooterTagline`}
+                  name={`FooterTagline`}
                   defaultValue={intl.formatMessage({ id: 'FooterTagline' })}
                 />
               </Text>
             </Box>
+
             <SimpleGrid
               columns={{ base: 1, sm: 2, md: 3 }}
               spacing={{ base: 8, md: 10 }}
               flex="1"
+              dir={isRtl ? 'rtl' : 'ltr'}
+              justifyItems={isRtl ? 'end' : 'start'}
             >
               {footerGroups.map(group => (
-                <VStack key={group.title} spacing={4} align="flex-start">
+                <VStack
+                  key={group.title}
+                  spacing={4}
+                  align={isRtl ? 'flex-end' : 'flex-start'}
+                  textAlign={isRtl ? 'right' : 'left'}
+                  w="full"
+                >
                   <Text
                     fontWeight="bold"
                     textTransform="uppercase"
                     letterSpacing="widest"
                     color="limosen.text.primary"
+                    w="full"
                   >
                     {group.title}
                   </Text>
-                  <VStack spacing={2} align="flex-start">
+                  {/* fix links alignment in Arabic reliably */}
+                  <VStack
+                    spacing={2}
+                    align={isRtl ? 'flex-end' : 'flex-start'}
+                    w="full"
+                    direction={isRtl ? 'rtl' : 'ltr'}
+                  >
                     {group.links.map(link => (
                       <Link
                         key={`${group.title}-${link.label}`}
                         href={link.href}
                         color="limosen.text.muted"
                         _hover={{ color: 'limosen.text.primary' }}
+                        display="block"
+                        w="full"
+                        textAlign={isRtl ? 'right' : 'left'}
+                        alignSelf={isRtl ? 'flex-end' : 'flex-start'}
+                        aria-label={link.label}
                       >
                         {link.label}
                       </Link>
@@ -1754,22 +2056,29 @@ export function Footer({fieldNamePrefix }: { fieldNamePrefix: string }) {
               ))}
             </SimpleGrid>
           </Flex>
+
           <Divider borderColor="limosen.border.subtle" />
+
           <Flex
-            direction={{ base: 'column', md: 'row' }}
+            direction={{ base: 'column', md: isRtl ? 'row-reverse' : 'row' }}
             align="center"
             justify="space-between"
             gap={4}
           >
-            <Text fontSize="sm" color="limosen.text.muted">
-              © {new Date().getFullYear()} LIMOSEN KG.{' '}
+            <Text
+              fontSize="sm"
+              color="limosen.text.muted"
+              textAlign={isRtl ? 'right' : 'left'}
+              w="full"
+            >
+              © {new Date().getFullYear()} LIMOSEN KG{' '}
               <Field.Text
                 as={chakra.span}
-                name={`${fieldNamePrefix}FooterRights`}
+                name={`FooterRights`}
                 defaultValue={intl.formatMessage({ id: 'FooterRights' })}
               />
             </Text>
-            <Wrap spacing={3}>
+            <Wrap spacing={3} justify={isRtl ? 'flex-start' : 'flex-end'} w="full">
               {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                 <WrapItem key={label}>
                   <IconButton

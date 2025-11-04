@@ -225,7 +225,7 @@ export function getI18nHomepage(code: I18nCode) {
           };
         case 'first-class-sedan':
           return {
-            name: 'Mercedes Benz S Klasse',
+            name: 'Mercedes Benz S vehicle.name',
             category: 'First Class',
             description:
               'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC, BMW i7 eDrive50',
@@ -258,7 +258,7 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'Services',
         links: [
           { label: 'Registrieren', href: '/signup' },
-          { label: 'Jetzt buchen', href: '?booking' },
+          { label: 'Jetzt buchen', href: 'https://limosen.at/de/booking' },
           { label: 'Impressum', href: 'https://limosen.at/de/imprint' },
           { label: 'Datenschutz', href: 'https://limosen.at/de/privacy' }
         ]
@@ -537,9 +537,9 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'Hizmetler',
         links: [
           { label: 'Kayıt ol', href: '/signup' },
-          { label: 'Hemen rezervasyon', href: '?booking' },
-          { label: 'Künye', href: 'https://limosen.at/tr/imprint' },
-          { label: 'Gizlilik', href: 'https://limosen.at/tr/privacy' }
+          { label: 'Hemen rezervasyon', href: 'https://limosen.at/de/booking' },
+          { label: 'Künye', href: 'https://limosen.at/de/imprint' },
+          { label: 'Gizlilik', href: 'https://limosen.at/de/privacy' }
         ]
       },
       {
@@ -817,12 +817,12 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'الخدمات',
         links: [
           { label: 'إنشاء حساب', href: '/signup' },
-          { label: 'احجز الآن', href: '?booking' },
+          { label: 'احجز الآن', href: 'https://limosen.at/de/booking' },
           {
             label: 'بيانات الناشر',
-            href: 'https://limosen.at/ar/imprint'
+            href: 'https://limosen.at/de/imprint'
           },
-          { label: 'الخصوصية', href: 'https://limosen.at/ar/privacy' }
+          { label: 'الخصوصية', href: 'https://limosen.at/de/privacy' }
         ]
       },
       {
@@ -1099,9 +1099,9 @@ export function getI18nHomepage(code: I18nCode) {
       title: 'Services',
       links: [
         { label: 'Sign up', href: '/signup' },
-        { label: 'Book now', href: '?booking' },
-        { label: 'Imprint', href: 'https://limosen.at/imprint' },
-        { label: 'Privacy', href: 'https://limosen.at/privacy' }
+        { label: 'Book now', href: 'https://limosen.at/de/booking' },
+        { label: 'Imprint', href: 'https://limosen.at/de/imprint' },
+        { label: 'Privacy', href: 'https://limosen.at/de/privacy' }
       ]
     },
     {

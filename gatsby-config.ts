@@ -17,6 +17,7 @@ const config: GatsbyConfig = {
     DEV_SSR: false
   },
   plugins: [
+    `gatsby-plugin-remove-console`,
     `gatsby-plugin-cloudflare-pages`,
     {
       resolve: `gatsby-plugin-jaen`,
@@ -83,12 +84,6 @@ const config: GatsbyConfig = {
             slugs: {}
           }
         ],
-        // omit certain path and subpaths segments from translation (urls not relative directories)
-        // urlBlacklist: [
-        //   '/cms',
-        //   '/login',
-        //   '/mailpress',
-        // ],
         trailingSlash: 'always'
       }
     }
