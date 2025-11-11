@@ -1,8 +1,9 @@
-import { PageConfig } from 'jaen';
-import { GatsbyNode } from 'gatsby';
-import path from 'path';
-import fs from 'fs';
-import { buildSearchIndex } from './src/utils/search/build-search-index';
+// gatsby-node.ts
+import type { PageConfig } from 'jaen' // type-only to avoid runtime import
+import type { GatsbyNode } from 'gatsby'
+import path from 'path'
+import {promises as fs} from 'fs' // no default import issues
+import { buildSearchIndex } from './src/utils/search/build-search-index'
 
 export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({
   actions
@@ -10,11 +11,12 @@ export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({
   actions.setWebpackConfig({
     resolve: {
       alias: {
-        '@/clients': path.resolve(__dirname, 'src/clients')
+        // use cwd so it also works if __dirname isn't defined in ESM contexts
+        '@/clients': path.resolve(process.cwd(), 'src/clients')
       }
     }
-  });
-};
+  })
+}
 
 export const onPostBuild: GatsbyNode['onPostBuild'] = async ({
   graphql,
@@ -23,122 +25,76 @@ export const onPostBuild: GatsbyNode['onPostBuild'] = async ({
   const result = await graphql<{
     allJaenPage: {
       nodes: Array<{
-        id: string;
-        slug: string;
-        parentPage: {
-          id: string;
-        } | null;
-        template: string | null;
-        jaenPageMetadata: {
-          title: string;
-        };
-        jaenFields: Record<string, any> | null;
-        pageConfig: PageConfig | null;
-        buildPath: string;
-        sections: Array<{
-          items: Array<{
-            jaenFields: Record<string, any>;
-            sections: Array<{
-              items: Array<{
-                jaenFields: Record<string, any>;
-              }>;
-            }>;
-          }>;
-        }>;
-      }>;
-    };
+        id: string
+        slug: string
+        template: string | null
+        buildPath?: string | null
+        jaenPageMetadata?: { title?: string | null } | null
+        jaenFields?: Record<string, any> | null
+      }>
+    }
   }>(`
-    query {
+    query BuildSearchIndexPages {
       allJaenPage {
         nodes {
           id
           slug
-          parentPage {
-            id
-          }
           template
+          buildPath
           jaenPageMetadata {
             title
           }
           jaenFields
-          pageConfig
-          buildPath
-          sections {
-            items {
-              jaenFields
-              sections {
-                items {
-                  jaenFields
-                }
-              }
-            }
-          }
         }
       }
     }
-  `);
+  `)
 
   if (result.errors || !result.data) {
-    reporter.panicOnBuild(
-      `Error while running GraphQL query. ${result.errors}`
-    );
-
-    return;
+    reporter.panicOnBuild(`Error while running GraphQL query. ${result.errors}`)
+    return
   }
 
-  const { allJaenPage } = result.data;
-
-  await preparePagesAndBuildSearch(allJaenPage);
-};
+  const { allJaenPage } = result.data
+  await preparePagesAndBuildSearch(allJaenPage)
+}
 
 async function preparePagesAndBuildSearch(allJaenPage: {
   nodes: Array<{
-    id: string;
-    slug: string;
-    parentPage: {
-      id: string;
-    } | null;
-    template: string | null;
-    jaenPageMetadata: {
-      title: string;
-    };
-    jaenFields: Record<string, any> | null;
-    pageConfig: PageConfig | null;
-    buildPath: string;
-    sections: Array<{
-      items: Array<{
-        jaenFields: Record<string, any>;
-        sections: Array<{
-          items: Array<{
-            jaenFields: Record<string, any>;
-          }>;
-        }>;
-      }>;
-    }>;
-  }>;
+    id: string
+    slug: string
+    template: string | null
+    buildPath?: string | null
+    jaenPageMetadata?: { title?: string | null } | null
+    jaenFields?: Record<string, any> | null
+  }>
 }) {
   const nodesForSearchIndex = allJaenPage.nodes.map(node => {
-    const originPath = node.buildPath;
+    const originPath =
+      (node.buildPath && node.buildPath.length > 0)
+        ? node.buildPath
+        : node.slug
+        ? `/${node.slug}`
+        : '/'
 
-    let type = node.template;
-
+    let type = node.template ?? undefined
     if (type && path.extname(type)) {
-      type = path.basename(type, path.extname(type));
+      type = path.basename(type, path.extname(type))
     }
 
     return {
       id: node.id,
       path: originPath,
-      jaenPageMetadata: node.jaenPageMetadata,
-      jaenFields: node.jaenFields,
+      jaenPageMetadata: node.jaenPageMetadata ?? {},
+      jaenFields: node.jaenFields ?? {},
       type
-    };
-  });
+    }
+  })
 
-  const searchIndex = await buildSearchIndex(nodesForSearchIndex as any);
+  const searchIndex = await buildSearchIndex(nodesForSearchIndex as any)
 
-  await fs.promises.writeFile(
+  await fs.writeFile(
     path.join('public', 'search-index.json'),
     JSON.stringify(searchIndex)
-  );
+  )
 }

@@ -14,7 +14,7 @@ import {
   HERO_SLIDES,
   GOOGLE_MAPS_EMBED,
   GOOGLE_MAPS_OPEN
-} from '../vars/limosen';
+} from '../../vars/limosen';
 
 export type I18nCode = 'en-US' | 'de-AT' | 'tr-TR' | 'ar-EG';
 

@@ -371,7 +371,6 @@ const ClientsMarquee: FC<ClientsMarqueeProps> = ({ ...props }) => {
       borderTop="1px solid"
       borderBottom="1px solid"
       borderColor="limosen.border.faint"
-      h="120px"
       py={{ base: 4, md: 6 }}
       dir="ltr"
       sx={{
@@ -503,9 +502,9 @@ export default function Content({ language }: { language: string }) {
         <HeroSection background={HERO_SLIDES[slideIndex] as any} />
         {/* New marquee band between Hero and About */}
         <ClientsMarquee />
-        <AboutSection />
         <FleetSection />
         <ServicesSection />
+        <AboutSection />
         <ReviewsSection />
         <FAQSection />
         <OnlineBookingSection />

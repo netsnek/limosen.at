@@ -1,5 +1,5 @@
 import type { GatsbyConfig } from 'gatsby';
-import { messagesByLocale } from './src/locales/messages';
+import {messagesByLocale} from './src/gatsby-plugin-jaen/locales/messages'
 
 require('dotenv').config({
   path: `.env.public`
@@ -17,8 +17,41 @@ const config: GatsbyConfig = {
     DEV_SSR: false
   },
   plugins: [
-    `gatsby-plugin-remove-console`,
     `gatsby-plugin-cloudflare-pages`,
+    // {
+    //   resolve: 'gatsby-plugin-i18n-l10n',
+    //   options: {
+    //     siteUrl: 'https://limosen.at/',
+    //     defaultLocale: 'en-US',
+    //     locales: [
+    //       {
+    //         locale: 'en-US',
+    //         prefix: 'en',
+    //         messages: messagesByLocale['en-US'], // <-- plain object from TS
+    //         slugs: {}
+    //       },
+    //       {
+    //         locale: 'de-AT',
+    //         prefix: 'de',
+    //         messages: messagesByLocale['de-AT'],
+    //         slugs: {}
+    //       },
+    //       {
+    //         locale: 'tr-TR',
+    //         prefix: 'tr',
+    //         messages: messagesByLocale['tr-TR'],
+    //         slugs: {}
+    //       },
+    //       {
+    //         locale: 'ar-EG',
+    //         prefix: 'ar',
+    //         messages: messagesByLocale['ar-EG'],
+    //         slugs: {}
+    //       }
+    //     ],
+    //     trailingSlash: 'always'
+    //   }
+    // },
     {
       resolve: `gatsby-plugin-jaen`,
       options: {
@@ -51,42 +84,8 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://mailpress.netsnek.com/graphql'
       }
-    },
-    //`gatsby-jaen-lens`
-    {
-      resolve: 'gatsby-plugin-i18n-l10n',
-      options: {
-        siteUrl: 'https://limosen.at/',
-        defaultLocale: 'en-US',
-        locales: [
-          {
-            locale: 'en-US',
-            prefix: 'en',
-            messages: messagesByLocale['en-US'], // <-- plain object from TS
-            slugs: {}
-          },
-          {
-            locale: 'de-AT',
-            prefix: 'de',
-            messages: messagesByLocale['de-AT'],
-            slugs: {}
-          },
-          {
-            locale: 'tr-TR',
-            prefix: 'tr',
-            messages: messagesByLocale['tr-TR'],
-            slugs: {}
-          },
-          {
-            locale: 'ar-EG',
-            prefix: 'ar',
-            messages: messagesByLocale['ar-EG'],
-            slugs: {}
-          }
-        ],
-        trailingSlash: 'always'
-      }
     }
+    //`gatsby-jaen-lens`
   ]
 };
 
