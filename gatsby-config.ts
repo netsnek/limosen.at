@@ -1,5 +1,5 @@
 import type { GatsbyConfig } from 'gatsby';
-import {messagesByLocale} from './src/gatsby-plugin-jaen/locales/messages'
+import { messagesByLocale } from './src/gatsby-plugin-jaen/locales/messages'
 
 require('dotenv').config({
   path: `.env.public`
@@ -18,40 +18,6 @@ const config: GatsbyConfig = {
   },
   plugins: [
     `gatsby-plugin-cloudflare-pages`,
-    // {
-    //   resolve: 'gatsby-plugin-i18n-l10n',
-    //   options: {
-    //     siteUrl: 'https://limosen.at/',
-    //     defaultLocale: 'en-US',
-    //     locales: [
-    //       {
-    //         locale: 'en-US',
-    //         prefix: 'en',
-    //         messages: messagesByLocale['en-US'], // <-- plain object from TS
-    //         slugs: {}
-    //       },
-    //       {
-    //         locale: 'de-AT',
-    //         prefix: 'de',
-    //         messages: messagesByLocale['de-AT'],
-    //         slugs: {}
-    //       },
-    //       {
-    //         locale: 'tr-TR',
-    //         prefix: 'tr',
-    //         messages: messagesByLocale['tr-TR'],
-    //         slugs: {}
-    //       },
-    //       {
-    //         locale: 'ar-EG',
-    //         prefix: 'ar',
-    //         messages: messagesByLocale['ar-EG'],
-    //         slugs: {}
-    //       }
-    //     ],
-    //     trailingSlash: 'always'
-    //   }
-    // },
     {
       resolve: `gatsby-plugin-jaen`,
       options: {
@@ -80,12 +46,58 @@ const config: GatsbyConfig = {
       }
     },
     {
+      resolve: 'gatsby-plugin-i18n-l10n',
+      options: {
+        siteUrl: 'https://limosen.at/',
+        defaultLocale: 'en-US',
+        locales: [
+          {
+            locale: 'en-US',
+            prefix: 'en',
+            messages: messagesByLocale['en-US'], // <-- plain object from TS
+            slugs: {}
+          },
+          {
+            locale: 'de-AT',
+            prefix: 'de',
+            messages: messagesByLocale['de-AT'],
+            slugs: {}
+          },
+          {
+            locale: 'tr-TR',
+            prefix: 'tr',
+            messages: messagesByLocale['tr-TR'],
+            slugs: {}
+          },
+          {
+            locale: 'ar-EG',
+            prefix: 'ar',
+            messages: messagesByLocale['ar-EG'],
+            slugs: {}
+          }
+        ],
+        trailingSlash: 'always'
+      }
+    },
+    {
       resolve: `gatsby-jaen-mailpress`,
       options: {
         pylonUrl: 'https://mailpress.netsnek.com/graphql'
       }
-    }
+    },
     //`gatsby-jaen-lens`
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `Limosen App`,
+        short_name: `Limosen`,
+        start_url: `/login`,
+        background_color: `#f7f0eb`,
+        theme_color: `#a2466c`,
+        display: `standalone`,
+        icon: `src/favicon.ico`
+      }
+    },
   ]
 };
 

@@ -1,9 +1,8 @@
-// gatsby-node.ts
-import type { PageConfig } from 'jaen' // type-only to avoid runtime import
-import type { GatsbyNode } from 'gatsby'
-import path from 'path'
-import {promises as fs} from 'fs' // no default import issues
-import { buildSearchIndex } from './src/utils/search/build-search-index'
+import { PageConfig } from 'jaen';
+import { GatsbyNode } from 'gatsby';
+import path from 'path';
+import fs from 'fs';
+import { buildSearchIndex } from './src/utils/search/build-search-index';
 
 export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({
   actions
@@ -11,12 +10,11 @@ export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({
   actions.setWebpackConfig({
     resolve: {
       alias: {
-        // use cwd so it also works if __dirname isn't defined in ESM contexts
-        '@/clients': path.resolve(process.cwd(), 'src/clients')
+        '@/clients': path.resolve(__dirname, 'src/clients')
       }
     }
-  })
-}
+  });
+};
 
 export const onPostBuild: GatsbyNode['onPostBuild'] = async ({
   graphql,
@@ -25,76 +23,122 @@ export const onPostBuild: GatsbyNode['onPostBuild'] = async ({
   const result = await graphql<{
     allJaenPage: {
       nodes: Array<{
-        id: string
-        slug: string
-        template: string | null
-        buildPath?: string | null
-        jaenPageMetadata?: { title?: string | null } | null
-        jaenFields?: Record<string, any> | null
-      }>
-    }
+        id: string;
+        slug: string;
+        parentPage: {
+          id: string;
+        } | null;
+        template: string | null;
+        jaenPageMetadata: {
+          title: string;
+        };
+        jaenFields: Record<string, any> | null;
+        pageConfig: PageConfig | null;
+        buildPath: string;
+        sections: Array<{
+          items: Array<{
+            jaenFields: Record<string, any>;
+            sections: Array<{
+              items: Array<{
+                jaenFields: Record<string, any>;
+              }>;
+            }>;
+          }>;
+        }>;
+      }>;
+    };
   }>(`
-    query BuildSearchIndexPages {
+    query {
       allJaenPage {
         nodes {
           id
           slug
+          parentPage {
+            id
+          }
           template
-          buildPath
           jaenPageMetadata {
             title
           }
           jaenFields
+          pageConfig
+          buildPath
+          sections {
+            items {
+              jaenFields
+              sections {
+                items {
+                  jaenFields
+                }
+              }
+            }
+          }
         }
       }
     }
-  `)
+  `);
 
   if (result.errors || !result.data) {
-    reporter.panicOnBuild(`Error while running GraphQL query. ${result.errors}`)
-    return
+    reporter.panicOnBuild(
+      `Error while running GraphQL query. ${result.errors}`
+    );
+
+    return;
   }
 
-  const { allJaenPage } = result.data
-  await preparePagesAndBuildSearch(allJaenPage)
-}
+  const { allJaenPage } = result.data;
+
+  await preparePagesAndBuildSearch(allJaenPage);
+};
 
 async function preparePagesAndBuildSearch(allJaenPage: {
   nodes: Array<{
-    id: string
-    slug: string
-    template: string | null
-    buildPath?: string | null
-    jaenPageMetadata?: { title?: string | null } | null
-    jaenFields?: Record<string, any> | null
-  }>
+    id: string;
+    slug: string;
+    parentPage: {
+      id: string;
+    } | null;
+    template: string | null;
+    jaenPageMetadata: {
+      title: string;
+    };
+    jaenFields: Record<string, any> | null;
+    pageConfig: PageConfig | null;
+    buildPath: string;
+    sections: Array<{
+      items: Array<{
+        jaenFields: Record<string, any>;
+        sections: Array<{
+          items: Array<{
+            jaenFields: Record<string, any>;
+          }>;
+        }>;
+      }>;
+    }>;
+  }>;
 }) {
   const nodesForSearchIndex = allJaenPage.nodes.map(node => {
-    const originPath =
-      (node.buildPath && node.buildPath.length > 0)
-        ? node.buildPath
-        : node.slug
-        ? `/${node.slug}`
-        : '/'
+    const originPath = node.buildPath;
 
-    let type = node.template ?? undefined
+    let type = node.template;
+
     if (type && path.extname(type)) {
-      type = path.basename(type, path.extname(type))
+      type = path.basename(type, path.extname(type));
     }
 
     return {
       id: node.id,
       path: originPath,
-      jaenPageMetadata: node.jaenPageMetadata ?? {},
-      jaenFields: node.jaenFields ?? {},
+      jaenPageMetadata: node.jaenPageMetadata,
+      jaenFields: node.jaenFields,
       type
-    }
-  })
+    };
+  });
 
-  const searchIndex = await buildSearchIndex(nodesForSearchIndex as any)
+  const searchIndex = await buildSearchIndex(nodesForSearchIndex as any);
 
-  await fs.writeFile(
+  await fs.promises.writeFile(
     path.join('public', 'search-index.json'),
     JSON.stringify(searchIndex)
-  )
+  );
 }
