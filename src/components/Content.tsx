@@ -347,11 +347,11 @@ const clients: Client[] = [
     name: 'das Reinisch',
     logo: '/images/clients/das_Reinisch _logo.png'
   },
-  // {
-  //   href: 'https://www.citypension.at/',
-  //   name: 'City Pension',
-  //   logo: '/images/clients/citypension.png'
-  // }
+  {
+    href: 'https://www.mon-cher.at/',
+    name: 'Mon Cher',
+    logo: '/images/clients/MonCherMain-Black-new.png'
+  }
 ];
 
 interface ClientsMarqueeProps extends BoxProps {}
@@ -501,8 +501,8 @@ export default function Content({ language }: { language: string }) {
       >
         <HeroSection background={HERO_SLIDES[slideIndex] as any} />
         {/* New marquee band between Hero and About */}
-        <ClientsMarquee />
         <FleetSection />
+        <ClientsMarquee />
         <ServicesSection />
         <AboutSection />
         <ReviewsSection />

@@ -37,6 +37,7 @@
     "hast-util-sanitize": "^5.0.1",
     "jaen": "*",
     "jaen-fields-mdx": "*",
+    "gatsby-jaen-app": "*",
     "prismjs": "^1.29.0",
     "quantum-circuit": "^0.9.218",
     "react": "^18.2.0",

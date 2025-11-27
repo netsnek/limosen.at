@@ -31,17 +31,17 @@ const config: GatsbyConfig = {
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
-              ? 'https://limosen.at'
+              ? 'https://limosen.at/loading'
               : 'https://psychic-dollop-6vwv6x9vq9jf464g-8000.app.github.dev',
           projectIds: ['2268283277977065078']
         },
-        // sentry: {
-        //   org: 'photonq',
-        //   project: 'website',
-        //   dsn: 'https://37ffbc7589f79cfab5936ce5fca4f310@sentry.cronit.io/10'
-        // },
+        sentry: {
+          org: 'netsnek',
+          project: 'limosen-at',
+          dsn: 'https://05b95fec2b635a71f00d5740c8240865@o4510394429079552.ingest.de.sentry.io/4510432642138192'
+        },
         googleAnalytics: {
-          trackingIds: ['G-G6Z65QP3Y3']
+          trackingIds: ['G-X2816CKYFM']
         }
       }
     },
@@ -79,12 +79,6 @@ const config: GatsbyConfig = {
         trailingSlash: 'always'
       }
     },
-    {
-      resolve: `gatsby-jaen-mailpress`,
-      options: {
-        pylonUrl: 'https://mailpress.netsnek.com/graphql'
-      }
-    },
     //`gatsby-jaen-lens`
     {
       resolve: `gatsby-plugin-manifest`,
@@ -96,6 +90,18 @@ const config: GatsbyConfig = {
         theme_color: `#a2466c`,
         display: `standalone`,
         icon: `src/favicon.ico`
+      }
+    },
+    {
+      resolve: `gatsby-jaen-mailpress`,
+      options: {
+        pylonUrl: 'https://mailpress.netsnek.com/graphql'
+      }
+    },
+    {
+      resolve: `gatsby-jaen-app`,
+      options: {
+        pylonUrl: 'https://limosen.netsnek.workers.dev/graphql'
       }
     },
   ]
