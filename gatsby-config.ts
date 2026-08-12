@@ -25,15 +25,20 @@ const config: GatsbyConfig = {
         remote: {
           repository: 'netsnek/limosen.at'
         },
-        zitadel: {
+        siteUrl: 'https://limosen.at',
+        // Renamed from `zitadel` on the jaen branch this site now links against.
+        // Same identity server, but jaen reads roles and the profile through
+        // zitadel-gql's GraphQL surface instead of REST. The ids are unchanged,
+        // so the CMS keeps talking to the same tenant and project.
+        zitadelGql: {
           organizationId: '339284789469124181',
           clientId: '268283382465631862@cms',
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
               ? 'https://limosen.at/loading'
-              : 'https://psychic-dollop-6vwv6x9vq9jf464g-8000.app.github.dev',
-          projectIds: ['2268283277977065078']
+              : 'http://localhost:8000',
+          projectIds: ['268283277977065078']
         },
         sentry: {
           org: 'netsnek',
@@ -83,27 +88,36 @@ const config: GatsbyConfig = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Limosen App`,
-        short_name: `Limosen`,
+        name: `KRCLimo App`,
+        short_name: `KRCLimo`,
         start_url: `/login`,
-        background_color: `#f7f0eb`,
-        theme_color: `#a2466c`,
+        background_color: `#ffffff`,
+        theme_color: `#ffffff`,
         display: `standalone`,
         icon: `src/favicon.ico`
       }
     },
     {
-      resolve: `gatsby-jaen-mailpress`,
+      // gatsby-jaen-mailpress became gatsby-jaen-emailwerk, emailwerk being
+      // mailpress v3. The CMS routes move with it, from /mailpress/* to
+      // /emailwerk/*, and the option is `url` rather than `pylonUrl`.
+      resolve: `gatsby-jaen-emailwerk`,
       options: {
-        pylonUrl: 'https://mailpress.netsnek.com/graphql'
+        url: 'https://emailwerk.com/graphql'
       }
     },
-    {
-      resolve: `gatsby-jaen-app`,
-      options: {
-        pylonUrl: 'https://limosen.netsnek.workers.dev/graphql'
-      }
-    },
+    // gatsby-jaen-app, which serves /app/* against api.limosen.at, has no home
+    // on the jaen branch this site now links against: the package exists only on
+    // the abandoned netsnek/i18n branch, not on dev and not on feat/chakra-v3.
+    // Left out of this build on purpose so the public site can be verified
+    // first. Restoring the app area is its own piece of work and the options are
+    // recorded in the migration notes.
+    // {
+    //   resolve: `gatsby-jaen-app`,
+    //   options: {
+    //     pylonUrl: 'https://api.limosen.at/graphql'
+    //   }
+    // },
   ]
 };
 
