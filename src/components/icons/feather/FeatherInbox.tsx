@@ -2,7 +2,7 @@ import { Icon, IconProps } from '@chakra-ui/react';
 
 const FeatherInbox = (props: IconProps) => {
   return (
-    <Icon
+    <Icon asChild={false} boxSize="1em"
       viewBox="0 0 24 24"
       fill="none"
       strokeWidth={2}

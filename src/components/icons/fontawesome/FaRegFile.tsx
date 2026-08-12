@@ -6,7 +6,7 @@ import React from 'react';
  */
 const FaRegFile = (props: IconProps) => {
   return (
-    <Icon
+    <Icon asChild={false} boxSize="1em"
       viewBox="0 0 384 512"
       strokeWidth={2}
       stroke="currentColor"

@@ -6,7 +6,7 @@ import React from 'react';
  */
 const BsFiletypeExe = (props: IconProps) => {
   return (
-    <Icon
+    <Icon asChild={false} boxSize="1em"
       viewBox="0 0 16 16"
       strokeWidth={0}
       stroke="currentColor"
