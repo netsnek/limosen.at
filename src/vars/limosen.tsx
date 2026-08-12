@@ -16,7 +16,7 @@ export const BOOKING_BACKGROUND = '/images/everything/booking-background.jpg'
 export const SERVICE_NAVIGATION_EVENT = 'service-accordion:navigate'
 
 export const SOCIAL_LINKS = [
-  { label: 'Instagram', href: 'https://www.instagram.com/limosenvip', icon: FaInstagram },
+  { label: 'Instagram', href: 'https://www.instagram.com/limosen.at', icon: FaInstagram },
 ]
 
 export const HERO_SLIDES = [

@@ -49,7 +49,7 @@ const Footer: FC = () => {
       },
       {
         label: 'Instagram',
-        href: 'https://www.instagram.com/limosenvip'
+        href: 'https://www.instagram.com/limosen.at'
       },
       {
         label: 'Impressum',
@@ -184,7 +184,7 @@ const Footer: FC = () => {
               color="#ffffff"
               icon={<FaInstagram />}
               aria-label="Instagram"
-              href="https://www.instagram.com/limosenvip"
+              href="https://www.instagram.com/limosen.at"
               isExternal
             />
             <IconButton

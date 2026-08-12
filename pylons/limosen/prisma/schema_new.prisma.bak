@@ -1,0 +1,122 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // For local dev (D1 adapter ignores this at runtime but Prisma requires it)
+  url      = env("DATABASE_URL")
+}
+
+enum TransferState {
+  pending        // not yet assigned and upcoming
+  assigned       // driver confirmed he will perform the transfer
+  rejected       // driver rejected the transfer
+  aborted        // driver aborted before pickup
+  on_the_way     // driver is on the way to pickup
+  at_pickup      // driver is at pickup spot
+  no_show        // passenger didn't show up
+  failed         // driver didn't show up or canceled < 1h before
+  canceled       // customer canceled
+  terminated     // admin canceled
+  ongoing        // passenger is being transferred
+  completed      // completed perfectly
+}
+
+enum TransferCategory {
+  distance
+  hourly
+  flatrate
+}
+
+enum TransferType {
+  one_way
+  return_trip
+}
+
+model Transfer {
+  transferId   String        @id
+
+  customerId   String
+  driverId     String?
+
+  // renamed scheduling fields
+  startTime    DateTime
+  pickupTime   DateTime?
+  endTime      DateTime?
+
+  pickup       String
+  dropoff      String
+
+  roomOrName   String?
+  vehicle      String?
+
+  amountEUR    Float?
+  payment      String?
+
+  state        TransferState @default(pending)
+
+  requestedAt  DateTime      @default(now())
+
+  // car relation (optional)
+  carId        String?
+  car          Car?          @relation(fields: [carId], references: [carId], onDelete: SetNull)
+
+  // lazy-loaded 1:1 relations
+  details      TransferDetails?
+  passenger    Passenger?
+
+  @@index([customerId, startTime])
+  @@index([driverId, startTime])
+  @@index([state, startTime])
+}
+
+model TransferDetails {
+  transferId        String           @id
+  transfer          Transfer         @relation(fields: [transferId], references: [transferId], onDelete: Cascade)
+
+  flightNumber      String?
+  message           String?          @db.Text
+
+  transferCategory  TransferCategory?
+  transferType      TransferType?
+
+  passengers        String?
+  luggage           String?
+  childSeats        String?
+  extraTime         String?
+
+  carClass          String?
+  carTitle          String?
+  paymentOption     String?
+}
+
+model Passenger {
+  transferId  String   @id
+  transfer    Transfer @relation(fields: [transferId], references: [transferId], onDelete: Cascade)
+
+  firstName   String?
+  lastName    String?
+  email       String?
+  phone       String?
+  language    String?
+}
+
+model Car {
+  carId         String   @id @default(cuid())
+
+  licensePlate  String   @unique
+  color         String?
+
+  // optional link to the driver (Zitadel userId stored as string)
+  driverId      String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transfers     Transfer[]
+
+  @@index([driverId])
+}

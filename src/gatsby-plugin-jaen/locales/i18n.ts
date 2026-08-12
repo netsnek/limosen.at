@@ -2,6 +2,7 @@
 import { getI18nHomepage } from './i18nHomepage'
 import { getI18nContact } from './i18nContact'
 import { getI18nBooking } from './i18nBooking'
+import { getI18nTransfers } from './i18nTransfers'
 
 export type I18nCode = 'en-US' | 'de-AT' | 'tr-TR' | 'ar-EG'
 
@@ -27,17 +28,20 @@ export function getI18n(code: I18nCode): UnifiedI18n {
   const homepage = getI18nHomepage(code)
   const contact = getI18nContact(code)
   const booking = getI18nBooking(code)
+  const transfers = getI18nTransfers(code)
 
   const messages: Record<string, any> = {
     // flat string IDs first
     ...(homepage?.strings ?? {}),
     ...(contact?.strings ?? {}),
     ...(booking?.strings ?? {}),
+    ...(transfers?.strings ?? {}),
 
     // then all other top-level fields (no hardcoding), excluding `code` and `strings`
     ...strip(homepage || {}, ['code', 'strings']),
     ...strip(contact || {}, ['code', 'strings']),
-    ...strip(booking || {}, ['code', 'strings'])
+    ...strip(booking || {}, ['code', 'strings']),
+    ...strip(transfers|| {}, ['code', 'strings'])
   }
 
   return {

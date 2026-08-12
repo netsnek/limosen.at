@@ -10,3 +10,8 @@ node_modules
 src/.DS_Store
 
 .vscode/tasks.json
+
+# Datenbank-Dumps gehoeren nicht in ein oeffentliches Repository.
+# Die vorhandenen liegen unter ~/backups/limosen-db-dumps.
+.backup/
+.backup-booklimo/

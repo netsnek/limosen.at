@@ -1,0 +1,294 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  runtime  = "workerd" // alias: "cloudflare"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum TransferState {
+  PENDING
+  ASSIGNED
+  REJECTED
+  ABORTED
+  ON_THE_WAY
+  AT_PICKUP
+  NO_SHOW
+  FAILED
+  CANCELED
+  TERMINATED
+  ONGOING
+  COMPLETED
+}
+
+enum TransferCategory {
+  DISTANCE
+  HOURLY
+  FLATRATE
+}
+
+enum TransferType {
+  ONE_WAY
+  RETURN_TRIP
+}
+
+// who is paying (not how they pay)
+enum PayingParty {
+  PASSENGER
+  CUSTOMER
+}
+
+// how it is paid
+enum PaymentMethode {
+  CASH
+  CARD
+  VOUCHER
+  INVOICE
+}
+
+enum CarClass {
+  BUSINESS_CLASS
+  ELECTRIC_CLASS
+  FIRST_CLASS
+  BUSINESS_VAN
+}
+
+model Transfer {
+  id String @id @default(cuid()) // middleware will override to transfer:{uuid} if id not provided
+
+  // Link to CustomerData by Zitadel userId
+  customerId String
+  customer   CustomerData @relation("CustomerTransfers", fields: [customerId], references: [userId], onDelete: Restrict)
+
+  // Link to DriverData by Zitadel userId (optional until assigned)
+  driverId String?
+  driver   DriverData? @relation("DriverTransfers", fields: [driverId], references: [userId], onDelete: SetNull)
+
+  // Self-reference: optional link to the origin transfer (e.g. for return trips).
+  // The origin transfer's id IS its "code", so referenceId stores the origin code.
+  referenceId  String?
+  reference    Transfer?  @relation("TransferReference", fields: [referenceId], references: [id], onDelete: SetNull)
+  referencedBy Transfer[] @relation("TransferReference")
+
+  // scheduling (pickupDateTime = planned time, start/end = actuals)
+  startDateTime  DateTime?
+  pickupDateTime DateTime
+  endDateTime    DateTime?
+
+  pickupLocation  String
+  dropoffLocation String
+
+  subject String?
+
+  // money + classification
+  // NOTE: Value is assumed to be in EUR (single-currency app)
+  price            Float?
+  paymentMethode   PaymentMethode?
+  payingParty      PayingParty @default(CUSTOMER)
+  transferCategory TransferCategory
+  transferType     TransferType
+
+  state       TransferState @default(PENDING)
+  requestedAt DateTime      @default(now())
+
+  // car relation (optional)
+  carId String?
+  car   Car? @relation(fields: [carId], references: [id], onDelete: SetNull)
+
+  // split off "wide" columns into 1:1 details
+  details TransferDetails?
+
+  passengers Passenger[]
+  extras     TransferExtra[]
+
+  @@index([customerId, pickupDateTime])
+  @@index([driverId, pickupDateTime])
+  @@index([state, pickupDateTime])
+  @@index([referenceId])
+}
+
+model TransferDetails {
+  // 1:1 with Transfer
+  transferId String @id
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  flightNumber String?
+  message      String?
+  luggage      String?
+  childSeats   String?
+  extraTime    String?
+
+  preferredCarClass CarClass?
+  preferredCarName  String?
+
+  @@index([transferId])
+}
+
+model Passenger {
+  id         String @id @default(cuid())
+  transferId String
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  firstName String?
+  lastName  String?
+  email     String?
+  phone     String?
+  language  String?
+
+  @@index([transferId])
+}
+
+/// Pre-defined extra types for transfers
+enum ExtraType {
+  CHILD_SEAT
+  BOOSTER_SEAT
+  EXTRA_LUGGAGE
+  WAITING_TIME
+  MEET_AND_GREET
+  WATER_BOTTLE
+  WHEELCHAIR
+  PET_TRANSPORT
+}
+
+model TransferExtra {
+  id         String @id @default(cuid())
+  transferId String
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  type   ExtraType
+  amount Int       @default(1)
+
+  @@index([transferId])
+}
+
+model Car {
+  id           String @id @default(cuid()) // middleware will override to car:{uuid} if id not provided
+  licensePlate String @unique
+
+  /// Hex color in format "#RRGGBB"
+  color String @default("#000000")
+
+  carClass CarClass?
+  carName  String?
+
+  // optional link to the driver (Zitadel userId stored as string)
+  driverId   String?
+  driverData DriverData? @relation("DriverCars", fields: [driverId], references: [userId], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transfers Transfer[]
+
+  @@index([driverId])
+}
+
+model DriverData {
+  id     String @id @default(cuid()) // middleware will override to data:driver:{uuid} if missing
+  userId String @unique              // Zitadel user id
+
+  /// Hex color in format "#RRGGBB"
+  color String @default("#C0C0C0") // Silver
+
+  payoutPercent Float @default(0)
+
+  cars      Car[]      @relation("DriverCars")
+  transfers Transfer[] @relation("DriverTransfers")
+
+  stats DriverStats?
+  location DriverLocation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DriverStats {
+  id String @id @default(cuid()) // middleware will override to stats:driver:{same-uuid-as-driverdata} if possible
+
+  // 1:1 to DriverData
+  driverDataId String @unique
+  driverData   DriverData @relation(fields: [driverDataId], references: [id], onDelete: Cascade)
+
+  revenue       Float @default(0)
+  transferCount Int   @default(0)
+
+  monthlyRevenue Float @default(0)
+  monthlyCount   Int   @default(0)
+  monthlyCash    Float @default(0)
+
+  cashTotal Float @default(0)
+
+  expensesMonth Float @default(0)
+  expensesTotal Float @default(0)
+
+  earnedThisMonth Float @default(0)
+  earnedTotal     Float @default(0)
+
+  computedAt DateTime @default(now()) @updatedAt
+}
+
+model CustomerData {
+  id     String @id @default(cuid()) // middleware will override to data:customer:{uuid} if missing
+  userId String @unique              // Zitadel user id
+
+  transfers Transfer[] @relation("CustomerTransfers")
+  location  CustomerLocation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DriverLocation {
+  id String @id @default(cuid()) // middleware will override to location:driver:{uuid} if id not provided
+
+  // Link to DriverData by Zitadel userId
+  driverId String
+  driver   DriverData @relation(fields: [driverId], references: [userId], onDelete: Cascade)
+
+  latitude  Float
+  longitude Float
+
+  accuracy         Float?
+  altitude         Float?
+  altitudeAccuracy Float?
+  heading          Float?
+  speed            Float?
+
+  /// Timestamp from the device (if provided)
+  recordedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([driverId])
+  @@index([updatedAt])
+}
+
+model CustomerLocation {
+  id String @id @default(cuid()) // middleware will override to location:customer:{uuid} if id not provided
+
+  // Link to CustomerData by Zitadel userId
+  customerId String
+  customer   CustomerData @relation(fields: [customerId], references: [userId], onDelete: Cascade)
+
+  latitude  Float
+  longitude Float
+
+  accuracy         Float?
+  altitude         Float?
+  altitudeAccuracy Float?
+  heading          Float?
+  speed            Float?
+
+  /// Timestamp from the device (if provided)
+  recordedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerId])
+  @@index([updatedAt])
+}

@@ -1,0 +1,48 @@
+{
+  "name": "iam",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "pylon build && wrangler deploy",
+    "dev": "pylon dev -c \"wrangler dev --port 3000\" --client --client-port 3000 --client-path ../../../../packages/gatsby-jaen-app/src/client/limosen/index.ts",
+    "cf-typegen": "wrangler types",
+    "db:prepare": "npx --yes tsx ./scripts/migrate.ts prepare",
+    "db:deploy": "npx --yes tsx ./scripts/migrate.ts deploy",
+    "db:reset": "npx --yes tsx ./scripts/migrate.ts reset",
+    "db:status": "npx --yes tsx ./scripts/migrate.ts status",
+    "db:create": "npx --yes tsx ./scripts/migrate.ts create",
+    "db:studio": "npx --yes tsx ./scripts/migrate.ts studio",
+    "db:info": "npx --yes tsx ./scripts/migrate.ts d1-info",
+    "db:backup": "npx --yes tsx ./scripts/migrate.ts d1-backup",
+    "migrate": "pnpm db:prepare",
+    "migrate:deploy": "pnpm db:deploy",
+    "migrate:reset": "pnpm db:reset",
+    "migrate:status": "pnpm db:status",
+    "migrate:studio": "pnpm db:studio",
+    "seed:deploy": "npx --yes tsx ./scripts/migrate.ts seed-deploy"
+  },
+  "dependencies": {
+    "@envelop/core": "^5.4.0",
+    "@getcronit/pylon": "^2.9.6",
+    "@pgqty/cli": "^5.0.0",
+    "@prisma/adapter-d1": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "@pushforge/builder": "^1.1.2",
+    "pgqty": "^4.0.0",
+    "validator": "^13.15.23"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.10.10",
+    "@cloudflare/workers-types": "^4.20251121.0",
+    "@getcronit/pylon-dev": "^1.0.6",
+    "prisma": "^7.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "~3.2.4",
+    "wrangler": "^4.50.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getcronit/pylon.git"
+  },
+  "homepage": "https://pylon.cronit.io"
+}

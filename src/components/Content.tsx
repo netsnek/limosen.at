@@ -845,9 +845,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   >
                     {CONTACT_EMAIL}
                   </Link>
-                  <Text color="limosen.text.muted">
-                    {labelCityCountry}
-                  </Text>
+                  <Text color="limosen.text.muted">{labelCityCountry}</Text>
                 </VStack>
               </Box>
             </Flex>
@@ -902,9 +900,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   >
                     {CONTACT_EMAIL}
                   </Link>
-                  <Text color="limosen.text.muted">
-                    {labelCityCountry}
-                  </Text>
+                  <Text color="limosen.text.muted">{labelCityCountry}</Text>
                 </VStack>
               </Box>
 
@@ -1048,11 +1044,7 @@ export function TopNavigation({ path }: { path?: string }) {
             onClick={handleNavLinkClick}
             aria-label="Home"
           >
-            <Box
-              height={{ base: 16, md: 20 }}
-              display="flex"
-              alignItems="center"
-            >
+            <Box height={{ base: 16, md: 20 }} display="flex" alignItems="center">
               <Logo />
             </Box>
           </Link>
@@ -1112,8 +1104,13 @@ export function TopNavigation({ path }: { path?: string }) {
               </HStack>
             </Button>
 
-            {/* Booking */}
-            <Button size="sm" variant="limosen" onClick={handleOnBookingClick}>
+            {/* Booking (hide on mobile; unchanged on desktop) */}
+            <Button
+              size="sm"
+              variant="limosen"
+              onClick={handleOnBookingClick}
+              display={{ base: 'none', md: 'inline-flex' }}
+            >
               {intl.formatMessage({ id: 'BookNowCta' })}
             </Button>
 
@@ -1140,9 +1137,7 @@ export function TopNavigation({ path }: { path?: string }) {
       <Modal isOpen={langModal.isOpen} onClose={langModal.onClose} isCentered>
         <ModalOverlay />
         <ModalContent bg="limosen.bg.surface" color="limosen.text.primary">
-          <ModalHeader>
-            {intl.formatMessage({ id: 'LangModalTitle' })}
-          </ModalHeader>
+          <ModalHeader>{intl.formatMessage({ id: 'LangModalTitle' })}</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <ChakraLanguageSwitcher
@@ -1176,6 +1171,12 @@ function HeroSection({
   objectPosition = 'center'
 }: HeroSectionProps) {
   const imageFromPath = useImageLookup();
+  const intl = useIntl();
+
+  const bookingModal = useBookingModal();
+  const handleOnBookingClick = () => {
+    bookingModal.onOpen({ meta: {} });
+  };
 
   // If a URL path string is passed (e.g., from HERO_SLIDES), resolve to Gatsby image if possible
   const resolved = typeof background === 'string' ? imageFromPath(background) : null;
@@ -1232,6 +1233,26 @@ function HeroSection({
           }}
         />
       )}
+
+      {/* Mobile-only centered CTA over the hero */}
+      <Box
+        position="absolute"
+        inset={0}
+        display={{ base: 'flex', md: 'none' }}
+        alignItems="center"
+        justifyContent="center"
+        pointerEvents="none"
+      >
+        <Button
+          variant="limosen"
+          size="md"
+          onClick={handleOnBookingClick}
+          pointerEvents="auto"
+          boxShadow="xl"
+        >
+          {intl.formatMessage({ id: 'BookNowCta' })}
+        </Button>
+      </Box>
       {/* place overlay content here if needed */}
     </Box>
   );
@@ -1252,12 +1273,7 @@ function AboutSection() {
           gap={{ base: 8, md: 12 }}
           align="stretch"
         >
-          <VStack
-            align="flex-start"
-            spacing={6}
-            flex="1"
-            className="about-text"
-          >
+          <VStack align="flex-start" spacing={6} flex="1" className="about-text">
             <Heading
               size="lg"
               className="about-text__title"
@@ -1344,8 +1360,7 @@ function ServicesSection() {
     useServiceAccordionNavigation(serviceIds);
 
   // merged defaults (overview & detail share the exact same fields)
-  const mergedDefaultText = (paragraphs: string[]) =>
-    (paragraphs ?? []).join('\n\n');
+  const mergedDefaultText = (paragraphs: string[]) => (paragraphs ?? []).join('\n\n');
 
   return (
     <Box
@@ -1378,10 +1393,7 @@ function ServicesSection() {
           </VStack>
 
           {/* Services Overview Cards */}
-          <SimpleGrid
-            columns={{ base: 1, md: 2, lg: 3 }}
-            spacing={{ base: 6, md: 8 }}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 6, md: 8 }}>
             {services.map(service => {
               const targetHref = `#${service.id}`;
               const imageFieldName = `service-${service.id}-image`;
@@ -1424,11 +1436,7 @@ function ServicesSection() {
                         <Heading size="sm" color="limosen.text.primary">
                           {service.title}
                         </Heading>
-                        <Text
-                          color="limosen.text.secondary"
-                          fontSize="sm"
-                          noOfLines={3}
-                        >
+                        <Text color="limosen.text.secondary" fontSize="sm" noOfLines={3}>
                           <Field.Text
                             as={chakra.span}
                             name={textFieldName}
@@ -1448,18 +1456,11 @@ function ServicesSection() {
 
           {/* Services Details (Accordion) */}
           <Box>
-            <Heading
-              size="md"
-              mb={4}
-              textAlign="center"
-              color="limosen.text.primary"
-            >
+            <Heading size="md" mb={4} textAlign="center" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
                 name={`ServicesDetailsTitle`}
-                defaultValue={intl.formatMessage({
-                  id: 'ServicesDetailsTitle'
-                })}
+                defaultValue={intl.formatMessage({ id: 'ServicesDetailsTitle' })}
               />
             </Heading>
 
@@ -1476,12 +1477,7 @@ function ServicesSection() {
                 const textDefault = mergedDefaultText(service.paragraphs);
 
                 return (
-                  <AccordionItem
-                    key={service.id}
-                    id={service.id as string}
-                    border="none"
-                    mb={4}
-                  >
+                  <AccordionItem key={service.id} id={service.id as string} border="none" mb={4}>
                     <h3>
                       <AccordionButton
                         ref={el => {
@@ -1539,12 +1535,7 @@ function ServicesSection() {
                           </AspectRatio>
                         )}
 
-                        <Stack
-                          spacing={4}
-                          color="limosen.text.primary"
-                          fontSize="md"
-                          flex="1"
-                        >
+                        <Stack spacing={4} color="limosen.text.primary" fontSize="md" flex="1">
                           <Text whiteSpace="pre-wrap">
                             <Field.Text
                               as={chakra.span}
@@ -1653,12 +1644,7 @@ function FleetSection() {
   }> = ((intl.messages as any)?.fleet as any) ?? [];
 
   return (
-    <Box
-      as="section"
-      id="fleet"
-      bg="limosen.bg.fleet"
-      py={{ base: 12, md: 20 }}
-    >
+    <Box as="section" id="fleet" bg="limosen.bg.fleet" py={{ base: 12, md: 20 }}>
       <Container maxW="6xl">
         <VStack spacing={10} align="stretch">
           <Heading size="lg" textAlign="center" color="limosen.text.primary">
@@ -1669,10 +1655,7 @@ function FleetSection() {
             />
           </Heading>
 
-          <SimpleGrid
-            columns={{ base: 1, md: 2 }}
-            spacing={{ base: 8, md: 10 }}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 10 }}>
             {vehicles.map(vehicle => (
               <Box
                 key={vehicle.name}
@@ -1706,18 +1689,13 @@ function FleetSection() {
                   <Text fontWeight="semibold" color="limosen.text.muted">
                     {vehicle.name}
                   </Text>
-                  <Text color="limosen.text.secondary">
-                    {vehicle.description}
-                  </Text>
+                  <Text color="limosen.text.secondary">{vehicle.description}</Text>
 
                   <Wrap spacing={6} pt={2}>
                     <WrapItem>
                       <HStack spacing={2}>
                         <Icon as={FaUser} color="limosen.accent" />
-                        <Text
-                          color="limosen.text.secondary"
-                          fontWeight="medium"
-                        >
+                        <Text color="limosen.text.secondary" fontWeight="medium">
                           <Field.Text
                             as={chakra.span}
                             name={`FleetPassengersLabel_${vehicle.name}`}
@@ -1733,10 +1711,7 @@ function FleetSection() {
                     <WrapItem>
                       <HStack spacing={2}>
                         <Icon as={FaSuitcaseRolling} color="limosen.accent" />
-                        <Text
-                          color="limosen.text.secondary"
-                          fontWeight="medium"
-                        >
+                        <Text color="limosen.text.secondary" fontWeight="medium">
                           <Field.Text
                             as={chakra.span}
                             name={`FleetLuggageLabel_${vehicle.name}`}
@@ -1779,11 +1754,7 @@ function OnlineBookingSection() {
     >
       <Container maxW="4xl">
         <VStack spacing={5} textAlign="center">
-          <Heading
-            size="md"
-            className="online-booking__title"
-            color="limosen.text.primary"
-          >
+          <Heading size="md" className="online-booking__title" color="limosen.text.primary">
             <Field.Text
               as={chakra.span}
               name={`BookingTitle`}
@@ -1791,12 +1762,7 @@ function OnlineBookingSection() {
             />
           </Heading>
 
-          <Stack
-            spacing={3}
-            fontSize="lg"
-            className="online-booking__sub-title"
-            color="limosen.text.secondary"
-          >
+          <Stack spacing={3} fontSize="lg" className="online-booking__sub-title" color="limosen.text.secondary">
             <Text>
               <Field.Text
                 as={chakra.span}
@@ -1807,9 +1773,7 @@ function OnlineBookingSection() {
             <HStack justify="center" spacing={2}>
               <Icon as={FaPhone} color="limosen.accent" />
               <Link
-                href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(
-                  CONTACT_PHONE
-                )}`}
+                href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`}
                 color="limosen.text.primary"
               >
                 {CONTACT_PHONE}
@@ -1831,10 +1795,7 @@ function OnlineBookingSection() {
             </Text>
             <HStack justify="center" spacing={2}>
               <Icon as={FaEnvelopeOpen} color="limosen.accent" />
-              <Link
-                href={`mailto:${CONTACT_EMAIL}`}
-                color="limosen.text.primary"
-              >
+              <Link href={`mailto:${CONTACT_EMAIL}`} color="limosen.text.primary">
                 {CONTACT_EMAIL}
               </Link>
             </HStack>
@@ -1852,12 +1813,7 @@ function OnlineBookingSection() {
 function ReviewsSection() {
   const intl = useIntl();
   return (
-    <Box
-      as="section"
-      id="reviews"
-      bg="limosen.bg.section"
-      py={{ base: 12, md: 20 }}
-    >
+    <Box as="section" id="reviews" bg="limosen.bg.section" py={{ base: 12, md: 20 }}>
       <Container maxW="6xl">
         <VStack spacing={{ base: 8, md: 12 }} align="stretch">
           <VStack spacing={3} textAlign="center">
@@ -1881,10 +1837,7 @@ function ReviewsSection() {
             />
           </VStack>
 
-          <Grid
-            templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
-            gap={{ base: 6, md: 10 }}
-          >
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={{ base: 6, md: 10 }}>
             <Box
               bg="limosen.bg.card"
               border="1px solid"
@@ -1898,9 +1851,7 @@ function ReviewsSection() {
                   <Field.Text
                     as={chakra.span}
                     name={`FeedbackBoxTitle`}
-                    defaultValue={intl.formatMessage({
-                      id: 'FeedbackBoxTitle'
-                    })}
+                    defaultValue={intl.formatMessage({ id: 'FeedbackBoxTitle' })}
                   />
                 </Heading>
                 <Text color="limosen.text.secondary">
@@ -1911,18 +1862,11 @@ function ReviewsSection() {
                   />
                 </Text>
                 <HStack pt={2} spacing={3} wrap="wrap">
-                  <Button
-                    as={Link}
-                    href={GOOGLE_MAPS_OPEN}
-                    isExternal
-                    variant="limosen"
-                  >
+                  <Button as={Link} href={GOOGLE_MAPS_OPEN} isExternal variant="limosen">
                     <Field.Text
                       as={chakra.span}
                       name={`FeedbackMapsCta`}
-                      defaultValue={intl.formatMessage({
-                        id: 'FeedbackMapsCta'
-                      })}
+                      defaultValue={intl.formatMessage({ id: 'FeedbackMapsCta' })}
                     />
                   </Button>
                 </HStack>
@@ -1938,12 +1882,7 @@ function ReviewsSection() {
               boxShadow="lg"
               minH={{ base: '280px', md: '360px' }}
             >
-              <Box
-                position="relative"
-                w="100%"
-                h="100%"
-                minH={{ base: '280px', md: '360px' }}
-              >
+              <Box position="relative" w="100%" h="100%" minH={{ base: '280px', md: '360px' }}>
                 <iframe
                   title="LIMOSEN VIP Google Maps"
                   src={GOOGLE_MAPS_EMBED}
@@ -1972,7 +1911,12 @@ export function Footer() {
   }> = ((intl.messages as any)?.footer as any) ?? [];
 
   return (
-    <Box as="footer" bg="limosen.bg.footer" py={{ base: 12, md: 16 }} dir={isRtl ? 'rtl' : 'ltr'}>
+    <Box
+      as="footer"
+      bg="limosen.bg.footer"
+      py={{ base: 12, md: 16 }}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
       <Container maxW="6xl">
         <VStack spacing={{ base: 10, md: 14 }} align="stretch">
           <Flex

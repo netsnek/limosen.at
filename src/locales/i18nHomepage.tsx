@@ -228,7 +228,7 @@ export function getI18nHomepage(code: I18nCode) {
             name: 'Mercedes Benz S Klasse',
             category: 'First Class',
             description:
-              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC, BMW i7 eDrive50',
+              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC',
             image: v.image,
             passengers: v.passengers,
             luggage: v.luggage
@@ -507,7 +507,7 @@ export function getI18nHomepage(code: I18nCode) {
             name: 'Mercedes-Benz S Serisi',
             category: 'First Class',
             description:
-              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC, BMW i7 eDrive50',
+              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC',
             image: v.image,
             passengers: v.passengers,
             luggage: v.luggage
@@ -787,7 +787,7 @@ export function getI18nHomepage(code: I18nCode) {
             name: 'Mercedes Benz S Klasse',
             category: 'الدرجة الأولى',
             description:
-              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC, BMW i7 eDrive50',
+              'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC',
             image: v.image,
             passengers: v.passengers,
             luggage: v.luggage
@@ -1069,7 +1069,7 @@ export function getI18nHomepage(code: I18nCode) {
           name: 'Mercedes Benz S Class',
           category: 'First Class',
           description:
-            'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC, BMW i7 eDrive50',
+            'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC',
           image: v.image,
           passengers: v.passengers,
           luggage: v.luggage

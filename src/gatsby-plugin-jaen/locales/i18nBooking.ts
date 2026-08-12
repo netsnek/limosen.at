@@ -50,7 +50,38 @@ export function getI18nBooking(code: I18nCode) {
         ConsentText:
           'Ich bin damit einverstanden, dass meine Angaben zur Kontaktaufnahme und für Rückfragen gespeichert werden.',
         ConsentError: 'Bitte bestätige die Bedingungen zur Kontaktaufnahme',
-        SubmitCta: 'Reservieren'
+        SubmitCta: 'Reservieren',
+
+        // Booking view (dashboard)
+        BookingsHeading: 'Meine Buchungen ({count})',
+        BookingModalHeading: 'Transfer buchen',
+        BookingLabelDate: 'Datum',
+        BookingErrorDateRequired: 'Datum ist erforderlich',
+        BookingLabelTime: 'Uhrzeit',
+        BookingErrorTimeRequired: 'Uhrzeit ist erforderlich',
+        BookingLabelPickup: 'Abholung',
+        BookingPlaceholderPickup: 'Hotel, Adresse, etc.',
+        BookingErrorPickupRequired: 'Abholung ist erforderlich',
+        BookingLabelDropoff: 'Ziel',
+        BookingPlaceholderDropoff: 'Flughafen, Adresse, etc.',
+        BookingErrorDropoffRequired: 'Ziel ist erforderlich',
+        BookingLabelRoomOrName: 'Zimmer / Name',
+        BookingPlaceholderRoomOrName: 'Zimmer 101 / Hr. Mustermann',
+        BookingLabelVehicleClass: 'Fahrzeugklasse',
+        BookingPlaceholderSelectClass: 'Klasse auswählen',
+        BookingLabelPaymentMethod: 'Zahlungsart',
+        BookingPlaceholderSelectPayment: 'Zahlungsart auswählen',
+        BookingSubmitCreate: 'Buchen',
+        BookingButtonBookTransfer: 'Transfer buchen',
+        BookingLabelVehicle: 'Fahrzeug',
+        BookingLabelPrice: 'Preis',
+        BookingLabelPayment: 'Zahlung',
+        TableHeader_Actions: 'Aktionen',
+        BookingCancelModalHeading: 'Buchung stornieren?',
+        BookingCancelModalBody:
+          'Bist du sicher, dass du diese Transferbuchung stornieren möchtest?',
+        BookingCancelKeep: 'Buchung behalten',
+        BookingCancelConfirm: 'Buchung stornieren'
       }
     }
   }
@@ -102,7 +133,38 @@ export function getI18nBooking(code: I18nCode) {
         ConsentText:
           'İletişim ve geri dönüş için verilerimin saklanmasına izin veriyorum.',
         ConsentError: 'Lütfen iletişim iznini onaylayın',
-        SubmitCta: 'Rezervasyon'
+        SubmitCta: 'Rezervasyon',
+
+        // Booking view (dashboard)
+        BookingsHeading: 'Rezervasyonlarım ({count})',
+        BookingModalHeading: 'Transfer rezervasyonu',
+        BookingLabelDate: 'Tarih',
+        BookingErrorDateRequired: 'Tarih gereklidir',
+        BookingLabelTime: 'Saat',
+        BookingErrorTimeRequired: 'Saat gereklidir',
+        BookingLabelPickup: 'Alış',
+        BookingPlaceholderPickup: 'Otel, adres, vb.',
+        BookingErrorPickupRequired: 'Alış adresi gereklidir',
+        BookingLabelDropoff: 'Bırakış',
+        BookingPlaceholderDropoff: 'Havalimanı, adres, vb.',
+        BookingErrorDropoffRequired: 'Bırakış adresi gereklidir',
+        BookingLabelRoomOrName: 'Oda / İsim',
+        BookingPlaceholderRoomOrName: 'Oda 101 / Bay Yılmaz',
+        BookingLabelVehicleClass: 'Araç sınıfı',
+        BookingPlaceholderSelectClass: 'Sınıf seçin',
+        BookingLabelPaymentMethod: 'Ödeme yöntemi',
+        BookingPlaceholderSelectPayment: 'Ödeme yöntemi seçin',
+        BookingSubmitCreate: 'Rezerve et',
+        BookingButtonBookTransfer: 'Transfer rezervasyonu',
+        BookingLabelVehicle: 'Araç',
+        BookingLabelPrice: 'Fiyat',
+        BookingLabelPayment: 'Ödeme',
+        TableHeader_Actions: 'İşlemler',
+        BookingCancelModalHeading: 'Rezervasyonu iptal et?',
+        BookingCancelModalBody:
+          'Bu transfer rezervasyonunu iptal etmek istediğinizden emin misiniz?',
+        BookingCancelKeep: 'Rezervasyonu koru',
+        BookingCancelConfirm: 'Rezervasyonu iptal et'
       }
     }
   }
@@ -153,7 +215,38 @@ export function getI18nBooking(code: I18nCode) {
         ConsentText:
           'أوافق على حفظ بياناتي لغرض التواصل والرد على الاستفسارات.',
         ConsentError: 'يرجى تأكيد إذن التواصل',
-        SubmitCta: 'إرسال الحجز'
+        SubmitCta: 'إرسال الحجز',
+
+        // Booking view (dashboard)
+        BookingsHeading: 'حجوزاتي ({count})',
+        BookingModalHeading: 'حجز نقل',
+        BookingLabelDate: 'التاريخ',
+        BookingErrorDateRequired: 'التاريخ مطلوب',
+        BookingLabelTime: 'الوقت',
+        BookingErrorTimeRequired: 'الوقت مطلوب',
+        BookingLabelPickup: 'الاستلام',
+        BookingPlaceholderPickup: 'فندق، عنوان، إلخ.',
+        BookingErrorPickupRequired: 'عنوان الاستلام مطلوب',
+        BookingLabelDropoff: 'التوصيل',
+        BookingPlaceholderDropoff: 'مطار، عنوان، إلخ.',
+        BookingErrorDropoffRequired: 'عنوان التوصيل مطلوب',
+        BookingLabelRoomOrName: 'الغرفة / الاسم',
+        BookingPlaceholderRoomOrName: 'غرفة ١٠١ / السيد أحمد',
+        BookingLabelVehicleClass: 'فئة المركبة',
+        BookingPlaceholderSelectClass: 'اختر الفئة',
+        BookingLabelPaymentMethod: 'طريقة الدفع',
+        BookingPlaceholderSelectPayment: 'اختر طريقة الدفع',
+        BookingSubmitCreate: 'حجز',
+        BookingButtonBookTransfer: 'حجز نقل',
+        BookingLabelVehicle: 'المركبة',
+        BookingLabelPrice: 'السعر',
+        BookingLabelPayment: 'الدفع',
+        TableHeader_Actions: 'الإجراءات',
+        BookingCancelModalHeading: 'إلغاء هذا الحجز؟',
+        BookingCancelModalBody:
+          'هل أنت متأكد من أنك تريد إلغاء حجز النقل هذا؟',
+        BookingCancelKeep: 'الاحتفاظ بالحجز',
+        BookingCancelConfirm: 'إلغاء الحجز'
       }
     }
   }
@@ -203,7 +296,38 @@ export function getI18nBooking(code: I18nCode) {
       WishesPlaceholder: 'Notes or requests',
       ConsentText: 'I agree that my details may be stored for contact and follow-up.',
       ConsentError: 'Please confirm the contact permission',
-      SubmitCta: 'Reserve'
+      SubmitCta: 'Reserve',
+
+      // Booking view (dashboard)
+      BookingsHeading: 'My bookings ({count})',
+      BookingModalHeading: 'Book a transfer',
+      BookingLabelDate: 'Date',
+      BookingErrorDateRequired: 'Date is required',
+      BookingLabelTime: 'Time',
+      BookingErrorTimeRequired: 'Time is required',
+      BookingLabelPickup: 'Pickup',
+      BookingPlaceholderPickup: 'Hotel, address, etc.',
+      BookingErrorPickupRequired: 'Pickup is required',
+      BookingLabelDropoff: 'Dropoff',
+      BookingPlaceholderDropoff: 'Airport, address, etc.',
+      BookingErrorDropoffRequired: 'Dropoff is required',
+      BookingLabelRoomOrName: 'Room / Name',
+      BookingPlaceholderRoomOrName: 'Room 101 / Mr. Smith',
+      BookingLabelVehicleClass: 'Vehicle class',
+      BookingPlaceholderSelectClass: 'Select class',
+      BookingLabelPaymentMethod: 'Payment method',
+      BookingPlaceholderSelectPayment: 'Select payment',
+      BookingSubmitCreate: 'Book',
+      BookingButtonBookTransfer: 'Book transfer',
+      BookingLabelVehicle: 'Vehicle',
+      BookingLabelPrice: 'Price',
+      BookingLabelPayment: 'Payment',
+      TableHeader_Actions: 'Actions',
+      BookingCancelModalHeading: 'Cancel this booking?',
+      BookingCancelModalBody:
+        'Are you sure you want to cancel this transfer booking?',
+      BookingCancelKeep: 'Keep booking',
+      BookingCancelConfirm: 'Cancel booking'
     }
   }
 }
