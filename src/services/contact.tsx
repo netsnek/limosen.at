@@ -1,6 +1,7 @@
 // src/services/contact.tsx
 import React, { useMemo } from "react"
-import { sendTemplateMail } from "gatsby-jaen-mailpress"
+import { sendTemplateMail } from "gatsby-jaen-emailwerk"
+import { CONTACT_TEMPLATE_ID } from "./mail-templates"
 import { useLocation } from "@reach/router"
 import { ContactFormValues, ContactModal } from "../components/ContactModal/ContactModal"
 import { useAuth, useNotificationsContext } from "jaen"
@@ -81,8 +82,11 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   const onSubmit = async (data: ContactFormValues): Promise<void> => {
     const invokedOnUrl = meta?.url ?? getCurrentUrl() ?? "unknown"
 
-    const { errors } = await sendTemplateMail(
-      "cc744364-b930-4d3c-918b-d9e98637607b",
+    // `ok` rather than `errors`: the client reports a transport or validation
+    // failure through the flag, and only a GraphQL error also fills `errors`. The
+    // old check therefore showed the success toast for every non-GraphQL failure.
+    const { ok } = await sendTemplateMail(
+      CONTACT_TEMPLATE_ID,
       {
         envelope: {
           replyTo: data.email,
@@ -101,7 +105,7 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
       }
     )
 
-    if (errors) {
+    if (!ok) {
       toast({
         title: t("ToastErrorTitle", "Error"),
         description: t("ToastErrorDesc", "Something went wrong."),

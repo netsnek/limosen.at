@@ -40,11 +40,27 @@ const config: GatsbyConfig = {
               : 'http://localhost:8000',
           projectIds: ['268283277977065078']
         },
-        sentry: {
-          org: 'netsnek',
-          project: 'limosen-at',
-          dsn: 'https://05b95fec2b635a71f00d5740c8240865@o4510394429079552.ingest.de.sentry.io/4510432642138192'
-        },
+        /**
+         * SENTRY_OFF=1 leaves this block out, and jaen then disables the plugin
+         * entirely rather than half-configuring it.
+         *
+         * It exists because a build cannot always create a Sentry release.
+         * gatsby-plugin-jaen writes SENTRY_ORG, SENTRY_PROJECT and SENTRY_URL
+         * into the environment from the values below, and it derives SENTRY_URL
+         * from the DSN's origin, which is the ingest host and not the API host.
+         * @sentry/cli therefore asks the wrong server for the project and the
+         * whole bundle step fails with "project not found". A verification build
+         * has no use for a release anyway, and the runtime DSN is unaffected.
+         */
+        ...(process.env.SENTRY_OFF
+          ? {}
+          : {
+              sentry: {
+                org: 'netsnek',
+                project: 'limosen-at',
+                dsn: 'https://05b95fec2b635a71f00d5740c8240865@o4510394429079552.ingest.de.sentry.io/4510432642138192'
+              }
+            }),
         googleAnalytics: {
           trackingIds: ['G-X2816CKYFM']
         }

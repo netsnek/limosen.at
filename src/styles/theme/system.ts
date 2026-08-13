@@ -229,8 +229,13 @@ const buttonRecipe = {
      * A plain `& svg` is specificity (0,1,1) against the recipe's (0,1,0), so it
      * wins without needing !important, and a call site that really wants a
      * bigger glyph still outranks it with a style prop.
+     *
+     * The `fontSize` is not redundant. v3's rule sets `font-size: 1.2em` on the
+     * svg as well, so a width of 1em would resolve against 1.2 times the
+     * button's own size and still come out too big. Measured against the live
+     * site on the social buttons: 16.8px where v2 painted 14px.
      */
-    '& svg': {width: '1em', height: '1em'}
+    '& svg': {width: '1em', height: '1em', fontSize: '1em'}
   },
   variants: {
     size: {

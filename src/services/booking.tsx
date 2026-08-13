@@ -1,6 +1,7 @@
 // src/services/booking.tsx
 import React, {useMemo} from 'react'
-import {sendTemplateMail} from 'gatsby-jaen-mailpress'
+import {sendTemplateMail} from 'gatsby-jaen-emailwerk'
+import {BOOKING_TEMPLATE_ID} from './mail-templates'
 import {useLocation} from '@reach/router'
 import {
   BookingFormValues,
@@ -281,8 +282,11 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
     const transferId = await createBookingInApi(data, invokedOnUrl)
 
     // 2) Send email
-    const {errors} = await sendTemplateMail(
-      'cc744364-b930-4d3c-918b-d9e98637607b',
+    // `ok` rather than `errors`, for the reason spelled out in contact.tsx: a
+    // failure that is not a GraphQL error left `errors` undefined and the visitor
+    // saw the success toast.
+    const {ok} = await sendTemplateMail(
+      BOOKING_TEMPLATE_ID,
       {
         envelope: {
           replyTo: data.email
@@ -321,7 +325,7 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
       }
     )
 
-    if (errors) {
+    if (!ok) {
       toast({
         title: t('ToastErrorTitle', 'Error'),
         description: t('ToastErrorDesc', 'Something went wrong.'),
