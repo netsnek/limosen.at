@@ -217,7 +217,20 @@ const buttonRecipe = {
     // inputs, checkboxes and switches, which v2 left at their own defaults.
     colorPalette: 'brand',
     fontWeight: 'semibold',
-    borderWidth: 0
+    borderWidth: 0,
+    /**
+     * v2's button did not size the icons inside it at all, so a react-icons
+     * glyph rendered at its own 1em and a Chakra icon at the 1em its wrapper
+     * declares. v3's recipe sizes every descendant svg through
+     * `_icon: {width: 4, height: 4}` at size sm and 5 at md, emitted as
+     * `& :where(svg)`, which any glyph's own width attribute loses to. The eight
+     * social buttons in the footer grew visibly.
+     *
+     * A plain `& svg` is specificity (0,1,1) against the recipe's (0,1,0), so it
+     * wins without needing !important, and a call site that really wants a
+     * bigger glyph still outranks it with a style prop.
+     */
+    '& svg': {width: '1em', height: '1em'}
   },
   variants: {
     size: {
@@ -262,6 +275,49 @@ const buttonRecipe = {
 }
 
 /**
+ * The seven sizes two components select by name, and the reason they are sizes.
+ *
+ * v2 set all seven with a flat `fontSize` STYLE PROP: 36/30/24/20/18/16 for
+ * h1 to h6 in docs/heading/components/Heading.tsx, and 12px for
+ * SearchResultSectionTitle. Unitless strings in v2, because v2's `fontSize`
+ * carried the `px` transform (@chakra-ui/styled-system config/typography.ts)
+ * and turned '36' into '36px'.
+ *
+ * Both components now pass `size` instead, because in v3 a style prop cannot
+ * reach the recipe's responsive default: cva() serialises `size: xl`'s
+ * `fontSize: ['3xl', null, '4xl']` into an `@media (min-width: 48rem)` key
+ * before the style props merge, so a prop replaces only the unconditional entry
+ * and the media rule wins it back from 768px up.
+ *
+ * A size the table does not carry is not an error, which is what made this
+ * worth pinning: cva falls through to NO size styles at all. Measured against
+ * v3.36.1 before this block existed, `size="h2"` resolved to fontFamily and
+ * fontWeight and nothing else, so every docs heading and every search group
+ * label rendered at the size it happened to inherit.
+ *
+ * `lineHeight` is v2's `xl` pair throughout, because that is what v2 actually
+ * kept: both components overrode fontSize alone and left the default size's
+ * leading in place.
+ */
+const pxHeadingSize = (px: number) => ({
+  fontSize: `${px}px`,
+  // A fresh array per entry. Chakra merges recipes with mergeWith, which
+  // assigns an array reference straight through and then mutates it in place on
+  // the next merge, so one shared literal would be a live wire between them.
+  lineHeight: [1.33, null, 1.2]
+})
+
+const namedHeadingSizes = {
+  h1: pxHeadingSize(36),
+  h2: pxHeadingSize(30),
+  h3: pxHeadingSize(24),
+  h4: pxHeadingSize(20),
+  h5: pxHeadingSize(18),
+  h6: pxHeadingSize(16),
+  'menu-group': pxHeadingSize(12)
+}
+
+/**
  * v2's Heading size table.
  *
  * theme.ts registered no Heading style, so v2's stock sizes applied, and v3's
@@ -283,7 +339,8 @@ const headingRecipe = {
       lg: {fontSize: ['2xl', null, '3xl'], lineHeight: [1.33, null, 1.2]},
       md: {fontSize: 'xl', lineHeight: 1.2},
       sm: {fontSize: 'md', lineHeight: 1.2},
-      xs: {fontSize: 'sm', lineHeight: 1.2}
+      xs: {fontSize: 'sm', lineHeight: 1.2},
+      ...namedHeadingSizes
     }
   }
 }
@@ -309,6 +366,62 @@ const containerRecipe = {
 }
 
 /**
+ * v2's FormControl rhythm, restored on v3's Field.
+ *
+ * The two modals carry eight and eleven form rows, and v2 spaced them with
+ * margins on the parts: FormLabel `mb: 2`, FormErrorMessage `mt: 2`,
+ * FormHelperText `mt: 2`, with no gap on the control itself. v3's field root
+ * declares `gap: 1.5` instead and drops the margins, so every row came out 6px
+ * where v2 had 8px, and the label sat 6px from its input rather than 8px.
+ *
+ * The type sizes are pinned too, and they had to be. The two modals do pass
+ * `fontSize="sm"` on every label and every error message, so the recipe never
+ * reaches them, but signup.tsx renders sixteen more Field rows that pass
+ * nothing, and v3's own textStyles are not v2's values:
+ *
+ *   label      v2 FormLabel `fontSize: md` (16px) with the body's inherited 1.5
+ *              leading. v3's label carries `textStyle: sm`, which is 14px with a
+ *              20px line box.
+ *   errorText  v2 FormErrorMessage `fontSize: sm, lineHeight: normal`. v3's
+ *              errorText carries `textStyle: xs`, 12px in a 16px line box.
+ *   helperText the same pair, and v2's colour was `gray.600`, not gray.500.
+ *
+ * Measured against v3.36.1 on the merged recipe. `lineHeight: inherit` on the
+ * label rather than a literal 1.5, because v2 declared none at all and took
+ * whatever the row inherited. A sibling declaration outranks a textStyle's own
+ * line-height here, verified on the same merge, so no `textStyle: ''` is needed.
+ *
+ * All four are still overridable from a call site, which is what keeps the
+ * modals at the 14px they ask for in both trees. The error colour is pinned for
+ * the same reason: v3 takes it from `fg.error` where v2 had a literal `red.500`.
+ */
+const fieldSlotRecipe = {
+  slots: [
+    'root',
+    'errorText',
+    'helperText',
+    'input',
+    'label',
+    'select',
+    'textarea',
+    'requiredIndicator'
+  ],
+  base: {
+    root: {gap: '0'},
+    label: {mb: '2', fontSize: 'md', lineHeight: 'inherit'},
+    errorText: {mt: '2', color: 'red.500', fontSize: 'sm', lineHeight: 'normal'},
+    helperText: {
+      mt: '2',
+      color: 'gray.600',
+      fontSize: 'sm',
+      lineHeight: 'normal'
+    },
+    // v2 drew the asterisk in red.500 through FormLabel's requiredIndicator.
+    requiredIndicator: {color: 'red.500'}
+  }
+}
+
+/**
  * theme.ts's Card variant, moved from v2's `container` part to v3's `root`.
  *
  * v2's Card slots were container/header/body/footer, v3's are
@@ -316,6 +429,10 @@ const containerRecipe = {
  */
 const cardSlotRecipe = {
   slots: ['root', 'header', 'body', 'footer', 'title', 'description'],
+  // v2's Card defaulted to the elevated variant, a shadow and no border, with
+  // radii.md from size md. v3 defaults to outline, a border and no shadow, with
+  // a larger radius. The docs image cards are the visible consequence.
+  defaultVariants: {variant: 'elevated', size: 'md'},
   variants: {
     variant: {
       limosen: {
@@ -328,6 +445,161 @@ const cardSlotRecipe = {
         }
       }
     }
+  }
+}
+
+/**
+ * The five recipes the site never registered in v2 and therefore inherited.
+ *
+ * theme.ts styled Button and Card and nothing else, so every other component
+ * rendered @chakra-ui/theme's stock values. v3's stock values are different, and
+ * these five differ in ways a screenshot shows. Each value below is v2's, read
+ * off the installed packages rather than remembered.
+ *
+ * `textStyle: ''` appears again for the same reason it does in the button sizes:
+ * v3 puts a textStyle in every size, a textStyle's line-height is a length that
+ * outranks a lineHeight beside it, and blanking it first lets v2's pair through.
+ */
+const checkboxSlotRecipe = {
+  slots: ['root', 'label', 'control', 'indicator', 'group'],
+  base: {
+    // v2's Checkbox defaulted to colorScheme blue and the site never changed it.
+    // v3 resolves the checked background against colorPalette, which is gray
+    // unless something says otherwise, so the box went grey when ticked.
+    root: {colorPalette: 'blue'},
+    control: {
+      // v2's control drew a 2px border. v3 draws 1px.
+      borderWidth: '2px',
+      // v2 sized the checkmark at 0.625rem inside a 16px box. v3 stretches the
+      // glyph to the full content box through `& :where(svg) {width: 100%}`,
+      // which a plain `& svg` outranks.
+      '& svg': {boxSize: '0.625rem'}
+    }
+  },
+  variants: {
+    size: {
+      // v2's md control was 16px with no padding. v3's is 20px with 2px.
+      md: {control: {boxSize: '4', p: '0'}}
+    }
+  }
+}
+
+const textareaRecipe = {
+  base: {
+    // v2's textarea carried minHeight 20 (5rem) and lineHeight short. v3 has
+    // neither, so the message box fell back to the browser's two rows and lost
+    // about a third of its height in both modals.
+    minHeight: '20',
+    lineHeight: 'short'
+  },
+  variants: {
+    size: {
+      md: {textStyle: '', fontSize: 'md', px: '4', py: '2'}
+    }
+  }
+}
+
+const inputRecipe = {
+  variants: {
+    size: {
+      // v2: fontSize md, px 4, radius md. v3: textStyle sm (14px), px 3,
+      // radius l2 which resolves to radii.sm.
+      md: {textStyle: '', fontSize: 'md', px: '4', borderRadius: 'md'}
+    },
+    variant: {
+      outline: {
+        // v2's outline input hovered to gray.300 and focused on blue.500. v3
+        // hovers nothing and takes the focus colour from colorPalette, which is
+        // gray on every input the site renders. The modals set their own gold
+        // focus at the call site, in v2 exactly as now, and a style prop still
+        // outranks this.
+        _hover: {borderColor: 'gray.300'},
+        '--focus-color': 'colors.blue.500'
+      }
+    }
+  }
+}
+
+const dialogSlotRecipe = {
+  slots: [
+    'trigger',
+    'backdrop',
+    'positioner',
+    'content',
+    'title',
+    'description',
+    'closeTrigger',
+    'header',
+    'body',
+    'footer'
+  ],
+  base: {
+    // v2's modal let its text inherit the body's 16px/1.5. v3's content slot
+    // declares textStyle sm, so every unsized paragraph in both modals shrank
+    // to 14px.
+    content: {textStyle: '', fontSize: 'md', lineHeight: 1.5},
+    // v2's overlay was blackAlpha.600, v3's backdrop is blackAlpha.500.
+    backdrop: {bg: 'blackAlpha.600'},
+    // v2's ModalFooter was py 4. v3 halves the top half to pt 2.
+    footer: {pt: '4'}
+  }
+}
+
+const separatorRecipe = {
+  // v2's Divider baseStyle was `{opacity: 0.6, borderColor: 'inherit'}`. v3's
+  // separator has no opacity, so every rule on the site painted at full
+  // strength. The colour needs no pinning: v3's `border` token is the same
+  // gray.200, because the grey ramp above is v2's.
+  base: {opacity: 0.6}
+}
+
+const linkRecipe = {
+  // v2's Link had no gap and laid its children out inline. v3's is an
+  // inline-flex with gap 1.5, which lands on top of the margins the icon
+  // call sites already carry. The hover underline is NOT reverted: v2's Link
+  // underlined on hover too.
+  base: {gap: '0'}
+}
+
+const accordionSlotRecipe = {
+  slots: ['root', 'item', 'itemTrigger', 'itemContent', 'itemIndicator', 'itemBody'],
+  base: {
+    // v2's Accordion drew a hairline above every item and one below the last,
+    // inheriting the global border colour. v3's outline variant draws a bottom
+    // border instead, and the site's `variant="leftNav"` matches nothing in
+    // either theme, so no border was drawn at all.
+    item: {
+      borderTopWidth: '1px',
+      borderColor: 'inherit',
+      _last: {borderBottomWidth: '1px'}
+    },
+    // v2's AccordionButton darkened on hover, which coexisted with the call
+    // sites' own background because v2 merged the two shallowly. v3's
+    // itemTrigger has no hover style, so the services and FAQ headers on the
+    // home page and every expandable label in the docs nav stopped reacting.
+    itemTrigger: {_hover: {bg: 'blackAlpha.50'}}
+  }
+}
+
+const listSlotRecipe = {
+  slots: ['root', 'item', 'indicator'],
+  variants: {
+    variant: {
+      // v3's default `marker` variant paints bullets and numbers in fg.subtle.
+      // v2's List styled no marker at all, so they took the text colour, and
+      // every list in the docs now reads with grey markers against darker text.
+      marker: {item: {_marker: {color: 'inherit'}}}
+    }
+  }
+}
+
+const nativeSelectSlotRecipe = {
+  slots: ['root', 'field', 'indicator'],
+  base: {
+    // v2's Select chevron was `currentColor` at fontSize xl. v3's indicator is
+    // fg.muted at textStyle lg, so the five chevrons in the booking form read
+    // lighter and a shade smaller.
+    indicator: {color: 'currentColor', fontSize: 'xl'}
   }
 }
 
@@ -414,10 +686,20 @@ export const siteConfig = defineConfig({
     recipes: {
       button: buttonRecipe,
       heading: headingRecipe,
-      container: containerRecipe
+      container: containerRecipe,
+      input: inputRecipe,
+      textarea: textareaRecipe,
+      separator: separatorRecipe,
+      link: linkRecipe
     },
     slotRecipes: {
-      card: cardSlotRecipe
+      card: cardSlotRecipe,
+      field: fieldSlotRecipe,
+      checkbox: checkboxSlotRecipe,
+      dialog: dialogSlotRecipe,
+      accordion: accordionSlotRecipe,
+      list: listSlotRecipe,
+      nativeSelect: nativeSelectSlotRecipe
     }
   }
 })
@@ -457,8 +739,29 @@ export const system = createSystem(
         borderWidth: '0',
         borderStyle: 'solid',
         boxSizing: 'border-box',
-        wordWrap: 'break-word'
+        wordWrap: 'break-word',
+        // v2's styles.global put `borderColor: chakra-border-color` on the same
+        // universal rule, gray.200 in light mode. Without it a border-width with
+        // no colour of its own falls back to CSS's initial `currentColor`, so
+        // every such rule takes the text colour instead of the grey line v2 drew.
+        borderColor: {base: 'gray.200', _dark: 'whiteAlpha.300'}
       },
+      /**
+       * v3's own baseline, put back after stripping its globalCss.
+       *
+       * `defaultConfig.globalCss` is where v3 declares `html {colorPalette:
+       * gray}`, and dropping it left `--chakra-colors-color-palette-*` undefined
+       * for every component that is not a button, which is every focus ring on
+       * the site and the mdx editor's tab indicator. An undefined custom property
+       * is invalid at computed-value time rather than an error, so nothing
+       * complains, the colour simply never arrives.
+       *
+       * `gray` and not `brand`: v2 set brand on the Button alone, which the
+       * button recipe now carries itself. The sibling site declares brand here
+       * because its v2 used withDefaultColorScheme globally, and copying that
+       * would repaint every input, checkbox and switch on this site gold.
+       */
+      html: {colorPalette: 'gray'},
       /**
        * v2's body rule, restored.
        *
@@ -467,18 +770,23 @@ export const system = createSystem(
        * it the site inherits the font jaen's preflight puts on `html`, which is
        * jaen's own typeface, on every word of every page.
        *
-       * The pair is v2's light half, `chakra-body-bg` white and
-       * `chakra-body-text` gray.800, because the site never mounted a dark mode:
-       * theme.ts set `initialColorMode: 'light'` with `useSystemColorMode:
-       * false` and not one semantic token declared a `_dark` half.
+       * The pair is v2's own `chakra-body-bg` and `chakra-body-text`, both
+       * halves. theme.ts declared no `_dark` value of its own and set
+       * `initialColorMode: 'light'`, so light is what a visitor lands on, but
+       * the toggle is reachable: NavbarControls renders one in LeftNav and in
+       * MobileNavDrawer, and v2's body followed it because those two semantic
+       * tokens carried `_dark` halves in @chakra-ui/theme (gray.800 and
+       * whiteAlpha.900). Pinning only the light half would leave dark mode with
+       * a white page under text that still inverts.
        *
-       * lineHeight is not restored. v2 set 1.5 here and v3's preflight already
-       * puts 1.5 on `html`.
+       * lineHeight is not restored. v2 set 1.5 here, and jaen's provider still
+       * puts 1.5 on `html` through the global styles it inherits from v3's
+       * defaults, so the site would only be declaring it a second time.
        */
       body: {
         fontFamily: 'body',
-        bg: 'white',
-        color: 'gray.800',
+        bg: {base: 'white', _dark: 'gray.800'},
+        color: {base: 'gray.800', _dark: 'whiteAlpha.900'},
         transitionProperty: 'background-color',
         // v2's `durations.normal`. v3's scale renamed it away, so the value is
         // spelled out.
