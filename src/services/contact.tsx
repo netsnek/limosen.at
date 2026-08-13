@@ -1,10 +1,9 @@
 // src/services/contact.tsx
 import React, { useMemo } from "react"
-import { useToast } from "@chakra-ui/react"
 import { sendTemplateMail } from "gatsby-jaen-mailpress"
 import { useLocation } from "@reach/router"
 import { ContactFormValues, ContactModal } from "../components/ContactModal/ContactModal"
-import { useAuth } from "jaen"
+import { useAuth, useNotificationsContext } from "jaen"
 import { useQueryRouter } from "../hooks/use-query-router"
 import { useT } from "../contexts/language"
 
@@ -36,7 +35,11 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   const [meta, setMeta] = React.useState<Record<string, any> | null>(null)
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const toast = useToast()
+  // v3 dropped useToast for a store whose create() reads `type`, not `status`.
+  // jaen's notifications context wraps that store back up in v2's option shape
+  // and is already mounted above every page, so the calls below keep the
+  // placement, timing and close button they had.
+  const { toast } = useNotificationsContext()
   const authentication = useAuth()
 
   const getCurrentUrl = React.useCallback(() => {

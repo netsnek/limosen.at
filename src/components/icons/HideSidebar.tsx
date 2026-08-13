@@ -1,4 +1,6 @@
-import { Icon, IconProps } from '@chakra-ui/icons';
+// v2 imported Icon from @chakra-ui/icons, which stopped at v2 and is not
+// installed here. Same component, from the package that ships it in v3.
+import { Icon, IconProps } from '@chakra-ui/react';
 import React, { FC } from 'react';
 
 /**

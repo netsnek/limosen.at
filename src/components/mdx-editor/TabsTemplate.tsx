@@ -1,29 +1,16 @@
-import {AddIcon} from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Spacer,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs
-} from '@chakra-ui/react'
-import React, {useState} from 'react'
+import { AddIcon } from '../../components/icons/chakra';
+import { Box, Button, Menu, Spacer, Tabs, Portal } from '@chakra-ui/react';
+import React, { useState } from 'react';
 
 interface ComponentInfoProps {
   items: Array<{
-    label: string
-    onClick: () => void
-  }>
+    label: string;
+    onClick: () => void;
+  }>;
 }
 
-export const ComponentInfo: React.FC<ComponentInfoProps> = ({items}) => (
-  <Menu>
+export const ComponentInfo: React.FC<ComponentInfoProps> = ({ items }) => (
+  <Menu.Root>
     {/* <MenuButton
       as={Button}
       leftIcon={<AddIcon />}
@@ -33,57 +20,77 @@ export const ComponentInfo: React.FC<ComponentInfoProps> = ({items}) => (
       Components
     </MenuButton> */}
 
-    <MenuList>
-      {items.map(item => (
-        <MenuItem key={item.label} onClick={item.onClick}>
-          {item.label}
-        </MenuItem>
-      ))}
-    </MenuList>
-  </Menu>
-)
+    <Portal>
+      <Menu.Positioner>
+        <Menu.Content>
+          {/* The value is the item's DOM id in v3 (zag composes
+              `${menuId}/${value}` and resolves the select listener with
+              getElementById), so the codemod's literal "item-0" gave every
+              entry the same id and only the first one could be picked. The
+              label is already the React key and is unique per menu. */}
+          {items.map(item => (
+            <Menu.Item
+              key={item.label}
+              onSelect={item.onClick}
+              value={item.label}
+            >
+              {item.label}
+            </Menu.Item>
+          ))}
+        </Menu.Content>
+      </Menu.Positioner>
+    </Portal>
+  </Menu.Root>
+);
 
 export interface TabsProps {
   tabs: Array<{
-    label: React.ReactNode
-    content: React.ReactNode
-  }>
-  selectedTab: number
-  componentsInfo?: ComponentInfoProps['items']
+    label: React.ReactNode;
+    content: React.ReactNode;
+  }>;
+  selectedTab: number;
+  componentsInfo?: ComponentInfoProps['items'];
 }
 
 const TabsTemplate: React.FC<TabsProps> = props => {
-  const [selectedTab, setSelectedTab] = useState(props.selectedTab)
+  const [selectedTab, setSelectedTab] = useState(props.selectedTab);
 
   const handleTabChange = (index: number) => {
-    setSelectedTab(index)
-  }
+    setSelectedTab(index);
+  };
 
   return (
     <Box position="relative">
-      <Tabs
-        index={selectedTab}
-        onChange={handleTabChange}
+      {/* v3 addresses tabs by string value where v2 addressed them by index.
+          The index is what this component's props, state and the editor that
+          mounts it all speak, so the position is stringified at the boundary
+          and nothing outside this file has to learn the new spelling. */}
+      <Tabs.Root
+        value={String(selectedTab)}
+        onValueChange={({ value }) => handleTabChange(Number(value))}
         pos="relative"
-        size="sm">
-        <TabList pos="sticky" top="0" zIndex="1">
+        size="sm"
+      >
+        <Tabs.List pos="sticky" top="0" zIndex="1">
           {props.tabs.map((tab, i) => (
-            <Tab key={i}>{tab.label}</Tab>
+            <Tabs.Trigger key={i} value={String(i)}>
+              {tab.label}
+            </Tabs.Trigger>
           ))}
           <Spacer />
           <ComponentInfo items={props.componentsInfo || []} />
-        </TabList>
+        </Tabs.List>
 
-        <TabPanels>
+        <Tabs.ContentGroup>
           {props.tabs.map((tab, i) => (
-            <TabPanel key={i} p="0">
+            <Tabs.Content key={i} value={String(i)} p="0">
               {tab.content}
-            </TabPanel>
+            </Tabs.Content>
           ))}
-        </TabPanels>
-      </Tabs>
+        </Tabs.ContentGroup>
+      </Tabs.Root>
     </Box>
-  )
-}
+  );
+};
 
-export default TabsTemplate
+export default TabsTemplate;

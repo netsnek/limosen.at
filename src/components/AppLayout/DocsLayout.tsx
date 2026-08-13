@@ -1,4 +1,11 @@
-import { Box, Container, Flex, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Flex,
+  LinkProps,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 import { FaLink } from '@react-icons/all-files/fa/FaLink';
 import React, { FC, useMemo, useState } from 'react';
 import { useMenuStructureContext } from '../../contexts/menu-structure';
@@ -161,7 +168,13 @@ const DocsLayout: FC<DocsLayoutProps> = ({ children, path, isCommunity }) => {
                       <Links
                         links={links}
                         props={{
-                          variant: 'right-bottom-nav',
+                          // Kept as a string because the site's link recipe is
+                          // where this belongs, not the call site. v3 derives
+                          // the variant union from generated recipe types, and
+                          // no build step here writes the site's own variants
+                          // into that union, so the theme's value has to be
+                          // cast past it.
+                          variant: 'right-bottom-nav' as LinkProps['variant'],
                           w: '100%',
                           display: 'block'
                         }}

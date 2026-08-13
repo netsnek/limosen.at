@@ -1,5 +1,7 @@
 // src/vars/limosen.tsx
-import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa'
+import {FaFacebookF} from '@react-icons/all-files/fa/FaFacebookF'
+import {FaInstagram} from '@react-icons/all-files/fa/FaInstagram'
+import {FaTwitter} from '@react-icons/all-files/fa/FaTwitter'
 
 export const CONTACT_EMAIL = 'office@limosen.at'
 export const CONTACT_PHONE = '+43 660 876 06 06'

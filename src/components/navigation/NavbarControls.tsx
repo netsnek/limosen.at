@@ -1,6 +1,6 @@
-import { Flex, FlexProps, IconButton, useColorMode } from '@chakra-ui/react';
+import { Flex, FlexProps, IconButton } from '@chakra-ui/react';
+import { useColorMode } from 'jaen';
 import { Dispatch, FC, SetStateAction } from 'react';
-import ThemeChooser from '../ThemeChooser';
 import HideSidebarIcon from '../icons/HideSidebar';
 
 interface NavbarControlsProps {
@@ -69,18 +69,17 @@ const NavbarControls: FC<NavbarControlsProps> = ({
       </Menu> */}
       {showExpandToggle && (
         <IconButton
-          icon={
-            <HideSidebarIcon
-              transform={!isExpanded ? 'rotate(180deg)' : undefined}
-              transition="transform 0.2s ease-in-out"
-            />
-          }
           aria-label={`${isExpanded ? 'Close' : 'Open'}`}
           size="sm"
           variant="ghost"
           color="shared.text.default"
           onClick={() => setIsExpanded(!isExpanded)}
-        />
+        >
+          <HideSidebarIcon
+            transform={!isExpanded ? 'rotate(180deg)' : undefined}
+            transition="transform 0.2s ease-in-out"
+          />
+        </IconButton>
       )}
     </Flex>
   );

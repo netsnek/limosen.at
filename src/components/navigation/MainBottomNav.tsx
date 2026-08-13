@@ -1,4 +1,7 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon
+} from '../../components/icons/chakra';
 import { Flex, Spacer, Text } from '@chakra-ui/react';
 import { FC, useMemo } from 'react';
 import { useLocation } from '@reach/router';
@@ -21,9 +24,16 @@ const props = {
   display: 'flex',
   alignItems: 'center',
   opacity: 0.7,
+  // v3's link recipe puts `gap: 1.5` on every Link, which v2's had not, and it
+  // would land on top of the chevrons' own mr/ml.
+  gap: 0,
   _hover: {
     color: 'main.bottomNav.linkHoverColor',
-    opacity: 1
+    opacity: 1,
+    // v2 replaced the recipe's `_hover` wholesale with this object and so lost
+    // its underline. v3 merges the two, so the underline has to be turned off
+    // by hand.
+    textDecoration: 'none'
   }
 };
 //TODO: Re-implement commented out jsx below

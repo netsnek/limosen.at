@@ -1,5 +1,13 @@
 import { PageConfig } from 'jaen';
-import { Box, Container, Flex, Stack, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Flex,
+  LinkProps,
+  Stack,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 import { PageProps, graphql } from 'gatsby';
 import * as React from 'react';
 import TableOfContent from '../components/navigation/TableOfContent';
@@ -34,7 +42,7 @@ const DocsPage: React.FC<PageProps> = () => {
 
   return (
     <>
-      <Stack spacing={{ base: 0, xl: 12 }} direction="row">
+      <Stack gap={{ base: 0, xl: 12 }} direction="row">
         <Box w="full" overflow="hidden">
           <MdxEditor />
           <MainBottomNav />
@@ -60,7 +68,12 @@ const DocsPage: React.FC<PageProps> = () => {
                 <Links
                   links={links}
                   props={{
-                    variant: 'right-bottom-nav',
+                    // Same story as DocsLayout.tsx: this site never carried a
+                    // Link recipe, so the variant resolved to nothing in v2
+                    // either. In v3 the variant union is generated from the
+                    // recipes, so the string needs a cast to keep compiling
+                    // while staying the same no-op it always was.
+                    variant: 'right-bottom-nav' as LinkProps['variant'],
                     w: '100%',
                     display: 'block'
                   }}

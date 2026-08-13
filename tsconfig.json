@@ -29,7 +29,7 @@
     /* Modules */
     "module": "esnext" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
+    "moduleResolution": "bundler" /* Chakra 3 and @ark-ui/react ship subpath exports that node10 resolution cannot read, which collapses every compound component to an any-shaped props type. netsnek.com switched the same way for the same reason. */,
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

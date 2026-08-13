@@ -1,28 +1,23 @@
 // BookingModal.tsx
 import {
   Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
+  Dialog,
+  Field,
   Heading,
   HStack,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalOverlay,
+  NativeSelect,
+  Portal,
+  Separator,
+  SimpleGrid,
   Stack,
   Text,
-  Textarea,
-  Select,
-  SimpleGrid,
-  Divider
+  Textarea
 } from '@chakra-ui/react';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { CheckboxStyled } from './CheckboxStyled';
+import { DialogCloseButton } from '../DialogCloseButton';
 import { useT } from '../../contexts/language';
 import { useIntl } from 'react-intl';
 
@@ -213,402 +208,469 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   }, [selectedCarClass, setValue]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="3xl"
-      blockScrollOnMount={false}
+    <Dialog.Root
+      open={isOpen}
+      // v2 was `size="3xl"`, i.e. maxW 3xl (48rem). v3's dialog sizes step
+      // straight from lg (maxW 2xl, 42rem) to xl (maxW 4xl, 56rem), so no size
+      // name paints 48rem any more. The nearest smaller step is taken and the
+      // width is pinned back on the content below, which is the only thing the
+      // size variant sets.
+      size="lg"
+      preventScroll={false}
+      onOpenChange={e => {
+        if (!e.open) {
+          onClose();
+        }
+      }}
     >
-      <ModalOverlay />
-      <ModalContent>
-        <form
-          onSubmit={event => {
-            void handleSubmit(onSubmit)(event);
-          }}
-        >
-          <ModalCloseButton />
-          <ModalBody
-            p={{
-              base: 4,
-              md: 8,
-              lg: 10
-            }}
-          >
-            <Stack spacing={8}>
-              <Stack spacing={2}>
-                <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
-                  {t('BookingHeading', 'Booking request')}
-                </Heading>
-                <Text color="black">
-                  {t(
-                    'BookingIntro',
-                    'Please fill in your ride details and contact info. We’ll get back to you shortly.'
-                  )}
-                </Text>
-              </Stack>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content maxW="3xl">
+            <form
+              onSubmit={event => {
+                void handleSubmit(onSubmit)(event);
+              }}
+            >
+              {/* A childless <Dialog.CloseTrigger/> draws no X at all in v3.
+                  See DialogCloseButton for what v2 painted here. */}
+              <DialogCloseButton />
+              <Dialog.Body
+                p={{
+                  base: 4,
+                  md: 8,
+                  lg: 10
+                }}
+              >
+                <Stack gap={8}>
+                  <Stack gap={2}>
+                    <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
+                      {t('BookingHeading', 'Booking request')}
+                    </Heading>
+                    <Text color="black">
+                      {t(
+                        'BookingIntro',
+                        'Please fill in your ride details and contact info. We’ll get back to you shortly.'
+                      )}
+                    </Text>
+                  </Stack>
 
-              {/* Ride details */}
-              <Stack spacing={4}>
-                <Heading as="h3" size="sm">
-                  {t('SectionRide', 'Ride')}
-                </Heading>
+                  {/* Ride details */}
+                  <Stack gap={4}>
+                    <Heading as="h3" size="sm">
+                      {t('SectionRide', 'Ride')}
+                    </Heading>
 
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                  <FormControl>
-                    <FormLabel fontSize="sm">
-                      {t('LabelCategory', 'Category')}
-                    </FormLabel>
-                    <Select
-                      {...register('rideCategory')}
-                      focusBorderColor="brand.500"
-                    >
-                      <option value="DISTANCE">
-                        {t('CategoryDistance', 'Distance')}
-                      </option>
-                      <option value="HOURLY">
-                        {t('CategoryHourly', 'Hourly')}
-                      </option>
-                      <option value="FLATRATE">
-                        {t('CategoryFlatrate', 'Flat rate')}
-                      </option>
-                    </Select>
-                  </FormControl>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                      <Field.Root>
+                        <Field.Label fontSize="sm">
+                          {t('LabelCategory', 'Category')}
+                        </Field.Label>
+                        {/* v2's `<Select>` was a native select with a chevron
+                            drawn by the theme. v3 splits that into NativeSelect's
+                            three parts: the root positions, the field is the
+                            `<select>` and the indicator is the chevron. The
+                            plain `Select` namespace in v3 is the JS listbox, not
+                            this. */}
+                        <NativeSelect.Root>
+                          {/* `focusBorderColor` is gone in v3 and would be
+                              forwarded to the DOM as an unknown attribute. The
+                              colour it set is restored as the focused border. */}
+                          <NativeSelect.Field
+                            {...register('rideCategory')}
+                            _focus={{ borderColor: 'brand.500' }}
+                          >
+                            <option value="DISTANCE">
+                              {t('CategoryDistance', 'Distance')}
+                            </option>
+                            <option value="HOURLY">
+                              {t('CategoryHourly', 'Hourly')}
+                            </option>
+                            <option value="FLATRATE">
+                              {t('CategoryFlatrate', 'Flat rate')}
+                            </option>
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </Field.Root>
 
-                  <FormControl>
-                    <FormLabel fontSize="sm">
-                      {t('LabelType', 'Type')}
-                    </FormLabel>
-                    <Select
-                      {...register('rideType')}
-                      focusBorderColor="brand.500"
-                    >
-                      <option value="ONEWAY">
-                        {t('TypeOneWay', 'One-way')}
-                      </option>
-                      <option value="RETURN">
-                        {t('TypeReturn', 'Return')}
-                      </option>
-                    </Select>
-                  </FormControl>
+                      <Field.Root>
+                        <Field.Label fontSize="sm">
+                          {t('LabelType', 'Type')}
+                        </Field.Label>
+                        <NativeSelect.Root>
+                          <NativeSelect.Field
+                            {...register('rideType')}
+                            _focus={{ borderColor: 'brand.500' }}
+                          >
+                            <option value="ONEWAY">
+                              {t('TypeOneWay', 'One-way')}
+                            </option>
+                            <option value="RETURN">
+                              {t('TypeReturn', 'Return')}
+                            </option>
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </Field.Root>
 
-                  <FormControl>
-                    <FormLabel htmlFor="date" fontSize="sm">
-                      {t('LabelDate', 'Date')}
-                    </FormLabel>
-                    <Input
-                      id="date"
-                      type="date"
-                      {...register('date')}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.date?.toString()}
-                    </FormErrorMessage>
-                  </FormControl>
+                      <Field.Root>
+                        <Field.Label htmlFor="date" fontSize="sm">
+                          {t('LabelDate', 'Date')}
+                        </Field.Label>
+                        <Input
+                          id="date"
+                          type="date"
+                          {...register('date')}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.date?.toString()}
+                        </Field.ErrorText>
+                      </Field.Root>
 
-                  <FormControl>
-                    <FormLabel htmlFor="time" fontSize="sm">
-                      {t('LabelTime', 'Pickup time')}
-                    </FormLabel>
-                    <Input
-                      id="time"
-                      type="time"
-                      {...register('time')}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.time?.toString()}
-                    </FormErrorMessage>
-                  </FormControl>
+                      <Field.Root>
+                        <Field.Label htmlFor="time" fontSize="sm">
+                          {t('LabelTime', 'Pickup time')}
+                        </Field.Label>
+                        <Input
+                          id="time"
+                          type="time"
+                          {...register('time')}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.time?.toString()}
+                        </Field.ErrorText>
+                      </Field.Root>
 
-                  <FormControl>
-                    <FormLabel htmlFor="pickupAddress" fontSize="sm">
-                      {t('LabelPickup', 'Pickup address')}
-                    </FormLabel>
-                    <Input
-                      id="pickupAddress"
-                      placeholder={t('LabelPickup', 'Pickup address')}
-                      {...register('pickupAddress')}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
+                      <Field.Root>
+                        <Field.Label htmlFor="pickupAddress" fontSize="sm">
+                          {t('LabelPickup', 'Pickup address')}
+                        </Field.Label>
+                        <Input
+                          id="pickupAddress"
+                          placeholder={t('LabelPickup', 'Pickup address')}
+                          {...register('pickupAddress')}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
 
-                  <FormControl>
-                    <FormLabel htmlFor="destinationAddress" fontSize="sm">
-                      {t('LabelDestination', 'Destination address')}
-                    </FormLabel>
-                    <Input
-                      id="destinationAddress"
-                      placeholder={t('LabelDestination', 'Destination address')}
-                      {...register('destinationAddress')}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel htmlFor="passengers" fontSize="sm">
-                      {t('LabelPassengers', 'Passengers')}
-                    </FormLabel>
-                    <Input
-                      id="passengers"
-                      type="number"
-                      min={1}
-                      {...register('passengers', { valueAsNumber: true })}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel htmlFor="luggage" fontSize="sm">
-                      {t('LabelLuggage', 'Luggage')}
-                    </FormLabel>
-                    <Input
-                      id="luggage"
-                      type="number"
-                      min={0}
-                      {...register('luggage', { valueAsNumber: true })}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel htmlFor="childSeats" fontSize="sm">
-                      {t('LabelChildSeats', 'Child seat')}
-                    </FormLabel>
-                    <Input
-                      id="childSeats"
-                      type="number"
-                      min={0}
-                      {...register('childSeats', { valueAsNumber: true })}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel htmlFor="extraTime" fontSize="sm">
-                      {t('LabelExtraTime', 'Extra time (hrs)')}
-                    </FormLabel>
-                    <Input
-                      id="extraTime"
-                      type="number"
-                      min={0}
-                      max={12}
-                      {...register('extraTime', { valueAsNumber: true })}
-                      focusBorderColor="brand.500"
-                    />
-                  </FormControl>
-                </SimpleGrid>
-
-                <Divider />
-
-                {/* Vehicle & Payment */}
-                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-                  <FormControl>
-                    <FormLabel fontSize="sm">
-                      {t('LabelCarClass', 'Vehicle class')}
-                    </FormLabel>
-                    <Select
-                      placeholder={t('SelectCarClass', 'Select a class')}
-                      {...register('carClass')}
-                      focusBorderColor="brand.500"
-                    >
-                      {fleetCategories.map(cat => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <FormControl isDisabled={!selectedCarClass}>
-                    <FormLabel fontSize="sm">
-                      {t('LabelCarTitle', 'Vehicle')}
-                    </FormLabel>
-                    <Select
-                      placeholder={
-                        selectedCarClass
-                          ? t('SelectVehicle', 'Select a vehicle')
-                          : t('SelectClassFirst', 'Select a class first')
-                      }
-                      {...register('carTitle')}
-                      focusBorderColor="brand.500"
-                    >
-                      {vehicleOptions.map(model => (
-                        <option key={model} value={model}>
-                          {model}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel fontSize="sm">
-                      {t('LabelPaymentOption', 'Payment option')}
-                    </FormLabel>
-                    <Select
-                      {...register('paymentOption')}
-                      focusBorderColor="brand.500"
-                    >
-                      <option value="CASH">{t('PaymentCash', 'Cash')}</option>
-                      <option value="CARD">{t('PaymentCard', 'Card')}</option>
-                      <option value="TRANSFER">
-                        {t('PaymentTransfer', 'Überweisung')}
-                      </option>
-                    </Select>
-                  </FormControl>
-                </SimpleGrid>
-              </Stack>
-
-              {/* Contact details */}
-              <Stack spacing={4}>
-                <Heading as="h3" size="sm">
-                  {t('SectionContact', 'Contact details')}
-                </Heading>
-
-                <HStack>
-                  <FormControl isRequired isInvalid={!!errors.firstName}>
-                    <FormLabel htmlFor="firstName" fontSize="sm">
-                      {t('LabelFirstName', 'First name')}
-                    </FormLabel>
-                    <Input
-                      id="firstName"
-                      placeholder={t('LabelFirstName', 'First name')}
-                      {...register('firstName', { required: true })}
-                      isDisabled={!!fixedValues?.firstName}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.firstName?.message}
-                    </FormErrorMessage>
-                  </FormControl>
-                  <FormControl isRequired isInvalid={!!errors.lastName}>
-                    <FormLabel htmlFor="lastName" fontSize="sm">
-                      {t('LabelLastName', 'Last name')}
-                    </FormLabel>
-                    <Input
-                      id="lastName"
-                      placeholder={t('LabelLastName', 'Last name')}
-                      {...register('lastName', { required: true })}
-                      isDisabled={!!fixedValues?.lastName}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.lastName?.message}
-                    </FormErrorMessage>
-                  </FormControl>
-                </HStack>
-
-                <HStack>
-                  <FormControl isRequired isInvalid={!!errors.email}>
-                    <FormLabel htmlFor="email" fontSize="sm">
-                      {t('LabelEmail', 'Email')}
-                    </FormLabel>
-                    <Input
-                      id="email"
-                      placeholder="john.doe@example.com"
-                      type="email"
-                      {...register('email', { required: true })}
-                      isDisabled={!!fixedValues?.email}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.email?.message}
-                    </FormErrorMessage>
-                  </FormControl>
-
-                  <FormControl isInvalid={!!errors.phone}>
-                    <FormLabel htmlFor="phone" fontSize="sm">
-                      {t('LabelPhone', 'Phone')}
-                    </FormLabel>
-                    <Input
-                      id="phone"
-                      placeholder="+43 660 000 0000"
-                      type="tel"
-                      {...register('phone')}
-                      isDisabled={!!fixedValues?.phone}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.phone?.toString()}
-                    </FormErrorMessage>
-                  </FormControl>
-                </HStack>
-
-                <HStack>
-                  <FormControl isInvalid={!!errors.flightNumber}>
-                    <FormLabel htmlFor="flightNumber" fontSize="sm">
-                      {t('LabelFlightNumber', 'Flight number')}
-                    </FormLabel>
-                    <Input
-                      id="flightNumber"
-                      placeholder="e.g. OS123"
-                      {...register('flightNumber')}
-                      focusBorderColor="brand.500"
-                    />
-                    <FormErrorMessage fontSize="sm">
-                      {errors.flightNumber?.toString()}
-                    </FormErrorMessage>
-                  </FormControl>
-                </HStack>
-
-                <FormControl isRequired isInvalid={!!errors.message}>
-                  <FormLabel htmlFor="message" fontSize="sm">
-                    {t('LabelWishes', 'Wishes')}
-                  </FormLabel>
-                  <Textarea
-                    id="message"
-                    placeholder={t('WishesPlaceholder', 'Wishes or note')}
-                    defaultValue={defaultValues?.message}
-                    {...register('message', { required: true })}
-                    focusBorderColor="brand.500"
-                  />
-                  <FormErrorMessage fontSize="sm">
-                    {errors.message?.message}
-                  </FormErrorMessage>
-                </FormControl>
-
-                <FormControl isRequired isInvalid={!!errors.agreeToTerms}>
-                  <Controller
-                    name="agreeToTerms"
-                    control={control}
-                    rules={{
-                      required: t(
-                        'ConsentError',
-                        'Please confirm the contact permission'
-                      )
-                    }}
-                    render={({ field }) => (
-                      <CheckboxStyled
-                        ref={field.ref}
-                        onBlur={field.onBlur}
-                        onChange={field.onChange}
-                        checked={field.value}
-                        roundedFull
-                      >
-                        <Text color="black" fontSize={{ base: 'xs', md: 'sm' }}>
-                          {t(
-                            'ConsentText',
-                            'I agree that my details may be stored for contacting me and for follow-up questions.'
+                      <Field.Root>
+                        <Field.Label htmlFor="destinationAddress" fontSize="sm">
+                          {t('LabelDestination', 'Destination address')}
+                        </Field.Label>
+                        <Input
+                          id="destinationAddress"
+                          placeholder={t(
+                            'LabelDestination',
+                            'Destination address'
                           )}
-                        </Text>
-                      </CheckboxStyled>
-                    )}
-                  />
-                  <FormErrorMessage fontSize="sm">
-                    {errors.agreeToTerms?.message}
-                  </FormErrorMessage>
-                </FormControl>
-              </Stack>
-            </Stack>
-          </ModalBody>
+                          {...register('destinationAddress')}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
 
-          <ModalFooter borderTop="1px solid" color="gray.2 00">
-            <Button isLoading={isSubmitting} type="submit">
-              {t('SubmitCta', 'Reserve')}
-            </Button>
-          </ModalFooter>
-        </form>
-      </ModalContent>
-    </Modal>
+                      <Field.Root>
+                        <Field.Label htmlFor="passengers" fontSize="sm">
+                          {t('LabelPassengers', 'Passengers')}
+                        </Field.Label>
+                        <Input
+                          id="passengers"
+                          type="number"
+                          min={1}
+                          {...register('passengers', { valueAsNumber: true })}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
+
+                      <Field.Root>
+                        <Field.Label htmlFor="luggage" fontSize="sm">
+                          {t('LabelLuggage', 'Luggage')}
+                        </Field.Label>
+                        <Input
+                          id="luggage"
+                          type="number"
+                          min={0}
+                          {...register('luggage', { valueAsNumber: true })}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
+
+                      <Field.Root>
+                        <Field.Label htmlFor="childSeats" fontSize="sm">
+                          {t('LabelChildSeats', 'Child seat')}
+                        </Field.Label>
+                        <Input
+                          id="childSeats"
+                          type="number"
+                          min={0}
+                          {...register('childSeats', { valueAsNumber: true })}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
+
+                      <Field.Root>
+                        <Field.Label htmlFor="extraTime" fontSize="sm">
+                          {t('LabelExtraTime', 'Extra time (hrs)')}
+                        </Field.Label>
+                        <Input
+                          id="extraTime"
+                          type="number"
+                          min={0}
+                          max={12}
+                          {...register('extraTime', { valueAsNumber: true })}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                      </Field.Root>
+                    </SimpleGrid>
+
+                    {/* v2's Divider drew a 1px line in the INHERITED colour at
+                        0.6 opacity. v3's Separator paints the `border` token
+                        instead, so both values are pinned back to keep the same
+                        grey. */}
+                    <Separator borderColor="inherit" opacity={0.6} />
+
+                    {/* Vehicle & Payment */}
+                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                      <Field.Root>
+                        <Field.Label fontSize="sm">
+                          {t('LabelCarClass', 'Vehicle class')}
+                        </Field.Label>
+                        <NativeSelect.Root>
+                          {/* NativeSelect.Field renders the placeholder as a
+                              leading empty option, the same markup v2's Select
+                              built from the prop. */}
+                          <NativeSelect.Field
+                            placeholder={t('SelectCarClass', 'Select a class')}
+                            {...register('carClass')}
+                            _focus={{ borderColor: 'brand.500' }}
+                          >
+                            {fleetCategories.map(cat => (
+                              <option key={cat} value={cat}>
+                                {cat}
+                              </option>
+                            ))}
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </Field.Root>
+
+                      <Field.Root disabled={!selectedCarClass}>
+                        <Field.Label fontSize="sm">
+                          {t('LabelCarTitle', 'Vehicle')}
+                        </Field.Label>
+                        {/* NativeSelect.Root reads `disabled` off the enclosing
+                            field and hands it to the select, which is how v2's
+                            FormControl isDisabled reached it. */}
+                        <NativeSelect.Root>
+                          <NativeSelect.Field
+                            placeholder={
+                              selectedCarClass
+                                ? t('SelectVehicle', 'Select a vehicle')
+                                : t('SelectClassFirst', 'Select a class first')
+                            }
+                            {...register('carTitle')}
+                            _focus={{ borderColor: 'brand.500' }}
+                          >
+                            {vehicleOptions.map(model => (
+                              <option key={model} value={model}>
+                                {model}
+                              </option>
+                            ))}
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </Field.Root>
+
+                      <Field.Root>
+                        <Field.Label fontSize="sm">
+                          {t('LabelPaymentOption', 'Payment option')}
+                        </Field.Label>
+                        <NativeSelect.Root>
+                          <NativeSelect.Field
+                            {...register('paymentOption')}
+                            _focus={{ borderColor: 'brand.500' }}
+                          >
+                            <option value="CASH">
+                              {t('PaymentCash', 'Cash')}
+                            </option>
+                            <option value="CARD">
+                              {t('PaymentCard', 'Card')}
+                            </option>
+                            <option value="TRANSFER">
+                              {t('PaymentTransfer', 'Überweisung')}
+                            </option>
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </Field.Root>
+                    </SimpleGrid>
+                  </Stack>
+
+                  {/* Contact details */}
+                  <Stack gap={4}>
+                    <Heading as="h3" size="sm">
+                      {t('SectionContact', 'Contact details')}
+                    </Heading>
+
+                    <HStack>
+                      {/* v2's FormLabel drew the red asterisk itself whenever the
+                          FormControl was required. v3's Field.Label does not, the
+                          indicator is a part of its own, so it is spelled out on
+                          every label that had one. */}
+                      <Field.Root required invalid={!!errors.firstName}>
+                        <Field.Label htmlFor="firstName" fontSize="sm">
+                          {t('LabelFirstName', 'First name')}
+                          <Field.RequiredIndicator />
+                        </Field.Label>
+                        <Input
+                          id="firstName"
+                          placeholder={t('LabelFirstName', 'First name')}
+                          {...register('firstName', { required: true })}
+                          disabled={!!fixedValues?.firstName}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.firstName?.message}
+                        </Field.ErrorText>
+                      </Field.Root>
+                      <Field.Root required invalid={!!errors.lastName}>
+                        <Field.Label htmlFor="lastName" fontSize="sm">
+                          {t('LabelLastName', 'Last name')}
+                          <Field.RequiredIndicator />
+                        </Field.Label>
+                        <Input
+                          id="lastName"
+                          placeholder={t('LabelLastName', 'Last name')}
+                          {...register('lastName', { required: true })}
+                          disabled={!!fixedValues?.lastName}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.lastName?.message}
+                        </Field.ErrorText>
+                      </Field.Root>
+                    </HStack>
+
+                    <HStack>
+                      <Field.Root required invalid={!!errors.email}>
+                        <Field.Label htmlFor="email" fontSize="sm">
+                          {t('LabelEmail', 'Email')}
+                          <Field.RequiredIndicator />
+                        </Field.Label>
+                        <Input
+                          id="email"
+                          placeholder="john.doe@example.com"
+                          type="email"
+                          {...register('email', { required: true })}
+                          disabled={!!fixedValues?.email}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.email?.message}
+                        </Field.ErrorText>
+                      </Field.Root>
+
+                      <Field.Root invalid={!!errors.phone}>
+                        <Field.Label htmlFor="phone" fontSize="sm">
+                          {t('LabelPhone', 'Phone')}
+                        </Field.Label>
+                        <Input
+                          id="phone"
+                          placeholder="+43 660 000 0000"
+                          type="tel"
+                          {...register('phone')}
+                          disabled={!!fixedValues?.phone}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.phone?.toString()}
+                        </Field.ErrorText>
+                      </Field.Root>
+                    </HStack>
+
+                    <HStack>
+                      <Field.Root invalid={!!errors.flightNumber}>
+                        <Field.Label htmlFor="flightNumber" fontSize="sm">
+                          {t('LabelFlightNumber', 'Flight number')}
+                        </Field.Label>
+                        <Input
+                          id="flightNumber"
+                          placeholder="e.g. OS123"
+                          {...register('flightNumber')}
+                          _focus={{ borderColor: 'brand.500' }}
+                        />
+                        <Field.ErrorText fontSize="sm">
+                          {errors.flightNumber?.toString()}
+                        </Field.ErrorText>
+                      </Field.Root>
+                    </HStack>
+
+                    <Field.Root required invalid={!!errors.message}>
+                      <Field.Label htmlFor="message" fontSize="sm">
+                        {t('LabelWishes', 'Wishes')}
+                        <Field.RequiredIndicator />
+                      </Field.Label>
+                      <Textarea
+                        id="message"
+                        placeholder={t('WishesPlaceholder', 'Wishes or note')}
+                        defaultValue={defaultValues?.message}
+                        {...register('message', { required: true })}
+                        _focus={{ borderColor: 'brand.500' }}
+                      />
+                      <Field.ErrorText fontSize="sm">
+                        {errors.message?.message}
+                      </Field.ErrorText>
+                    </Field.Root>
+
+                    <Field.Root required invalid={!!errors.agreeToTerms}>
+                      <Controller
+                        name="agreeToTerms"
+                        control={control}
+                        rules={{
+                          required: t(
+                            'ConsentError',
+                            'Please confirm the contact permission'
+                          )
+                        }}
+                        render={({ field }) => (
+                          <CheckboxStyled
+                            ref={field.ref}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
+                            checked={field.value}
+                            roundedFull
+                          >
+                            <Text
+                              color="black"
+                              fontSize={{ base: 'xs', md: 'sm' }}
+                            >
+                              {t(
+                                'ConsentText',
+                                'I agree that my details may be stored for contacting me and for follow-up questions.'
+                              )}
+                            </Text>
+                          </CheckboxStyled>
+                        )}
+                      />
+                      <Field.ErrorText fontSize="sm">
+                        {errors.agreeToTerms?.message}
+                      </Field.ErrorText>
+                    </Field.Root>
+                  </Stack>
+                </Stack>
+              </Dialog.Body>
+
+              <Dialog.Footer borderTop="1px solid" color="gray.2 00">
+                <Button loading={isSubmitting} type="submit">
+                  {t('SubmitCta', 'Reserve')}
+                </Button>
+              </Dialog.Footer>
+            </form>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
   );
 };

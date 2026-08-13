@@ -1,4 +1,4 @@
-import { ArrowBackIcon, InfoIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, InfoIcon } from '../../../../components/icons/chakra';
 import { Box, Center, Flex, HStack, Text } from '@chakra-ui/react';
 import { Link } from 'gatsby-plugin-jaen';
 import { FC, ReactNode } from 'react';

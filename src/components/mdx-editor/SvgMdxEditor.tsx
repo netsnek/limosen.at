@@ -18,7 +18,7 @@ const svgEditorComponents: MdxFieldProps['components'] = {
   g: props => <g children={props.children} />,
   circle: props => <circle children={props.children} />,
   polygon: props => <polygon children={props.children} />,
-  line: props => <line children={props.children} />,
+  line: props => <line children={props.children} />
 };
 
 delete svgEditorComponents.Filesystem;
@@ -26,20 +26,20 @@ delete svgEditorComponents.DocsIndex;
 delete svgEditorComponents.ImageCard;
 delete svgEditorComponents.Image;
 
-interface ICodeMdxEditorProps
-  extends Omit<Parameters<typeof UncontrolledMdxField>[0], 'components'> {}
+interface ICodeMdxEditorProps extends Omit<
+  Parameters<typeof UncontrolledMdxField>[0],
+  'components'
+> {}
 
 /**
  * Standalone MDX editor without automatic loading/saving by Jaen.
  */
-const CodeMdxEditor: FC<ICodeMdxEditorProps> = ({
-  ...props
-}) => {
+const CodeMdxEditor: FC<ICodeMdxEditorProps> = ({ ...props }) => {
   return (
     <Stack
       pt={14}
-      sx={{
-        '.cm-editor': {
+      css={{
+        '& .cm-editor': {
           height: '90dvh'
         }
       }}

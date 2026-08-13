@@ -1,16 +1,11 @@
 import {
   Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   Container as ChakraContainer,
   Checkbox,
   CloseButton,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
+  Field,
   HStack,
   Heading,
   IconButton,
@@ -94,13 +89,16 @@ const Page: React.FC<PageProps> = () => {
       />
       <Box pos="relative">
         <ChakraContainer maxW="3xl" py={{ base: '6', md: '12' }} px={{ base: '4', sm: '8' }}>
-          <Stack spacing="8">
-            <Stack spacing="6" align="center">
-              <Link as={Button} leftIcon={<FaArrowLeft />} to="/">
+          <Stack gap="8">
+            <Stack gap="6" align="center">
+              {/* v3 has no leftIcon: the icon is just the first child, and the
+                  button recipe's own gap takes over from v2's iconSpacing. */}
+              <Link as={Button} to="/">
+                <FaArrowLeft />
                 Zurück zur Webseite
               </Link>
               {/* Logo wurde von hier entfernt */}
-              <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
+              <Stack gap={{ base: '2', md: '3' }} textAlign="center">
                 <Heading size={{ base: 'sm', md: 'md' }} color="white">
                   Als Partner-Fahrer registrieren
                 </Heading>
@@ -111,11 +109,11 @@ const Page: React.FC<PageProps> = () => {
             </Stack>
 
             {alert && (
-              <Alert status={alert.status}>
-                <AlertIcon />
+              <Alert.Root status={alert.status}>
+                <Alert.Indicator />
                 <Box w="full">
-                  <AlertTitle>{alert.message}</AlertTitle>
-                  <AlertDescription>{alert.description}</AlertDescription>
+                  <Alert.Title>{alert.message}</Alert.Title>
+                  <Alert.Description>{alert.description}</Alert.Description>
                 </Box>
                 <CloseButton
                   alignSelf="flex-start"
@@ -124,7 +122,7 @@ const Page: React.FC<PageProps> = () => {
                   top={-1}
                   onClick={resetAlert}
                 />
-              </Alert>
+              </Alert.Root>
             )}
 
             {/* Weißer Formular-Container auf dunklem Hintergrund */}
@@ -349,213 +347,246 @@ const DriverSignupForm: React.FC<DriverSignupFormProps> = ({ welcomeText, onSucc
   };
 
   return (
-    <Stack spacing="4">
+    <Stack gap="4">
       {/* Normale Schrift im weißen Container */}
       <Text whiteSpace="pre-wrap" fontSize="md" color="black">
         {displayText}
       </Text>
 
+      {/* v3 pins a component prop type to its own element, so `as="form"` no
+          longer widens Stack to the form attributes and noValidate stops
+          type-checking. asChild merges the Stack styles onto a real form
+          instead, which emits the same single element the v2 markup did. */}
       {showInput && (
-        <Stack as="form" noValidate onSubmit={handleSubmit(onSubmit)} spacing={6} color="black">
-          {/* Step 1: Details */}
-          <Stack display={step >= DriverStep.Details ? 'flex' : 'none'} spacing={4}>
-            <Heading size="sm">Kontakt</Heading>
-            <HStack>
-              <FormControl isInvalid={!!errors.details?.firstName} isRequired>
-                <FormLabel>Vorname</FormLabel>
-                <Input
-                  {...register('details.firstName', { required: 'Vorname ist erforderlich' })}
-                />
-                <FormErrorMessage>{errors.details?.firstName?.message}</FormErrorMessage>
-              </FormControl>
-              <FormControl isInvalid={!!errors.details?.lastName} isRequired>
-                <FormLabel>Nachname</FormLabel>
-                <Input
-                  {...register('details.lastName', { required: 'Nachname ist erforderlich' })}
-                />
-                <FormErrorMessage>{errors.details?.lastName?.message}</FormErrorMessage>
-              </FormControl>
-            </HStack>
-
-            <HStack>
-              <FormControl isInvalid={!!errors.details?.email} isRequired>
-                <FormLabel>E-Mail</FormLabel>
-                <Input
-                  type="email"
-                  {...register('details.email', {
-                    required: 'E-Mail ist erforderlich',
-                    pattern: { value: /^\S+@\S+$/, message: 'Bitte gültige E-Mail angeben' }
-                  })}
-                />
-                <FormErrorMessage>{errors.details?.email?.message}</FormErrorMessage>
-              </FormControl>
-
-              <FormControl isInvalid={!!errors.details?.phone} isRequired>
-                <FormLabel>Handynummer</FormLabel>
-                <Input
-                  type="tel"
-                  placeholder="+43 ..."
-                  {...register('details.phone', {
-                    required: 'Handynummer ist erforderlich',
-                    minLength: { value: 6, message: 'Bitte gültige Nummer' }
-                  })}
-                />
-                <FormErrorMessage>{errors.details?.phone?.message}</FormErrorMessage>
-              </FormControl>
-            </HStack>
-
-            {step === DriverStep.Details && (
-              <HStack justify="flex-end">
-                <Button type="button" onClick={onNext}>
-                  Weiter
-                </Button>
+        <Stack asChild gap={6} color="black">
+          <form noValidate onSubmit={handleSubmit(onSubmit)}>
+            {/* Step 1: Details */}
+            <Stack display={step >= DriverStep.Details ? 'flex' : 'none'} gap={4}>
+              <Heading size="sm">Kontakt</Heading>
+              <HStack>
+                <Field.Root invalid={!!errors.details?.firstName} required>
+                  {/* v2 drew this asterisk by itself whenever the FormControl
+                      was required. v3 has to be asked for it, and the indicator
+                      renders nothing when the Field.Root is not required. */}
+                  <Field.Label>
+                    Vorname
+                    <Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    {...register('details.firstName', { required: 'Vorname ist erforderlich' })}
+                  />
+                  <Field.ErrorText>{errors.details?.firstName?.message}</Field.ErrorText>
+                </Field.Root>
+                <Field.Root invalid={!!errors.details?.lastName} required>
+                  <Field.Label>
+                    Nachname
+                    <Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    {...register('details.lastName', { required: 'Nachname ist erforderlich' })}
+                  />
+                  <Field.ErrorText>{errors.details?.lastName?.message}</Field.ErrorText>
+                </Field.Root>
               </HStack>
-            )}
-          </Stack>
 
-          {/* Step 2: Pflicht-Dokumente */}
-          <Stack display={step >= DriverStep.RequiredDocs ? 'flex' : 'none'} spacing={4}>
-            <Heading size="sm">Pflicht-Dokumente</Heading>
-            <FileField
-              control={control}
-              name="docs.ecard"
-              label="E-Card"
-              accept={ACCEPTED}
-              isRequired
-              error={errors.docs?.ecard as any}
-            />
-            <FileField
-              control={control}
-              name="docs.registrationForm"
-              label="Meldezettel"
-              accept={ACCEPTED}
-              isRequired
-              error={errors.docs?.registrationForm as any}
-            />
-            {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
-            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-              <FileField
-                control={control}
-                name="docs.drivingFront"
-                label="Führerschein Vorderseite"
-                accept={ACCEPTED}
-                isRequired
-                error={errors.docs?.drivingFront as any}
-              />
-              <FileField
-                control={control}
-                name="docs.drivingBack"
-                label="Führerschein Rückseite"
-                accept={ACCEPTED}
-                isRequired
-                error={errors.docs?.drivingBack as any}
-              />
+              <HStack>
+                <Field.Root invalid={!!errors.details?.email} required>
+                  <Field.Label>
+                    E-Mail
+                    <Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    type="email"
+                    {...register('details.email', {
+                      required: 'E-Mail ist erforderlich',
+                      pattern: { value: /^\S+@\S+$/, message: 'Bitte gültige E-Mail angeben' }
+                    })}
+                  />
+                  <Field.ErrorText>{errors.details?.email?.message}</Field.ErrorText>
+                </Field.Root>
+
+                <Field.Root invalid={!!errors.details?.phone} required>
+                  <Field.Label>
+                    Handynummer
+                    <Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    type="tel"
+                    placeholder="+43 ..."
+                    {...register('details.phone', {
+                      required: 'Handynummer ist erforderlich',
+                      minLength: { value: 6, message: 'Bitte gültige Nummer' }
+                    })}
+                  />
+                  <Field.ErrorText>{errors.details?.phone?.message}</Field.ErrorText>
+                </Field.Root>
+              </HStack>
+
+              {step === DriverStep.Details && (
+                <HStack justify="flex-end">
+                  <Button type="button" onClick={onNext}>
+                    Weiter
+                  </Button>
+                </HStack>
+              )}
             </Stack>
-            {/* ▲▲ */}
-            <FileField
-              control={control}
-              name="docs.criminalRecord"
-              label="Leumundszeugnis / Strafregisterauszug"
-              accept={ACCEPTED}
-              isRequired
-              error={errors.docs?.criminalRecord as any}
-            />
-            {step === DriverStep.RequiredDocs && (
+
+            {/* Step 2: Pflicht-Dokumente */}
+            <Stack display={step >= DriverStep.RequiredDocs ? 'flex' : 'none'} gap={4}>
+              <Heading size="sm">Pflicht-Dokumente</Heading>
+              <FileField
+                control={control}
+                name="docs.ecard"
+                label="E-Card"
+                accept={ACCEPTED}
+                isRequired
+                error={errors.docs?.ecard as any}
+              />
+              <FileField
+                control={control}
+                name="docs.registrationForm"
+                label="Meldezettel"
+                accept={ACCEPTED}
+                isRequired
+                error={errors.docs?.registrationForm as any}
+              />
+              {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
+              <Stack direction={{ base: 'column', md: 'row' }} gap={4}>
+                <FileField
+                  control={control}
+                  name="docs.drivingFront"
+                  label="Führerschein Vorderseite"
+                  accept={ACCEPTED}
+                  isRequired
+                  error={errors.docs?.drivingFront as any}
+                />
+                <FileField
+                  control={control}
+                  name="docs.drivingBack"
+                  label="Führerschein Rückseite"
+                  accept={ACCEPTED}
+                  isRequired
+                  error={errors.docs?.drivingBack as any}
+                />
+              </Stack>
+              {/* ▲▲ */}
+              <FileField
+                control={control}
+                name="docs.criminalRecord"
+                label="Leumundszeugnis / Strafregisterauszug"
+                accept={ACCEPTED}
+                isRequired
+                error={errors.docs?.criminalRecord as any}
+              />
+              {step === DriverStep.RequiredDocs && (
+                <HStack justify="space-between">
+                  <Button variant="ghost" onClick={onBack}>
+                    Zurück
+                  </Button>
+                  <Button type="button" onClick={onNext}>
+                    Weiter
+                  </Button>
+                </HStack>
+              )}
+            </Stack>
+
+            {/* Step 3: Optionale Dokumente */}
+            <Stack display={step >= DriverStep.OptionalDocs ? 'flex' : 'none'} gap={4}>
+              <Heading size="sm">Optionale Dokumente</Heading>
+              <FileField
+                control={control}
+                name="docs.idCard"
+                label="Personalausweis"
+                accept={ACCEPTED}
+                error={errors.docs?.idCard as any}
+              />
+              <FileField
+                control={control}
+                name="docs.residencePermit"
+                label="Aufenthaltstitel"
+                accept={ACCEPTED}
+                error={errors.docs?.residencePermit as any}
+              />
+              <FileField
+                control={control}
+                name="docs.passport"
+                label="Reisepass"
+                accept={ACCEPTED}
+                error={errors.docs?.passport as any}
+              />
+              {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
+              <Stack direction={{ base: 'column', md: 'row' }} gap={4}>
+                <FileField
+                  control={control}
+                  name="docs.taxiFront"
+                  label="Taxischein Vorderseite"
+                  accept={ACCEPTED}
+                  error={errors.docs?.taxiFront as any}
+                />
+                <FileField
+                  control={control}
+                  name="docs.taxiBack"
+                  label="Taxischein Rückseite"
+                  accept={ACCEPTED}
+                  error={errors.docs?.taxiBack as any}
+                />
+              </Stack>
+              {/* ▲▲ */}
+
+              {step === DriverStep.OptionalDocs && (
+                <HStack justify="space-between">
+                  <Button variant="ghost" onClick={onBack}>
+                    Zurück
+                  </Button>
+                  <Button type="button" onClick={onNext}>
+                    Weiter
+                  </Button>
+                </HStack>
+              )}
+            </Stack>
+
+            {/* Step 4: Bedingungen – hier wird direkt abgesendet */}
+            <Stack display={step >= DriverStep.Terms ? 'flex' : 'none'} gap={4}>
+              <Heading size="sm">Bedingungen</Heading>
+              <Field.Root invalid={!!errors.terms} required>
+                <Controller
+                  control={control}
+                  name="terms"
+                  rules={{ required: 'Bitte akzeptiere die Bedingungen' }}
+                  render={({ field }) => (
+                    // v3's Checkbox is a compound: the Root is the label element,
+                    // the real input moved into HiddenInput, and the box is drawn
+                    // by Control plus Indicator. Because the input is no longer
+                    // the thing receiving the event, the change handler is
+                    // onCheckedChange with a details object rather than onChange
+                    // with a DOM event.
+                    <Checkbox.Root
+                      checked={!!field.value}
+                      onCheckedChange={details => field.onChange(!!details.checked)}
+                    >
+                      <Checkbox.HiddenInput />
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                      <Checkbox.Label>
+                        Ich akzeptiere die AGB und die Verarbeitung meiner Daten gemäß Datenschutz.
+                      </Checkbox.Label>
+                    </Checkbox.Root>
+                  )}
+                />
+                <Field.ErrorText>{(errors.terms as any)?.message}</Field.ErrorText>
+              </Field.Root>
+
               <HStack justify="space-between">
                 <Button variant="ghost" onClick={onBack}>
                   Zurück
                 </Button>
-                <Button type="button" onClick={onNext}>
-                  Weiter
+                <Button type="submit" loading={isSubmitting} disabled={isSubmitted}>
+                  Registrierung absenden
                 </Button>
               </HStack>
-            )}
-          </Stack>
-
-          {/* Step 3: Optionale Dokumente */}
-          <Stack display={step >= DriverStep.OptionalDocs ? 'flex' : 'none'} spacing={4}>
-            <Heading size="sm">Optionale Dokumente</Heading>
-            <FileField
-              control={control}
-              name="docs.idCard"
-              label="Personalausweis"
-              accept={ACCEPTED}
-              error={errors.docs?.idCard as any}
-            />
-            <FileField
-              control={control}
-              name="docs.residencePermit"
-              label="Aufenthaltstitel"
-              accept={ACCEPTED}
-              error={errors.docs?.residencePermit as any}
-            />
-            <FileField
-              control={control}
-              name="docs.passport"
-              label="Reisepass"
-              accept={ACCEPTED}
-              error={errors.docs?.passport as any}
-            />
-            {/* ▼▼ Responsive: Vorder-/Rückseite untereinander auf Mobile */}
-            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-              <FileField
-                control={control}
-                name="docs.taxiFront"
-                label="Taxischein Vorderseite"
-                accept={ACCEPTED}
-                error={errors.docs?.taxiFront as any}
-              />
-              <FileField
-                control={control}
-                name="docs.taxiBack"
-                label="Taxischein Rückseite"
-                accept={ACCEPTED}
-                error={errors.docs?.taxiBack as any}
-              />
             </Stack>
-            {/* ▲▲ */}
-
-            {step === DriverStep.OptionalDocs && (
-              <HStack justify="space-between">
-                <Button variant="ghost" onClick={onBack}>
-                  Zurück
-                </Button>
-                <Button type="button" onClick={onNext}>
-                  Weiter
-                </Button>
-              </HStack>
-            )}
-          </Stack>
-
-          {/* Step 4: Bedingungen – hier wird direkt abgesendet */}
-          <Stack display={step >= DriverStep.Terms ? 'flex' : 'none'} spacing={4}>
-            <Heading size="sm">Bedingungen</Heading>
-            <FormControl isInvalid={!!errors.terms} isRequired>
-              <Controller
-                control={control}
-                name="terms"
-                rules={{ required: 'Bitte akzeptiere die Bedingungen' }}
-                render={({ field }) => (
-                  <Checkbox
-                    isChecked={!!field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  >
-                    Ich akzeptiere die AGB und die Verarbeitung meiner Daten gemäß Datenschutz.
-                  </Checkbox>
-                )}
-              />
-              <FormErrorMessage>{(errors.terms as any)?.message}</FormErrorMessage>
-            </FormControl>
-
-            <HStack justify="space-between">
-              <Button variant="ghost" onClick={onBack}>
-                Zurück
-              </Button>
-              <Button type="submit" isLoading={isSubmitting} isDisabled={isSubmitted}>
-                Registrierung absenden
-              </Button>
-            </HStack>
-          </Stack>
+          </form>
         </Stack>
       )}
     </Stack>
@@ -586,14 +617,17 @@ const FileField: React.FC<FileFieldProps> = ({ control, name, label, accept, isR
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <FormControl isInvalid={!!error} isRequired={isRequired}>
-      <FormLabel>{label}</FormLabel>
+    <Field.Root invalid={!!error} required={isRequired}>
+      <Field.Label>
+        {label}
+        <Field.RequiredIndicator />
+      </Field.Label>
       <Controller
         control={control}
         name={name}
         rules={isRequired ? { required: 'Bitte Datei hochladen' } : undefined}
         render={({ field: { onChange, value } }) => (
-          <HStack align="center" spacing={3}>
+          <HStack align="center" gap={3}>
             <VisuallyHidden>
               <input
                 ref={inputRef}
@@ -603,15 +637,12 @@ const FileField: React.FC<FileFieldProps> = ({ control, name, label, accept, isR
               />
             </VisuallyHidden>
 
-            <Button
-              leftIcon={<FiUpload />}
-              onClick={() => inputRef.current?.click()}
-              variant="outline"
-            >
+            <Button onClick={() => inputRef.current?.click()} variant="outline">
+              <FiUpload />
               Datei wählen
             </Button>
 
-            <Text flex="1" noOfLines={1}>
+            <Text flex="1" lineClamp={1}>
               {value ? (
                 <>
                   <Badge mr={2}>gewählt</Badge>
@@ -625,21 +656,23 @@ const FileField: React.FC<FileFieldProps> = ({ control, name, label, accept, isR
             </Text>
 
             {value && (
+              // v3's IconButton has no `icon` prop, the icon is the child.
               <IconButton
                 aria-label="Auswahl entfernen"
-                icon={<FiTrash2 />}
                 variant="ghost"
                 onClick={() => {
                   if (inputRef.current) inputRef.current.value = '';
                   onChange(null);
                 }}
-              />
+              >
+                <FiTrash2 />
+              </IconButton>
             )}
           </HStack>
         )}
       />
-      <FormErrorMessage>{error?.message}</FormErrorMessage>
-    </FormControl>
+      <Field.ErrorText>{error?.message}</Field.ErrorText>
+    </Field.Root>
   );
 };
 

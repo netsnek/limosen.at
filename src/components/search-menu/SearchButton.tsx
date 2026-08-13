@@ -1,7 +1,7 @@
 import { withRedux } from 'jaen';
 import { Button, ButtonProps, Kbd } from '@chakra-ui/react';
 import { FC } from 'react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { SearchIcon } from '../../components/icons/chakra';
 
 interface ISearchButtonProps extends ButtonProps {
   openModal: () => void;
@@ -88,7 +88,9 @@ const SearchButton: FC<ISearchButtonProps> = withRedux(
         {/* Type{' '} */}
         <Kbd
           borderBottomWidth={1}
-          borderRadius={4}
+          // 4px, not 4. The radii scale has no numeric keys, so v2 appended
+          // the unit and v3 emits `border-radius: 4`, which the parser drops.
+          borderRadius="4px"
           py={0.5}
           mr={2}
           //bgColor={'transparent'}

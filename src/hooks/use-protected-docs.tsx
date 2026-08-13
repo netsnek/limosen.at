@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { navigate } from 'gatsby'
-import { useAuth /*, checkUserRoles*/ } from 'jaen'
-import { useToast, Spinner, Center } from '@chakra-ui/react'
+import { useAuth, useNotificationsContext /*, checkUserRoles*/ } from 'jaen'
 
 /**
  * Protect /docs/magisterarbeit/* for authenticated users only.
@@ -9,7 +8,10 @@ import { useToast, Spinner, Center } from '@chakra-ui/react'
  */
 export const useProtectedDocs = () => {
   const auth = useAuth()
-  const toast = useToast()
+  // v3 dropped useToast for a store whose create() reads `type`, not `status`.
+  // jaen's notifications context wraps that store back up in v2's option shape,
+  // so the call below keeps the placement, timing and close button it had.
+  const { toast } = useNotificationsContext()
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {

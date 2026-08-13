@@ -2,7 +2,6 @@ import {
   Box,
   Center,
   Container,
-  Divider,
   Flex,
   HStack,
   Icon,
@@ -12,11 +11,11 @@ import {
   Spacer,
   Text,
   VStack,
-  useColorModeValue
+  Separator
 } from '@chakra-ui/react';
 import { FC, ReactNode } from 'react';
 import { Link } from 'gatsby-plugin-jaen';
-import { Field } from 'jaen';
+import { Field, useColorModeValue } from 'jaen';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { FaInstagram } from '@react-icons/all-files/fa/FaInstagram';
@@ -203,55 +202,67 @@ const Footer: FC = () => {
             color={'white'}
             mt={20}
             mb={4}
-            as={LinkBox}
-            spacing="4"
-            flexWrap={'wrap'}>
-            <LinkBox
-              mr="4"
-              display="flex"
-              transition="color 0.2s"
-              _hover={{
-                color: 'brand.500'
-              }}>
-              <LinkOverlay href="https://www.facebook.com/profile.php?id=61552973278627" isExternal>
-                <Icon as={FaFacebook} boxSize="5" />
-              </LinkOverlay>
+            gap="4"
+            flexWrap={'wrap'}
+            asChild>
+            <LinkBox>
+              <LinkBox
+                mr="4"
+                display="flex"
+                transition="color 0.2s"
+                _hover={{
+                  color: 'brand.500'
+                }}>
+                <LinkOverlay
+                  href="https://www.facebook.com/profile.php?id=61552973278627"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  <Icon boxSize="5" asChild>
+                    <FaFacebook />
+                  </Icon>
+                </LinkOverlay>
+              </LinkBox>
+              <LinkBox
+                mr="4"
+                display="flex"
+                transition="color 0.2s"
+                _hover={{
+                  color: 'brand.500'
+                }}>
+                <LinkOverlay
+                  href="https://instagram.com/barbara.mauz"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  <Icon boxSize="5" asChild>
+                    <FaInstagram />
+                  </Icon>
+                </LinkOverlay>
+              </LinkBox>
+              {/* <LinkBox
+                mr="4"
+                display="flex"
+                transition="color 0.2s"
+                _hover={{
+                  color: 'brand.500'
+                }}>
+                <LinkOverlay href="https://twitter.com" isExternal>
+                  <Icon as={FaTwitter} boxSize="5" />
+                </LinkOverlay>
+              </LinkBox>
+              <LinkBox
+                mr="4"
+                display="flex"
+                transition="color 0.2s"
+                _hover={{
+                  color: 'brand.500'
+                }}>
+                <LinkOverlay href="https://github.com" isExternal>
+                  <Icon as={FaGithub} boxSize="5" />
+                </LinkOverlay>
+              </LinkBox> */}
             </LinkBox>
-            <LinkBox
-              mr="4"
-              display="flex"
-              transition="color 0.2s"
-              _hover={{
-                color: 'brand.500'
-              }}>
-              <LinkOverlay href="https://instagram.com/barbara.mauz" isExternal>
-                <Icon as={FaInstagram} boxSize="5" />
-              </LinkOverlay>
-            </LinkBox>
-            {/* <LinkBox
-              mr="4"
-              display="flex"
-              transition="color 0.2s"
-              _hover={{
-                color: 'brand.500'
-              }}>
-              <LinkOverlay href="https://twitter.com" isExternal>
-                <Icon as={FaTwitter} boxSize="5" />
-              </LinkOverlay>
-            </LinkBox>
-            <LinkBox
-              mr="4"
-              display="flex"
-              transition="color 0.2s"
-              _hover={{
-                color: 'brand.500'
-              }}>
-              <LinkOverlay href="https://github.com" isExternal>
-                <Icon as={FaGithub} boxSize="5" />
-              </LinkOverlay>
-            </LinkBox> */}
           </HStack>
-          <Divider mt={0} opacity={0.2} border="1px" />
+          <Separator mt={0} opacity={0.2} border="1px" />
           <Field.Text
             name="FooterBottomText"
             defaultValue="Copyright © 2023 Florian H. Kleber, Florian Herbert Kleber IT. All rights reserved."

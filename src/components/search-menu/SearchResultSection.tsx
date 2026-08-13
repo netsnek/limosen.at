@@ -1,16 +1,13 @@
 import {
   HeadingProps,
   Heading,
-  MenuGroup,
-  MenuDivider,
   HStack,
   Box,
-  Divider,
+  Separator,
   Icon,
   VStack,
-  UnorderedList,
-  ListItem,
-  Stack
+  Stack,
+  List
 } from '@chakra-ui/react';
 import { FC, ReactNode } from 'react';
 import SearchResultItem from './SearchResultItem';
@@ -32,7 +29,13 @@ export const SearchResultSectionTitle: FC<
   const heading = (
     <Heading
       key={-1}
-      fontSize="12px"
+      // size, not fontSize: see `siteHeadingSizes` in styles/theme/recipes.
+      // It stays ahead of the `{...props}` spread, and a caller's fontSize now
+      // wins at every width instead of only below 768px, because the selected
+      // size emits no media rule for font-size.
+      // Cast because nothing runs `chakra typegen` here, so the prop still
+      // advertises v3's built-in union rather than the site recipe's names.
+      size={'menu-group' as HeadingProps['size']}
       {...(!icon && {
         mb: 2,
         mt: idx === 0 ? 2 : 5
@@ -49,7 +52,9 @@ export const SearchResultSectionTitle: FC<
       <HStack
         mb={2}
         mt={idx === 0 ? 2 : 5}
-        __css={{
+        css={{
+          // One ampersand: emotion expands each `&` to this element's own
+          // class, so `& & svg` was `.css-x .css-x svg` and never matched.
           '& svg': {
             stroke: props.color ?? 'components.menu.groupTitle.color'
           }
@@ -89,14 +94,14 @@ export const SearchResultSection: FC<{
   };
 
   return (
-    <Stack key={idx} w="full" spacing="1">
+    <Stack key={idx} w="full" gap="1">
       {isDocs && (
         <SearchResultItem
           item={{
             title: section.title,
             to: section.results?.[0]?.to
               ? pageToWithoutHash(section.results?.[0]?.to)
-              : section.to ?? '',
+              : (section.to ?? ''),
             description: ''
           }}
           query={query}
@@ -105,9 +110,9 @@ export const SearchResultSection: FC<{
         />
       )}
       {/* <SearchResultSectionTitle title={section.title} idx={idx} icon={icon} /> */}
-      {/* <Divider /> */}
-      <UnorderedList listStyleType="none" ml={isDocs ? 4 : 0}>
-        <ListItem>
+      {/* <Separator /> */}
+      <List.Root as="ul" listStyleType="none" ml={isDocs ? 4 : 0}>
+        <List.Item>
           {section.results.map((result, i) => (
             <SearchResultItem
               item={result}
@@ -120,8 +125,8 @@ export const SearchResultSection: FC<{
               isDocs={isDocs}
             />
           ))}
-        </ListItem>
-      </UnorderedList>
+        </List.Item>
+      </List.Root>
     </Stack>
   );
 };

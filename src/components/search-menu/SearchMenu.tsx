@@ -1,13 +1,12 @@
 import {
   Center,
-  Divider,
-  ThemeProvider,
   VStack,
   useDisclosure,
   Text,
   Box,
   BoxProps,
-  ButtonProps
+  ButtonProps,
+  Separator
 } from '@chakra-ui/react';
 import {
   FC,
@@ -27,7 +26,6 @@ import {
   searchUser
 } from '../../utils/search';
 import useSearch from '../../hooks/use-search';
-import theme from '../../styles/theme/theme';
 import {
   SearchResultSection,
   SearchResultSectionTitle
@@ -269,7 +267,12 @@ const SearchMenu: FC<SearchMenuProps> = ({ ...props }) => {
     return data.map((chapter, cidx) => {
       return (
         <Fragment key={cidx}>
-          {cidx > 0 && <Divider />}
+          {/* v2's bare <Divider/> took two things from its baseStyle that v3's
+              Separator recipe does not have: `opacity: 0.6` and `borderColor:
+              inherit`. v3 paints the line in `colors.border` at full strength
+              instead, which is a lighter grey than the text colour this line
+              used to inherit. */}
+          {cidx > 0 && <Separator opacity={0.6} borderColor="inherit" />}
           <SearchResultSectionTitle
             title={chapter.title}
             idx={itemIdx * -1}
@@ -281,7 +284,7 @@ const SearchMenu: FC<SearchMenuProps> = ({ ...props }) => {
             icon={chapter.icon}
           />
           <VStack
-            spacing={1}
+            gap={1}
             w="full"
             textAlign="left"
             _last={{
@@ -300,7 +303,8 @@ const SearchMenu: FC<SearchMenuProps> = ({ ...props }) => {
                   key={sidx}
                   defaultHighlight={itemIdx === 0}
                   icon={chapter.icon}
-                  isDocs={ true
+                  isDocs={
+                    true
                     // !!section.to?.startsWith('/docs/') ||
                     // !!section.results[0]?.to?.startsWith('/docs/')
                   }
@@ -318,11 +322,23 @@ const SearchMenu: FC<SearchMenuProps> = ({ ...props }) => {
   }, [data, navigateIdx]);
 
   return (
-    <ThemeProvider theme={theme}>
+    /**
+     * No provider of its own. It used to carry the v2 theme so that the CMS
+     * routes, where Layout mounts no site theme, would still resolve the
+     * site's tokens.
+     *
+     * In v3 a provider is also the global-style emitter, so every extra
+     * provider re-emits the whole token block. SearchMenu mounts more than
+     * once per page (TopNav twice, MobileNavDrawer), and all of those sit
+     * inside Layout's provider already. Only the CMS path needs one of its
+     * own, so the provider moved to the Toolbar shadow, which is the single
+     * mount that renders inside jaen's frame.
+     */
+    <>
       <SearchButton openModal={onOpen} navigate={handleNavigate} {...props} />
       <SearchModal
         defaultQuery={searchQuery}
-        isOpen={modalDisclosure.isOpen}
+        isOpen={modalDisclosure.open}
         onClose={modalDisclosure.onClose}
         isLoading={search.isLoading}
         searchResultItems={results}
@@ -330,7 +346,7 @@ const SearchMenu: FC<SearchMenuProps> = ({ ...props }) => {
         handleNavigate={handleNavigate}
         openActiveItem={handleOpenActiveItem}
       />
-    </ThemeProvider>
+    </>
   );
 };
 

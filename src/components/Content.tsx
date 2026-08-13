@@ -1,16 +1,21 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  FC,
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import {
   Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   AspectRatio,
   Box,
   BoxProps,
   Button,
+  ButtonProps,
   Container,
-  Divider,
+  Separator,
   Flex,
   Grid,
   Heading,
@@ -20,8 +25,6 @@ import {
   Image,
   LinkBox,
   LinkOverlay,
-  List,
-  ListItem,
   SimpleGrid,
   Stack,
   Text,
@@ -30,28 +33,23 @@ import {
   VStack,
   Wrap,
   WrapItem,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
+  Dialog,
+  Portal,
   chakra,
   useBreakpointValue
 } from '@chakra-ui/react';
 import { Field, useAuth } from 'jaen';
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import {
-  FaEnvelopeOpen,
-  FaEnvelopeOpenText,
-  FaFacebookF,
-  FaInstagram,
-  FaPhone,
-  FaSuitcaseRolling,
-  FaTwitter,
-  FaUser,
-  FaWhatsapp
-} from 'react-icons/fa';
+import { ChevronDownIcon } from './icons/chakra';
+import { DialogCloseButton } from './DialogCloseButton';
+import {FaEnvelopeOpen} from '@react-icons/all-files/fa/FaEnvelopeOpen';
+import {FaEnvelopeOpenText} from '@react-icons/all-files/fa/FaEnvelopeOpenText';
+import {FaFacebookF} from '@react-icons/all-files/fa/FaFacebookF';
+import {FaInstagram} from '@react-icons/all-files/fa/FaInstagram';
+import {FaPhone} from '@react-icons/all-files/fa/FaPhone';
+import {FaSuitcaseRolling} from '@react-icons/all-files/fa/FaSuitcaseRolling';
+import {FaTwitter} from '@react-icons/all-files/fa/FaTwitter';
+import {FaUser} from '@react-icons/all-files/fa/FaUser';
+import {FaWhatsapp} from '@react-icons/all-files/fa/FaWhatsapp';
 import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
 import { graphql, useStaticQuery } from 'gatsby';
 import Marquee from 'react-fast-marquee';
@@ -103,7 +101,7 @@ const HamburgerMenuIcon: FC<IHamburgerMenuIconProps> = ({
   iconProps
 }) => {
   const props = {
-    __css: {
+    css: {
       '&.open': {
         '& > div:nth-of-type(1)': { top: '50%', transform: 'rotate(45deg)' },
         '& > div:nth-of-type(2)': { opacity: 0 },
@@ -113,7 +111,7 @@ const HamburgerMenuIcon: FC<IHamburgerMenuIconProps> = ({
         transition:
           'transform 0.2s cubic-bezier(0.68, 0, 0.27, 1), opacity 0.2s cubic-bezier(0.68, 0, 0.27, 1), top 0.2s cubic-bezier(0.68, 0, 0.27, 1), background-color 0.2s cubic-bezier(0.68, 0, 0.27, 1)'
       },
-      ...wrapperProps?.__css
+      ...wrapperProps?.css
     },
     ...wrapperProps
   };
@@ -122,7 +120,10 @@ const HamburgerMenuIcon: FC<IHamburgerMenuIconProps> = ({
       position="relative"
       rounded="full"
       boxSize="100%"
-      onClick={handleClick}
+      // handleClick is declared as (isOpen: boolean) but has always been wired
+      // straight to onClick, so it receives the click event, never a flag. The
+      // callers ignore the argument; unwinding that is a behaviour change.
+      onClick={handleClick as unknown as MouseEventHandler<HTMLDivElement>}
       {...props}
     >
       <Box
@@ -373,7 +374,7 @@ const ClientsMarquee: FC<ClientsMarqueeProps> = ({ ...props }) => {
       borderColor="limosen.border.faint"
       py={{ base: 4, md: 6 }}
       dir="ltr"
-      sx={{
+      css={{
         '&, & *': { direction: 'ltr !important' }
       }}
       {...props}
@@ -394,7 +395,7 @@ const ClientsMarquee: FC<ClientsMarqueeProps> = ({ ...props }) => {
                 alignItems="center"
                 justifyContent="center"
                 px="16px"
-                sx={{
+                css={{
                   '& img, .gatsby-image-wrapper, .gatsby-image-wrapper img': {
                     width: '100% !important',
                     height: '100% !important',
@@ -407,7 +408,14 @@ const ClientsMarquee: FC<ClientsMarqueeProps> = ({ ...props }) => {
                   }
                 }}
               >
-                <LinkOverlay href={client.href} isExternal aria-label={client.name}>
+                {/* v2's `isExternal`, spelled out: v3's Link dropped the prop
+                    and keeps only the two attributes it used to set. */}
+                <LinkOverlay
+                  href={client.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={client.name}
+                >
                   <AspectRatio
                     ratio={ratio}
                     h={`${heightPx}px`}
@@ -529,14 +537,14 @@ export function HeaderBar() {
           justify="space-between"
           gap={{ base: 2, md: 4 }}
         >
-          <HStack spacing={3} className="header-bar__item">
+          <HStack gap={3} className="header-bar__item">
             <Icon as={FaEnvelopeOpenText} color="limosen.accent" />
             <Link href={`mailto:${CONTACT_EMAIL}`} color="limosen.text.primary">
               {CONTACT_EMAIL}
             </Link>
           </HStack>
 
-          <HStack spacing={3} className="header-bar__item">
+          <HStack gap={3} className="header-bar__item">
             <Icon as={FaWhatsapp} color="limosen.accent" />
             <Link
               href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(
@@ -548,25 +556,37 @@ export function HeaderBar() {
             </Link>
           </HStack>
 
-          <HStack spacing={3} ml={{ base: 0, md: 'auto' }}>
+          <HStack gap={3} ml={{ base: 0, md: 'auto' }}>
             {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
               <IconButton
                 key={label}
                 as={Link}
                 href={href}
                 aria-label={label}
-                icon={<IconComponent />}
-                isRound
+                // v3's IconButton takes the glyph as a child; `icon` is gone.
+                // `isRound` went with it, and it only ever set radii.full.
+                borderRadius="full"
                 size="sm"
                 variant="ghost"
-                isExternal
+                // v2's `isExternal`. This Link is reached with `href` rather
+                // than `to`, so it never took jaen's external branch either and
+                // the two attributes have to be spelled out here.
+                target="_blank"
+                rel="noopener noreferrer"
                 color="limosen.text.primary"
                 _hover={{ bg: 'whiteAlpha.200', color: 'limosen.accent' }}
-              />
+              >
+                <IconComponent />
+              </IconButton>
             ))}
             <Button
               size={'xs'}
-              variant="limosen"
+              // limosen is one of the site's own button variants
+              // (styles/theme). The prop only admits v3's built-in names
+              // because the site does not run `chakra typegen`, so the recipe's
+              // own names have to be asserted through. Same at every other
+              // variant={'limosen'} below.
+              variant={'limosen' as ButtonProps['variant']}
               onClick={() => void signinRedirect()}
             >
               Login
@@ -579,7 +599,7 @@ export function HeaderBar() {
 }
 
 export function TopNavigation({ path }: { path?: string }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { open, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
   const { signinRedirect } = useAuth();
   const intl = useIntl();
@@ -633,7 +653,7 @@ export function TopNavigation({ path }: { path?: string }) {
     onClose();
   }, [onClose]);
   const toggleMenu = () => {
-    if (isOpen) {
+    if (open) {
       closeMenu();
     } else {
       setMenuActive(true);
@@ -641,8 +661,8 @@ export function TopNavigation({ path }: { path?: string }) {
     }
   };
   const handleNavLinkClick = useCallback(() => {
-    if (isOpen) closeMenu();
-  }, [isOpen, closeMenu]);
+    if (open) closeMenu();
+  }, [open, closeMenu]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -698,8 +718,8 @@ export function TopNavigation({ path }: { path?: string }) {
       pos="relative"
       overflow="hidden"
       backgroundColor="limosen.bg.navTop"
-      height={isOpen ? 'calc(100vh + 15px)' : { base: '12vh', md: '15vh' }}
-      minH={isOpen ? '600px' : '100px'}
+      height={open ? 'calc(100vh + 15px)' : { base: '12vh', md: '15vh' }}
+      minH={open ? '600px' : '100px'}
       transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
       dir={isRtl ? 'rtl' : 'ltr'}
       lang={intl.locale}
@@ -709,8 +729,8 @@ export function TopNavigation({ path }: { path?: string }) {
         bg="limosen.bg.navTop"
         color="limosen.text.primary"
         transition="height 0.2s cubic-bezier(0.68, 0, 0.27, 1), min-height 0.2s cubic-bezier(0.68, 0, 0.27, 1)"
-        height={isOpen ? 'max(600px, calc(100vh + 15px))' : '0'}
-        minH={isOpen ? 'fit-content' : '0'}
+        height={open ? 'max(600px, calc(100vh + 15px))' : '0'}
+        minH={open ? 'fit-content' : '0'}
         width="100%"
         overflow="hidden"
       >
@@ -827,7 +847,7 @@ export function TopNavigation({ path }: { path?: string }) {
                 </Text>
                 <VStack
                   align="flex-start"
-                  spacing={2}
+                  gap={2}
                   color="limosen.text.secondary"
                   fontSize="md"
                 >
@@ -882,7 +902,7 @@ export function TopNavigation({ path }: { path?: string }) {
                 </Text>
                 <VStack
                   align="flex-start"
-                  spacing={2}
+                  gap={2}
                   color="limosen.text.secondary"
                   fontSize="md"
                 >
@@ -905,7 +925,7 @@ export function TopNavigation({ path }: { path?: string }) {
               </Box>
 
               <Box gridColumn="2" gridRow="1" pr="32px">
-                <VStack spacing={3} align="flex-start" minW="auto">
+                <VStack gap={3} align="flex-start" minW="auto">
                   <Text
                     color="limosen.text.primary"
                     fontWeight="bold"
@@ -916,7 +936,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   </Text>
                   <Button
                     size="sm"
-                    variant="limosen"
+                    variant={'limosen' as ButtonProps['variant']}
                     onClick={() => void signinRedirect()}
                   >
                     Login
@@ -933,12 +953,16 @@ export function TopNavigation({ path }: { path?: string }) {
                 >
                   {intl.formatMessage({ id: 'TopNavFollowUs' })}
                 </Text>
-                <HStack spacing={6}>
+                <HStack gap={6}>
                   {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                     <Link
                       key={label}
                       href={href}
-                      isExternal
+                      // v2's `isExternal`. jaen's Link only takes its external
+                      // branch for `to`, so an `href` link needs the two
+                      // attributes the prop used to set.
+                      target="_blank"
+                      rel="noopener noreferrer"
                       color="limosen.text.primary"
                       transition="color 0.2s"
                       _hover={{ color: 'limosen.accent' }}
@@ -953,7 +977,7 @@ export function TopNavigation({ path }: { path?: string }) {
 
               {/* LANGUAGE (mobile) */}
               <Box gridColumn="2" gridRow="2" pr="32px">
-                <VStack spacing={3} align="flex-start" minW="auto">
+                <VStack gap={3} align="flex-start" minW="auto">
                   <Text
                     color="limosen.text.primary"
                     fontWeight="bold"
@@ -962,15 +986,18 @@ export function TopNavigation({ path }: { path?: string }) {
                   >
                     {labelLanguage}
                   </Text>
+                  {/* v2's `rightIcon` is gone: the glyph is a trailing child
+                      now. The 0.5rem it used to get from iconSpacing is what
+                      size md's own gap already is, so nothing has to be
+                      pinned. */}
                   <Button
                     variant="ghost"
                     color="limosen.text.primary"
                     px={2}
-                    rightIcon={<ChevronDownIcon color="limosen.text.primary" />}
                     _hover={{ bg: 'whiteAlpha.200' }}
                     onClick={langModal.onOpen}
                   >
-                    <HStack spacing={2}>
+                    <HStack gap={2}>
                       <Image
                         src={currentFlag}
                         alt={labelLanguage}
@@ -982,6 +1009,7 @@ export function TopNavigation({ path }: { path?: string }) {
                         {languageCodeDisplay}
                       </Text>
                     </HStack>
+                    <ChevronDownIcon color="limosen.text.primary" />
                   </Button>
                 </VStack>
               </Box>
@@ -1003,12 +1031,16 @@ export function TopNavigation({ path }: { path?: string }) {
                 >
                   {labelFollowUs}
                 </Text>
-                <HStack spacing={6}>
+                <HStack gap={6}>
                   {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                     <Link
                       key={label}
                       href={href}
-                      isExternal
+                      // v2's `isExternal`. jaen's Link only takes its external
+                      // branch for `to`, so an `href` link needs the two
+                      // attributes the prop used to set.
+                      target="_blank"
+                      rel="noopener noreferrer"
                       color="limosen.text.primary"
                       transition="color 0.2s"
                       _hover={{ color: 'limosen.accent' }}
@@ -1063,7 +1095,7 @@ export function TopNavigation({ path }: { path?: string }) {
                     fontSize="sm"
                     fontWeight="semibold"
                     color="limosen.text.primary"
-                    sx={{
+                    css={{
                       textDecoration: isActive ? 'underline' : 'none',
                       textUnderlineOffset: '4px',
                       textDecorationThickness: '2px'
@@ -1078,36 +1110,57 @@ export function TopNavigation({ path }: { path?: string }) {
             </Flex>
 
             {/* Language button opens modal */}
+            {/* v2's `rightIcon` is gone: the glyph is a trailing child now,
+                and size md's own gap is the 0.5rem iconSpacing used to add. */}
             <Button
               variant="ghost"
               color="limosen.text.primary"
               px={2}
-              rightIcon={<ChevronDownIcon color="limosen.text.primary" />}
               _hover={{ bg: 'whiteAlpha.200' }}
               onClick={langModal.onOpen}
               display={{ base: 'none', md: 'inline-flex' }}
             >
-              <HStack spacing={2}>
-                <Tooltip label={labelLanguage} hasArrow>
-                  <Image
-                    src={currentFlag}
-                    alt={labelLanguage}
-                    width="24px"
-                    height="24px"
-                    objectFit="cover"
-                    display={{ base: 'none', sm: 'block' }}
-                  />
-                </Tooltip>
+              <HStack gap={2}>
+                {/*
+                  v2's single <Tooltip label hasArrow> is four parts in v3, and
+                  the trigger takes the flag through asChild so the element on
+                  the page stays the same <img>. The delays are pinned because
+                  v3 waits 400ms before showing and 150ms before hiding, where
+                  v2's tooltip did both immediately.
+                */}
+                <Tooltip.Root openDelay={0} closeDelay={0}>
+                  <Tooltip.Trigger asChild>
+                    <Image
+                      src={currentFlag}
+                      alt={labelLanguage}
+                      width="24px"
+                      height="24px"
+                      objectFit="cover"
+                      display={{ base: 'none', sm: 'block' }}
+                    />
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content>
+                        <Tooltip.Arrow>
+                          <Tooltip.ArrowTip />
+                        </Tooltip.Arrow>
+                        {labelLanguage}
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
                 <Text fontWeight="semibold" color="limosen.text.primary">
                   {languageCodeDisplay}
                 </Text>
               </HStack>
+              <ChevronDownIcon color="limosen.text.primary" />
             </Button>
 
             {/* Booking (hide on mobile; unchanged on desktop) */}
             <Button
               size="sm"
-              variant="limosen"
+              variant={'limosen' as ButtonProps['variant']}
               onClick={handleOnBookingClick}
               display={{ base: 'none', md: 'inline-flex' }}
             >
@@ -1115,49 +1168,79 @@ export function TopNavigation({ path }: { path?: string }) {
             </Button>
 
             {/* Mobile menu */}
+            {/* v3's IconButton takes the glyph as a child; `icon` is gone. */}
             <IconButton
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              icon={
-                <HamburgerMenuIcon
-                  handleClick={toggleMenu}
-                  wrapperProps={{ className: menuActive ? 'open' : '' }}
-                  iconProps={{ backgroundColor: 'limosen.text.primary' }}
-                />
-              }
+              aria-label={open ? 'Close menu' : 'Open menu'}
               variant="ghost"
               onClick={toggleMenu}
               display={{ base: 'flex', lg: 'none' }}
               _hover={{ bg: 'limosen.border.subtle' }}
-            />
+            >
+              <HamburgerMenuIcon
+                handleClick={toggleMenu}
+                wrapperProps={{ className: menuActive ? 'open' : '' }}
+                iconProps={{ backgroundColor: 'limosen.text.primary' }}
+              />
+            </IconButton>
           </Flex>
         </Flex>
       </Container>
 
       {/* Language Modal */}
-      <Modal isOpen={langModal.isOpen} onClose={langModal.onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent bg="limosen.bg.surface" color="limosen.text.primary">
-          <ModalHeader>{intl.formatMessage({ id: 'LangModalTitle' })}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <ChakraLanguageSwitcher
-              onSelect={langModal.onClose}
-              buttonProps={{
-                justifyContent: 'flex-start',
-                variant: 'ghost',
-                color: 'limosen.text.primary',
-                _hover: { bg: 'whiteAlpha.200' }
-              }}
-              flags={{
-                'de-AT': FLAG_DE,
-                'en-US': FLAG_EN,
-                'tr-TR': FLAG_TR,
-                'ar-EG': FLAG_AR
-              }}
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      {/*
+        v2's Modal is v3's Dialog: `isOpen` -> `open`, `isCentered` ->
+        `placement="center"`, and `onClose` arrives as an open-change event
+        rather than a callback of its own. Overlay, positioner and content also
+        have to be portalled by hand, which v2's Modal did internally.
+      */}
+      <Dialog.Root
+        open={langModal.open}
+        placement="center"
+        // v2's modal sizes each sit one step below v3's dialog sizes on the
+        // sizes scale: this had v2's default size md, which was maxW 28rem,
+        // and v3's md is 32rem. `size="sm"` is the one that resolves to 28rem.
+        size="sm"
+        onOpenChange={e => {
+          if (!e.open) {
+            langModal.onClose();
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content bg="limosen.bg.surface" color="limosen.text.primary">
+              {/* v3's dialog recipe gives the content textStyle sm and leaves
+                  the header unsized, where v2's ModalHeader carried fontSize xl
+                  and semibold of its own. Both are restated so the title keeps
+                  the size it had. */}
+              <Dialog.Header fontSize="xl" fontWeight="semibold" px={6} py={4}>
+                {intl.formatMessage({ id: 'LangModalTitle' })}
+              </Dialog.Header>
+              {/* Was <ModalCloseButton/>. A childless Dialog.CloseTrigger draws
+                  no X at all, see DialogCloseButton. */}
+              <DialogCloseButton />
+              <Dialog.Body pb={6}>
+                <ChakraLanguageSwitcher
+                  onSelect={langModal.onClose}
+                  buttonProps={{
+                    justifyContent: 'flex-start',
+                    variant: 'ghost',
+                    color: 'limosen.text.primary',
+                    _hover: { bg: 'whiteAlpha.200' }
+                  }}
+                  flags={{
+                    'de-AT': FLAG_DE,
+                    'en-US': FLAG_EN,
+                    'tr-TR': FLAG_TR,
+                    'ar-EG': FLAG_AR
+                  }}
+                />
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </Box>
   );
 }
@@ -1244,7 +1327,7 @@ function HeroSection({
         pointerEvents="none"
       >
         <Button
-          variant="limosen"
+          variant={'limosen' as ButtonProps['variant']}
           size="md"
           onClick={handleOnBookingClick}
           pointerEvents="auto"
@@ -1273,7 +1356,7 @@ function AboutSection() {
           gap={{ base: 8, md: 12 }}
           align="stretch"
         >
-          <VStack align="flex-start" spacing={6} flex="1" className="about-text">
+          <VStack align="flex-start" gap={6} flex="1" className="about-text">
             <Heading
               size="lg"
               className="about-text__title"
@@ -1287,7 +1370,7 @@ function AboutSection() {
             </Heading>
 
             <Stack
-              spacing={4}
+              gap={4}
               fontSize="lg"
               className="about-description"
               color="limosen.text.secondary"
@@ -1370,8 +1453,8 @@ function ServicesSection() {
       id="services"
     >
       <Container maxW="6xl">
-        <VStack spacing={{ base: 12, md: 16 }} align="stretch">
-          <VStack spacing={3} textAlign="center">
+        <VStack gap={{ base: 12, md: 16 }} align="stretch">
+          <VStack gap={3} textAlign="center">
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
@@ -1386,14 +1469,18 @@ function ServicesSection() {
                 defaultValue={intl.formatMessage({ id: 'ServicesSubtitle' })}
               />
             </Text>
-            <Divider
+            <Separator
               w={{ base: '80px', md: '120px' }}
               borderColor="limosen.border.subtle"
+              // v2's Divider baseStyle carried `opacity: 0.6` and v3's
+              // Separator recipe has none, so every one of these lines came out
+              // two thirds brighter than the line it replaced.
+              opacity={0.6}
             />
           </VStack>
 
           {/* Services Overview Cards */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 6, md: 8 }}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={{ base: 6, md: 8 }}>
             {services.map(service => {
               const targetHref = `#${service.id}`;
               const imageFieldName = `service-${service.id}-image`;
@@ -1432,11 +1519,11 @@ function ServicesSection() {
                       display="block"
                       onClick={e => handleServiceLinkClick(e, targetHref)}
                     >
-                      <Stack spacing={3}>
+                      <Stack gap={3}>
                         <Heading size="sm" color="limosen.text.primary">
                           {service.title}
                         </Heading>
-                        <Text color="limosen.text.secondary" fontSize="sm" noOfLines={3}>
+                        <Text color="limosen.text.secondary" fontSize="sm" lineClamp={3}>
                           <Field.Text
                             as={chakra.span}
                             name={textFieldName}
@@ -1464,22 +1551,43 @@ function ServicesSection() {
               />
             </Heading>
 
-            <Accordion
-              allowMultiple
-              reduceMotion
-              index={expandedIndices}
-              onChange={handleAccordionChange}
+            {/*
+              v2 drove this accordion by numeric `index`/`onChange`. v3 drives
+              it by item value, so the same indices travel as strings and are
+              turned back into numbers on the way out. The hook keeps its
+              numeric state because the hash navigation looks services up by
+              position.
+            */}
+            <Accordion.Root
+              multiple
+              value={expandedIndices.map(String)}
+              onValueChange={e => handleAccordionChange(e.value.map(Number))}
             >
-              {services.map(service => {
+              {services.map((service, serviceIndex) => {
                 const hasImage = Boolean(service.image);
                 const imageFieldName = `service-${service.id}-image`;
                 const textFieldName = `service-${service.id}-text`;
                 const textDefault = mergedDefaultText(service.paragraphs);
 
+                /*
+                  v2's `id` on the item is gone rather than carried over. v2's
+                  AccordionItem consumed the prop to build the button and panel
+                  ids and never put it on the DOM, so nothing on the page ever
+                  had this id. v3's Item is a plain div that would now wear it,
+                  and ark already gives the item an id of its own that keeps the
+                  keyboard wiring pointing at the right nodes. The scroll
+                  helper's getElementById fallback stayed dead either way,
+                  because btnRefs always answers first.
+                */
                 return (
-                  <AccordionItem key={service.id} id={service.id as string} border="none" mb={4}>
+                  <Accordion.Item
+                    key={service.id}
+                    value={String(serviceIndex)}
+                    border="none"
+                    mb={4}
+                  >
                     <h3>
-                      <AccordionButton
+                      <Accordion.ItemTrigger
                         ref={el => {
                           btnRefs.current[service.id as string] = el;
                         }}
@@ -1495,6 +1603,10 @@ function ServicesSection() {
                         py={{ base: 4, md: 5 }}
                         border="1px solid"
                         borderColor="limosen.border.faint"
+                        // v3's trigger sets gap 3 between the title and the
+                        // chevron. v2's had none, and the chevron sat hard
+                        // against the right padding.
+                        gap={0}
                       >
                         <Box
                           flex="1"
@@ -1503,53 +1615,78 @@ function ServicesSection() {
                         >
                           {service.title}
                         </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
+                        {/*
+                          v2's <AccordionIcon/> was Chakra's own ChevronDown at
+                          1.25em, which is the glyph vendored into icons/chakra.
+                          An ItemIndicator with no children falls back to v3's
+                          built-in chevron instead, a different path that draws a
+                          visibly different arrow. `color` is restated because
+                          v3's indicator paints itself fg.subtle where v2's icon
+                          inherited the trigger's colour.
+                        */}
+                        <Accordion.ItemIndicator color="inherit">
+                          <ChevronDownIcon boxSize="1.25em" />
+                        </Accordion.ItemIndicator>
+                      </Accordion.ItemTrigger>
                     </h3>
 
-                    <AccordionPanel px={{ base: 4, md: 6 }} pt={6} pb={2}>
-                      <Stack
-                        spacing={6}
-                        direction={{
-                          base: 'column',
-                          md: hasImage ? 'row' : 'column'
-                        }}
-                        align={{ base: 'stretch', md: 'flex-start' }}
-                      >
-                        {hasImage && (
-                          <AspectRatio
-                            ratio={5 / 3}
-                            w={{ base: '100%', md: '320px' }}
-                            flexShrink={0}
-                            borderRadius="lg"
-                            overflow="hidden"
-                          >
-                            {/* keep Field.Image unchanged */}
-                            <Field.Image
-                              name={imageFieldName}
-                              defaultValue={service.image as string}
-                              alt={service.title as string}
-                              objectFit="cover"
-                              style={{ width: '100%', height: '100%' }}
-                            />
-                          </AspectRatio>
-                        )}
+                    {/*
+                      v2's panel is v3's ItemContent wrapping an ItemBody, and
+                      the padding lives on the body. `animationName: none`
+                      stands in for v2's `reduceMotion` on the accordion: the
+                      panel opened and closed instantly there, and the hash
+                      navigation below depends on it, because it scrolls to the
+                      trigger two frames after the state change and a running
+                      collapse above would still be moving the page.
+                    */}
+                    <Accordion.ItemContent
+                      _open={{ animationName: 'none' }}
+                      _closed={{ animationName: 'none' }}
+                    >
+                      <Accordion.ItemBody px={{ base: 4, md: 6 }} pt={6} pb={2}>
+                        <Stack
+                          gap={6}
+                          direction={{
+                            base: 'column',
+                            md: hasImage ? 'row' : 'column'
+                          }}
+                          align={{ base: 'stretch', md: 'flex-start' }}
+                        >
+                          {hasImage && (
+                            <AspectRatio
+                              ratio={5 / 3}
+                              w={{ base: '100%', md: '320px' }}
+                              flexShrink={0}
+                              borderRadius="lg"
+                              overflow="hidden"
+                            >
+                              {/* keep Field.Image unchanged */}
+                              <Field.Image
+                                name={imageFieldName}
+                                defaultValue={service.image as string}
+                                alt={service.title as string}
+                                objectFit="cover"
+                                style={{ width: '100%', height: '100%' }}
+                              />
+                            </AspectRatio>
+                          )}
 
-                        <Stack spacing={4} color="limosen.text.primary" fontSize="md" flex="1">
-                          <Text whiteSpace="pre-wrap">
-                            <Field.Text
-                              as={chakra.span}
-                              name={textFieldName}
-                              defaultValue={textDefault}
-                            />
-                          </Text>
+                          <Stack gap={4} color="limosen.text.primary" fontSize="md" flex="1">
+                            <Text whiteSpace="pre-wrap">
+                              <Field.Text
+                                as={chakra.span}
+                                name={textFieldName}
+                                defaultValue={textDefault}
+                              />
+                            </Text>
+                          </Stack>
                         </Stack>
-                      </Stack>
-                    </AccordionPanel>
-                  </AccordionItem>
+                      </Accordion.ItemBody>
+                    </Accordion.ItemContent>
+                  </Accordion.Item>
                 );
               })}
-            </Accordion>
+            </Accordion.Root>
           </Box>
         </VStack>
       </Container>
@@ -1566,8 +1703,8 @@ function FAQSection() {
   return (
     <Box as="section" bg="limosen.bg.section" py={{ base: 12, md: 20 }}>
       <Container maxW="5xl">
-        <VStack spacing={{ base: 8, md: 10 }} align="stretch">
-          <VStack spacing={3} textAlign="center">
+        <VStack gap={{ base: 8, md: 10 }} align="stretch">
+          <VStack gap={3} textAlign="center">
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
@@ -1582,17 +1719,29 @@ function FAQSection() {
                 defaultValue={intl.formatMessage({ id: 'FaqSubtitle' })}
               />
             </Text>
-            <Divider
+            <Separator
               w={{ base: '80px', md: '120px' }}
               borderColor="limosen.border.subtle"
+              // v2's Divider baseStyle carried `opacity: 0.6` and v3's
+              // Separator recipe has none, so every one of these lines came out
+              // two thirds brighter than the line it replaced.
+              opacity={0.6}
             />
           </VStack>
 
-          <Accordion allowToggle reduceMotion>
+          {/* v2's `allowToggle` is v3's `collapsible`: one item at a time,
+              and clicking the open one closes it. Items are addressed by value
+              now, and the question is what already keyed them. */}
+          <Accordion.Root collapsible>
             {items.map(item => (
-              <AccordionItem key={item.question} border="none" mb={3}>
+              <Accordion.Item
+                key={item.question}
+                value={item.question}
+                border="none"
+                mb={3}
+              >
                 <h3>
-                  <AccordionButton
+                  <Accordion.ItemTrigger
                     bg="whiteAlpha.50"
                     _expanded={{
                       bg: 'whiteAlpha.200',
@@ -1604,6 +1753,9 @@ function FAQSection() {
                     py={{ base: 4, md: 5 }}
                     border="1px solid"
                     borderColor="limosen.border.faint"
+                    // v3's trigger sets gap 3 between the question and the
+                    // chevron, where v2's had none.
+                    gap={0}
                   >
                     <Box
                       flex="1"
@@ -1612,20 +1764,31 @@ function FAQSection() {
                     >
                       {item.question}
                     </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
+                    {/* The vendored ChevronDown, for the reason spelled out on
+                        the services accordion above. */}
+                    <Accordion.ItemIndicator color="inherit">
+                      <ChevronDownIcon boxSize="1.25em" />
+                    </Accordion.ItemIndicator>
+                  </Accordion.ItemTrigger>
                 </h3>
-                <AccordionPanel
-                  px={{ base: 4, md: 6 }}
-                  pt={4}
-                  pb={6}
-                  color="limosen.text.secondary"
+                {/* v2's panel is ItemContent plus ItemBody, and `animationName:
+                    none` is what is left of `reduceMotion`. */}
+                <Accordion.ItemContent
+                  _open={{ animationName: 'none' }}
+                  _closed={{ animationName: 'none' }}
                 >
-                  {item.answer}
-                </AccordionPanel>
-              </AccordionItem>
+                  <Accordion.ItemBody
+                    px={{ base: 4, md: 6 }}
+                    pt={4}
+                    pb={6}
+                    color="limosen.text.secondary"
+                  >
+                    {item.answer}
+                  </Accordion.ItemBody>
+                </Accordion.ItemContent>
+              </Accordion.Item>
             ))}
-          </Accordion>
+          </Accordion.Root>
         </VStack>
       </Container>
     </Box>
@@ -1646,7 +1809,7 @@ function FleetSection() {
   return (
     <Box as="section" id="fleet" bg="limosen.bg.fleet" py={{ base: 12, md: 20 }}>
       <Container maxW="6xl">
-        <VStack spacing={10} align="stretch">
+        <VStack gap={10} align="stretch">
           <Heading size="lg" textAlign="center" color="limosen.text.primary">
             <Field.Text
               as={chakra.span}
@@ -1655,7 +1818,7 @@ function FleetSection() {
             />
           </Heading>
 
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 8, md: 10 }}>
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 8, md: 10 }}>
             {vehicles.map(vehicle => (
               <Box
                 key={vehicle.name}
@@ -1682,7 +1845,7 @@ function FleetSection() {
                   />
                 </Box>
 
-                <Stack spacing={3} p={6}>
+                <Stack gap={3} p={6}>
                   <Heading size="md" color="limosen.text.primary">
                     {vehicle.category}
                   </Heading>
@@ -1691,9 +1854,9 @@ function FleetSection() {
                   </Text>
                   <Text color="limosen.text.secondary">{vehicle.description}</Text>
 
-                  <Wrap spacing={6} pt={2}>
+                  <Wrap gap={6} pt={2}>
                     <WrapItem>
-                      <HStack spacing={2}>
+                      <HStack gap={2}>
                         <Icon as={FaUser} color="limosen.accent" />
                         <Text color="limosen.text.secondary" fontWeight="medium">
                           <Field.Text
@@ -1709,7 +1872,7 @@ function FleetSection() {
                     </WrapItem>
 
                     <WrapItem>
-                      <HStack spacing={2}>
+                      <HStack gap={2}>
                         <Icon as={FaSuitcaseRolling} color="limosen.accent" />
                         <Text color="limosen.text.secondary" fontWeight="medium">
                           <Field.Text
@@ -1753,7 +1916,7 @@ function OnlineBookingSection() {
       bgRepeat="no-repeat"
     >
       <Container maxW="4xl">
-        <VStack spacing={5} textAlign="center">
+        <VStack gap={5} textAlign="center">
           <Heading size="md" className="online-booking__title" color="limosen.text.primary">
             <Field.Text
               as={chakra.span}
@@ -1762,7 +1925,7 @@ function OnlineBookingSection() {
             />
           </Heading>
 
-          <Stack spacing={3} fontSize="lg" className="online-booking__sub-title" color="limosen.text.secondary">
+          <Stack gap={3} fontSize="lg" className="online-booking__sub-title" color="limosen.text.secondary">
             <Text>
               <Field.Text
                 as={chakra.span}
@@ -1770,7 +1933,7 @@ function OnlineBookingSection() {
                 defaultValue={intl.formatMessage({ id: 'BookingReachPhone' })}
               />
             </Text>
-            <HStack justify="center" spacing={2}>
+            <HStack justify="center" gap={2}>
               <Icon as={FaPhone} color="limosen.accent" />
               <Link
                 href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`}
@@ -1793,7 +1956,7 @@ function OnlineBookingSection() {
                 defaultValue={intl.formatMessage({ id: 'BookingReachEmail' })}
               />
             </Text>
-            <HStack justify="center" spacing={2}>
+            <HStack justify="center" gap={2}>
               <Icon as={FaEnvelopeOpen} color="limosen.accent" />
               <Link href={`mailto:${CONTACT_EMAIL}`} color="limosen.text.primary">
                 {CONTACT_EMAIL}
@@ -1801,7 +1964,7 @@ function OnlineBookingSection() {
             </HStack>
           </Stack>
 
-          <Button variant="limosen" onClick={handleOnContactClick}>
+          <Button variant={'limosen' as ButtonProps['variant']} onClick={handleOnContactClick}>
             {intl.formatMessage({ id: 'ContactCta' })}
           </Button>
         </VStack>
@@ -1815,8 +1978,8 @@ function ReviewsSection() {
   return (
     <Box as="section" id="reviews" bg="limosen.bg.section" py={{ base: 12, md: 20 }}>
       <Container maxW="6xl">
-        <VStack spacing={{ base: 8, md: 12 }} align="stretch">
-          <VStack spacing={3} textAlign="center">
+        <VStack gap={{ base: 8, md: 12 }} align="stretch">
+          <VStack gap={3} textAlign="center">
             <Heading size="lg" color="limosen.text.primary">
               <Field.Text
                 as={chakra.span}
@@ -1831,9 +1994,13 @@ function ReviewsSection() {
                 defaultValue={intl.formatMessage({ id: 'FeedbackSubtitle' })}
               />
             </Text>
-            <Divider
+            <Separator
               w={{ base: '80px', md: '120px' }}
               borderColor="limosen.border.subtle"
+              // v2's Divider baseStyle carried `opacity: 0.6` and v3's
+              // Separator recipe has none, so every one of these lines came out
+              // two thirds brighter than the line it replaced.
+              opacity={0.6}
             />
           </VStack>
 
@@ -1846,7 +2013,7 @@ function ReviewsSection() {
               p={{ base: 6, md: 8 }}
               boxShadow="lg"
             >
-              <VStack align="flex-start" spacing={4}>
+              <VStack align="flex-start" gap={4}>
                 <Heading size="md" color="limosen.text.primary">
                   <Field.Text
                     as={chakra.span}
@@ -1861,8 +2028,16 @@ function ReviewsSection() {
                     defaultValue={intl.formatMessage({ id: 'FeedbackBoxText' })}
                   />
                 </Text>
-                <HStack pt={2} spacing={3} wrap="wrap">
-                  <Button as={Link} href={GOOGLE_MAPS_OPEN} isExternal variant="limosen">
+                <HStack pt={2} gap={3} wrap="wrap">
+                  {/* v2's `isExternal`, spelled out: v3 has no such prop and
+                      jaen's Link only opens `to` in a new tab. */}
+                  <Button
+                    as={Link}
+                    href={GOOGLE_MAPS_OPEN}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant={'limosen' as ButtonProps['variant']}
+                  >
                     <Field.Text
                       as={chakra.span}
                       name={`FeedbackMapsCta`}
@@ -1918,7 +2093,7 @@ export function Footer() {
       dir={isRtl ? 'rtl' : 'ltr'}
     >
       <Container maxW="6xl">
-        <VStack spacing={{ base: 10, md: 14 }} align="stretch">
+        <VStack gap={{ base: 10, md: 14 }} align="stretch">
           <Flex
             direction={{ base: 'column', md: isRtl ? 'row-reverse' : 'row' }}
             align="flex-start"
@@ -1950,7 +2125,7 @@ export function Footer() {
 
             <SimpleGrid
               columns={{ base: 1, sm: 2, md: 3 }}
-              spacing={{ base: 8, md: 10 }}
+              gap={{ base: 8, md: 10 }}
               flex="1"
               dir={isRtl ? 'rtl' : 'ltr'}
               justifyItems={isRtl ? 'end' : 'start'}
@@ -1958,7 +2133,7 @@ export function Footer() {
               {footerGroups.map(group => (
                 <VStack
                   key={group.title}
-                  spacing={4}
+                  gap={4}
                   align={isRtl ? 'flex-end' : 'flex-start'}
                   textAlign={isRtl ? 'right' : 'left'}
                   w="full"
@@ -1974,7 +2149,7 @@ export function Footer() {
                   </Text>
                   {/* fix links alignment in Arabic reliably */}
                   <VStack
-                    spacing={2}
+                    gap={2}
                     align={isRtl ? 'flex-end' : 'flex-start'}
                     w="full"
                     direction={isRtl ? 'rtl' : 'ltr'}
@@ -2000,7 +2175,8 @@ export function Footer() {
             </SimpleGrid>
           </Flex>
 
-          <Divider borderColor="limosen.border.subtle" />
+          {/* opacity 0.6 is v2's Divider baseStyle, see the note above. */}
+          <Separator borderColor="limosen.border.subtle" opacity={0.6} />
 
           <Flex
             direction={{ base: 'column', md: isRtl ? 'row-reverse' : 'row' }}
@@ -2021,20 +2197,23 @@ export function Footer() {
                 defaultValue={intl.formatMessage({ id: 'FooterRights' })}
               />
             </Text>
-            <Wrap spacing={3} justify={isRtl ? 'flex-start' : 'flex-end'} w="full">
+            <Wrap gap={3} justify={isRtl ? 'flex-start' : 'flex-end'} w="full">
               {SOCIAL_LINKS.map(({ label, href, icon: IconComponent }) => (
                 <WrapItem key={label}>
+                  {/* v3's IconButton takes the glyph as a child, and `isRound`
+                      is gone; it only ever set radii.full. */}
                   <IconButton
                     as={Link}
                     href={href}
                     aria-label={label}
-                    icon={<IconComponent />}
-                    isRound
+                    borderRadius="full"
                     size="sm"
                     variant="ghost"
                     color="limosen.text.primary"
                     _hover={{ bg: 'whiteAlpha.200', color: 'limosen.accent' }}
-                  />
+                  >
+                    <IconComponent />
+                  </IconButton>
                 </WrapItem>
               ))}
             </Wrap>

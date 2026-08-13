@@ -68,7 +68,7 @@ export default function ChakraLanguageSwitcher({
   };
 
   return (
-    <VStack align="stretch" spacing={3}>
+    <VStack align="stretch" gap={3}>
       {translations.map(({ locale, path }) => {
         const active = isActive(locale);
         const label = labelFor(locale);
@@ -86,7 +86,7 @@ export default function ChakraLanguageSwitcher({
             _hover={{ bg: 'whiteAlpha.200' }}
             {...buttonProps}
           >
-            <HStack spacing={3}>
+            <HStack gap={3}>
               {flagSrc ? (
                 <Image
                   src={flagSrc}
