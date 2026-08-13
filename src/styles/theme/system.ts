@@ -218,6 +218,11 @@ const buttonRecipe = {
     colorPalette: 'brand',
     fontWeight: 'semibold',
     borderWidth: 0,
+    // v2's button base was `borderRadius: md`, 6px. v3 spells it `l2`, which
+    // resolves to radii.sm, 4px. Measured against the live site on the Login and
+    // the nav buttons: every corner on every page was two pixels tighter, which
+    // is what the last 104 changed pixels per page turned out to be.
+    borderRadius: 'md',
     /**
      * v2's button did not size the icons inside it at all, so a react-icons
      * glyph rendered at its own 1em and a Chakra icon at the 1em its wrapper
