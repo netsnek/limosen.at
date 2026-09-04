@@ -14,6 +14,17 @@ require('dotenv').config({
   path: `.env.public`
 });
 
+/**
+ * .env is gitignored and this repository is public, so anything that should not
+ * be readable on GitHub lives there. GATSBY_MAPBOX_TOKEN is the case in point:
+ * Mapbox public tokens ship in the browser bundle by design, but an unrestricted
+ * one still belongs out of the tree. dotenv does not overwrite what the
+ * environment already carries, so a CI variable of the same name still wins.
+ */
+require('dotenv').config({
+  path: `.env`
+});
+
 const config: GatsbyConfig = {
   siteMetadata: {
     siteUrl: `${SITE.siteUrl}/`
