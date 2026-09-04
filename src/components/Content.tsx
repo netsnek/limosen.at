@@ -38,7 +38,7 @@ import {
   chakra,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { Field, useAuth } from 'jaen';
+import { Field } from 'jaen';
 import { ChevronDownIcon } from './icons/chakra';
 import { DialogCloseButton } from './DialogCloseButton';
 import {FaEnvelopeOpen} from '@react-icons/all-files/fa/FaEnvelopeOpen';
@@ -51,7 +51,7 @@ import {FaTwitter} from '@react-icons/all-files/fa/FaTwitter';
 import {FaUser} from '@react-icons/all-files/fa/FaUser';
 import {FaWhatsapp} from '@react-icons/all-files/fa/FaWhatsapp';
 import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
-import { graphql, useStaticQuery } from 'gatsby';
+import { graphql, useStaticQuery, navigate} from 'gatsby';
 import Marquee from 'react-fast-marquee';
 import { Link } from 'gatsby-plugin-jaen';
 import Logo from '../gatsby-plugin-jaen/components/Logo';
@@ -69,8 +69,8 @@ import {
   SOCIAL_LINKS,
   SERVICE_NAVIGATION_EVENT,
   GOOGLE_MAPS_EMBED,
-  GOOGLE_MAPS_OPEN
-} from '../vars/limosen';
+  GOOGLE_MAPS_OPEN,
+  COMPANY_NAME, CONTACT_PHONE_WHATSAPP} from '../vars/limosen';
 import { useContactModal } from '../services/contact';
 import { useBookingModal } from '../services/booking';
 import { useIntl } from 'react-intl';
@@ -522,7 +522,6 @@ export default function Content({ language }: { language: string }) {
 }
 
 export function HeaderBar() {
-  const { signinRedirect } = useAuth();
   return (
     <Box
       bg="limosen.bg.banner"
@@ -548,7 +547,7 @@ export function HeaderBar() {
             <Icon as={FaWhatsapp} color="limosen.accent" />
             <Link
               href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(
-                CONTACT_PHONE
+                CONTACT_PHONE_WHATSAPP
               )}`}
               color="limosen.text.primary"
             >
@@ -587,7 +586,7 @@ export function HeaderBar() {
               // own names have to be asserted through. Same at every other
               // variant={'limosen'} below.
               variant={'limosen' as ButtonProps['variant']}
-              onClick={() => void signinRedirect()}
+              onClick={() => void navigate('/login')}
             >
               Login
             </Button>
@@ -601,7 +600,6 @@ export function HeaderBar() {
 export function TopNavigation({ path }: { path?: string }) {
   const { open, onOpen, onClose } = useDisclosure();
   const langModal = useDisclosure();
-  const { signinRedirect } = useAuth();
   const intl = useIntl();
 
   // 'de' | 'en' | 'tr' | 'ar' for flag display and direction
@@ -937,7 +935,7 @@ export function TopNavigation({ path }: { path?: string }) {
                   <Button
                     size="sm"
                     variant={'limosen' as ButtonProps['variant']}
-                    onClick={() => void signinRedirect()}
+                    onClick={() => void navigate('/login')}
                   >
                     Login
                   </Button>
@@ -1936,7 +1934,7 @@ function OnlineBookingSection() {
             <HStack justify="center" gap={2}>
               <Icon as={FaPhone} color="limosen.accent" />
               <Link
-                href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE)}`}
+                href={`https://api.whatsapp.com/send?phone=${encodeURIComponent(CONTACT_PHONE_WHATSAPP)}`}
                 color="limosen.text.primary"
               >
                 {CONTACT_PHONE}
@@ -2190,7 +2188,7 @@ export function Footer() {
               textAlign={isRtl ? 'right' : 'left'}
               w="full"
             >
-              © {new Date().getFullYear()} LIMOSEN KG{' '}
+              © {new Date().getFullYear()} {COMPANY_NAME}{' '}
               <Field.Text
                 as={chakra.span}
                 name={`FooterRights`}

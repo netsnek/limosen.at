@@ -3,9 +3,28 @@ import {FaFacebookF} from '@react-icons/all-files/fa/FaFacebookF'
 import {FaInstagram} from '@react-icons/all-files/fa/FaInstagram'
 import {FaTwitter} from '@react-icons/all-files/fa/FaTwitter'
 
-export const CONTACT_EMAIL = 'office@limosen.at'
-export const CONTACT_PHONE = '+43 660 876 06 06'
-export const CONTACT_PHONE_TEL = '+436608760606'
+import {SITE} from './site-variants'
+
+/**
+ * Everything a visitor can see that names the company comes from the active
+ * variant now. It used to be limosen's literal values, which the booklimo build
+ * served unchanged: that brand's pages carried limosen's phone number, mail
+ * address and Instagram, so an enquiry from a KRC visitor reached the wrong
+ * company.
+ */
+export const CONTACT_EMAIL = SITE.contactEmail
+export const CONTACT_PHONE = SITE.contactPhone
+export const CONTACT_PHONE_TEL = SITE.contactPhoneTel
+export const COMPANY_NAME = SITE.companyName
+
+/**
+ * The number as WhatsApp wants it: digits only, no plus and no spaces.
+ *
+ * The links were built from CONTACT_PHONE, which is the human readable form, so
+ * they came out as phone=%2B43%20660%20876%2006%2006 and WhatsApp could not
+ * resolve them.
+ */
+export const CONTACT_PHONE_WHATSAPP = SITE.contactPhoneTel.replace(/[^0-9]/g, '')
 
 export const LOGO_SRC = '/images/everything/logo.png'
 export const FLAG_DE = '/images/everything/flag-de.png'
@@ -17,9 +36,16 @@ export const BOOKING_BACKGROUND = '/images/everything/booking-background.jpg'
 
 export const SERVICE_NAVIGATION_EVENT = 'service-accordion:navigate'
 
-export const SOCIAL_LINKS = [
-  { label: 'Instagram', href: 'https://www.instagram.com/limosen.at', icon: FaInstagram },
-]
+const SOCIAL_ICONS: Record<string, typeof FaInstagram> = {
+  Instagram: FaInstagram,
+  Facebook: FaFacebookF,
+  Twitter: FaTwitter
+}
+
+export const SOCIAL_LINKS = SITE.socialLinks.map(link => ({
+  ...link,
+  icon: SOCIAL_ICONS[link.label] ?? FaInstagram
+}))
 
 export const HERO_SLIDES = [
   '/images/everything/hero-beauty-of-vienna.jpg',

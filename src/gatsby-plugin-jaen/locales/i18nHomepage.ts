@@ -13,8 +13,7 @@ import {
   SOCIAL_LINKS,
   HERO_SLIDES,
   GOOGLE_MAPS_EMBED,
-  GOOGLE_MAPS_OPEN
-} from '../../vars/limosen';
+  GOOGLE_MAPS_OPEN, COMPANY_NAME, CONTACT_PHONE_WHATSAPP} from '../../vars/limosen';
 
 export type I18nCode = 'en-US' | 'de-AT' | 'tr-TR' | 'ar-EG';
 
@@ -62,7 +61,7 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackMapsCta: 'In Google Maps öffnen',
       AboutTitle: 'Über uns',
       AboutP1:
-        'LIMOSEN KG bietet seit 2016 an 365 Tagen rund um die Uhr Service und verfolgt die Entwicklungen in Branche und Technik.',
+        `${COMPANY_NAME} bietet seit 2016 an 365 Tagen rund um die Uhr Service und verfolgt die Entwicklungen in Branche und Technik.`,
       AboutP2:
         'Unsere Flotte wächst kontinuierlich mit modernen Mercedes Benz Fahrzeugen sowie freundlichen professionellen erfahrenen Fahrern. Wir arbeiten zuverlässig wirtschaftlich und komfortorientiert und steigern die Servicequalität.',
       AboutP3:
@@ -269,7 +268,7 @@ export function getI18nHomepage(code: I18nCode) {
           {
             label: CONTACT_PHONE,
             href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(
-              CONTACT_PHONE
+              CONTACT_PHONE_WHATSAPP
             )}`
           },
           { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
@@ -341,7 +340,7 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackMapsCta: 'Google Haritalar’da aç',
       AboutTitle: 'Hakkımızda',
       AboutP1:
-        'LIMOSEN KG, 2016 yılından bu yana sektörel ve teknolojik degişimleri takip ederek sizler için 365 gün boyunca 7/24 hizmet vermektedir.',
+        `${COMPANY_NAME}, 2016 yılından bu yana sektörel ve teknolojik degişimleri takip ederek sizler için 365 gün boyunca 7/24 hizmet vermektedir.`,
       AboutP2:
         'Filomuz, son model Mercedes-Benz araçlarımızla ve güleryüzlü, profesyonel, deneyimli şoförlerimizle güvenilir, ekonomik, konforlu bir hizmet anlayışıyla, servis kalitesini arttırarak istikrarlı bir şekilde büyümeye devam ederek çalışmaktadır.',
       AboutP3:
@@ -548,7 +547,7 @@ export function getI18nHomepage(code: I18nCode) {
           {
             label: CONTACT_PHONE,
             href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(
-              CONTACT_PHONE
+              CONTACT_PHONE_WHATSAPP
             )}`
           },
           { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
@@ -621,7 +620,7 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackMapsCta: 'فتح في خرائط Google',
       AboutTitle: 'من نحن',
       AboutP1:
-        'تقدم LIMOSEN KG خدمة على مدار الساعة طوال أيام الأسبوع منذ عام 2016 مع متابعة التطورات في القطاع والتقنية.',
+        `تقدم ${COMPANY_NAME} خدمة على مدار الساعة طوال أيام الأسبوع منذ عام 2016 مع متابعة التطورات في القطاع والتقنية.`,
       AboutP2:
         'ينمو أسطولنا باستمرار بسيارات مرسيدس بنز الحديثة ومع سائقين ودودين محترفين ذوي خبرة. نقدم خدمة موثوقة واقتصادية ومريحة ونرفع جودة الخدمة.',
       AboutP3:
@@ -831,7 +830,7 @@ export function getI18nHomepage(code: I18nCode) {
           {
             label: CONTACT_PHONE,
             href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(
-              CONTACT_PHONE
+              CONTACT_PHONE_WHATSAPP
             )}`
           },
           { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
@@ -903,7 +902,7 @@ export function getI18nHomepage(code: I18nCode) {
     FeedbackMapsCta: 'Open in Google Maps',
     AboutTitle: 'About us',
     AboutP1:
-      'Since 2016 LIMOSEN KG has provided service 24 hours a day all year while following developments in the industry and technology.',
+      `Since 2016 ${COMPANY_NAME} has provided service 24 hours a day all year while following developments in the industry and technology.`,
     AboutP2:
       'Our fleet grows steadily with modern Mercedes Benz vehicles and friendly professional experienced drivers. We work reliably economically and with comfort in mind and keep improving service quality.',
     AboutP3:
@@ -1110,7 +1109,7 @@ export function getI18nHomepage(code: I18nCode) {
         {
           label: CONTACT_PHONE,
           href: `https://api.whatsapp.com/send?phone=${encodeURIComponent(
-            CONTACT_PHONE
+            CONTACT_PHONE_WHATSAPP
           )}`
         },
         { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
