@@ -1,21 +1,15 @@
 /**
- * The brand mark, chosen by build variant.
+ * The brand mark.
  *
- * Both marks were already in the tree, but nothing selected between them: the
- * booklimo build was produced by overwriting this file by hand before running
- * gatsby build, which is why the deployed booklimo site carries the booklimo
- * logo and, at the same time, limosen's og:title.
- *
- * GATSBY_SITE_VARIANT is set from SITE_VARIANT in gatsby-config, and Gatsby
- * inlines GATSBY_* variables at build time, so this resolves to a single import
- * in the bundle rather than shipping both marks.
+ * This used to choose between two marks on `GATSBY_SITE_VARIANT`, because one
+ * source tree served both brands. It does not any more: the other brand has its
+ * own repository and its own mark. Re-export rather than rename, so no call site
+ * has to move.
  */
 import LimosenLogo, {LogoProps} from './Logo-limosen'
-import BooklimoLogo from './Logo-booklimo'
 
 export type {LogoProps}
 
-export const Logo =
-  process.env.GATSBY_SITE_VARIANT === 'booklimo' ? BooklimoLogo : LimosenLogo
+export const Logo = LimosenLogo
 
 export default Logo

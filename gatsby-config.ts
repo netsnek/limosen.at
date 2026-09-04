@@ -1,14 +1,6 @@
 import type { GatsbyConfig } from 'gatsby';
 import { messagesByLocale } from './src/gatsby-plugin-jaen/locales/messages'
-import { ACTIVE_VARIANT, SITE } from './src/vars/site-variants'
-
-/**
- * The brand is chosen with SITE_VARIANT and everything that differs between the
- * two lives in src/vars/site-variants.ts. Mirroring it into GATSBY_SITE_VARIANT
- * is what lets the browser bundle pick the right logo: Gatsby inlines GATSBY_*
- * variables, and gatsby-config is the first thing it evaluates.
- */
-process.env.GATSBY_SITE_VARIANT = ACTIVE_VARIANT
+import { SITE } from './src/vars/site-variants'
 
 require('dotenv').config({
   path: `.env.public`
