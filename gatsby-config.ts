@@ -134,7 +134,11 @@ const config: GatsbyConfig = {
     {
       resolve: `gatsby-jaen-app`,
       options: {
-        pylonUrl: SITE.appPylonUrl
+        pylonUrl: SITE.appPylonUrl,
+        // The project role that marks somebody as a driver. The dispatch
+        // screen's driver picker filters by it, because offering every account
+        // there put customers and hotel front desks in a driver dropdown.
+        driverRoleKey: 'limosen:driver'
       }
     },
     {
