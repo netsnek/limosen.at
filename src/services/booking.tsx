@@ -12,7 +12,7 @@ import {useQueryRouter} from '../hooks/use-query-router'
 import {useT} from '../contexts/language'
 import {useIntl} from 'react-intl'
 
-import {resolve} from '../clients/iam'
+import {bookTransfer} from './book-transfer'
 
 export interface BookingModalContextProps {
   onOpen: (args?: {meta?: Record<string, any>}) => void
@@ -236,29 +236,41 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
     }
 
     try {
-      const transferId = await resolve(
-        ({mutation}) => {
-          const result = (mutation as any).bookTransfer({
-            rideDateISO: input.rideDateISO,
-            rideTime: input.rideTime,
-            pickup: input.pickup,
-            dropoff: input.dropoff,
-            roomOrName: input.roomOrName,
-            vehicle: input.vehicle,
-            payment: input.payment,
-            amountEUR: input.amountEUR,
-
-            // ✅ NEW: optional details (must exist in your schema)
-            details
-          })
-          return result.transferId
+      const transferId = await bookTransfer({
+        // The form collects a date and a time; the backend takes one instant.
+        pickupDateTime: `${input.rideDateISO}T${input.rideTime}:00`,
+        pickupLocation: input.pickup,
+        dropoffLocation: input.dropoff,
+        subject: input.roomOrName,
+        paymentMethode: input.payment,
+        passengers: {
+          firstName: details.passengerFirstName,
+          lastName: details.passengerLastName,
+          email: details.passengerEmail,
+          phone: details.passengerPhone,
+          language: locale
         },
-        {cachePolicy: 'no-store'}
-      )
+        details: {
+          flightNumber: details.flightNumber,
+          message: details.message,
+          transferCategory: details.rideCategory,
+          transferType: details.rideType,
+          luggage: details.luggage,
+          childSeats: details.childSeats,
+          extraTime: details.extraTime,
+          preferredCarClass: details.carClass,
+          preferredCarName: details.carTitle
+        }
+      })
 
       setMeta(prev => ({...(prev ?? {}), transferId}))
       return typeof transferId === 'string' ? transferId : null
     } catch (err) {
+      // The visitor gets a calm sentence, but somebody debugging this needs the
+      // actual reason. Swallowing it whole is how a schema mismatch stayed
+      // invisible: every refused booking looked the same from the outside.
+      console.error('bookTransfer failed:', err)
+
       // If the API rejects (e.g. misconfig / temporary issue), still proceed with email.
       toast({
         title: t('ToastApiBookingErrorTitle', 'Booking not created'),
