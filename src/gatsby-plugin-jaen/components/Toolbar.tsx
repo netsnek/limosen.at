@@ -1,4 +1,4 @@
-import { ChakraProvider } from '@chakra-ui/react';
+import { Box, ChakraProvider } from '@chakra-ui/react';
 
 import SearchMenu from '../../components/search-menu';
 import { chromeSystem } from '../../styles/theme/system';
@@ -28,7 +28,16 @@ export interface ToolbarProps {}
 export const Toolbar: React.FC<ToolbarProps> = () => {
   return (
     <ChakraProvider value={chromeSystem}>
-      <SearchMenu />
+      {/*
+        Hidden below md on purpose. The frame's top bar has room for the brand
+        mark and nothing else on a phone, and the search overlay is reachable
+        from the page itself. `hideBelow` emits a media query rather than
+        unmounting, so the overlay's keyboard shortcut keeps working on a
+        desktop that is merely narrow.
+      */}
+      <Box hideBelow="md">
+        <SearchMenu />
+      </Box>
     </ChakraProvider>
   );
 };
