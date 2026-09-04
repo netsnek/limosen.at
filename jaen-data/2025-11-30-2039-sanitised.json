@@ -1,0 +1,129 @@
+{
+ "message": "Update 8 pages [sanitised: jaenPageMetadata of 8 pages removed, foreign brand]",
+ "createdAt": "2025-11-30T20:39:47.829Z",
+ "data": {
+  "pages": [
+   {
+    "id": "JaenPage /",
+    "modifiedAt": "2025-11-30T20:32:22.928Z",
+    "parentPage": {},
+    "excludedFromIndex": null,
+    "childPagesOrder": [],
+    "childPages": [
+     {
+      "id": "JaenPage /tr/"
+     },
+     {
+      "id": "JaenPage /ar/"
+     },
+     {
+      "id": "JaenPage /imprint/"
+     },
+     {
+      "id": "JaenPage /en/"
+     }
+    ]
+   },
+   {
+    "id": "JaenPage /tr/",
+    "modifiedAt": "2025-11-30T20:33:03.618Z",
+    "slug": "tr",
+    "parentPage": {
+     "id": "JaenPage /"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": [],
+    "childPages": [
+     {
+      "id": "JaenPage /tr/imprint/"
+     }
+    ]
+   },
+   {
+    "id": "JaenPage /ar/",
+    "modifiedAt": "2025-11-30T20:37:16.102Z",
+    "slug": "ar",
+    "parentPage": {
+     "id": "JaenPage /"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": [],
+    "childPages": [
+     {
+      "id": "JaenPage /ar/imprint/"
+     }
+    ]
+   },
+   {
+    "id": "JaenPage /ar/imprint/",
+    "modifiedAt": "2025-11-30T20:37:06.657Z",
+    "slug": "imprint",
+    "parentPage": {
+     "id": "JaenPage /ar/"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": []
+   },
+   {
+    "id": "JaenPage /tr/imprint/",
+    "modifiedAt": "2025-11-30T20:37:48.013Z",
+    "slug": "imprint",
+    "parentPage": {
+     "id": "JaenPage /tr/"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": []
+   },
+   {
+    "id": "JaenPage /en/imprint/",
+    "modifiedAt": "2025-11-30T20:38:25.533Z",
+    "slug": "imprint",
+    "parentPage": {
+     "id": "JaenPage /en/"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": []
+   },
+   {
+    "id": "JaenPage /en/",
+    "modifiedAt": "2025-11-30T20:39:38.814Z",
+    "childPages": [
+     {
+      "id": "JaenPage /en/imprint/"
+     }
+    ],
+    "slug": "en",
+    "parentPage": {
+     "id": "JaenPage /"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": []
+   },
+   {
+    "id": "JaenPage /imprint/",
+    "modifiedAt": "2025-11-30T20:39:12.417Z",
+    "slug": "imprint",
+    "parentPage": {
+     "id": "JaenPage /"
+    },
+    "excludedFromIndex": null,
+    "childPagesOrder": []
+   }
+  ],
+  "site": {
+   "siteMetadata": {}
+  },
+  "widgets": []
+ },
+ "_sanitisedFrom": "https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACBA9pLKuUJgABSrjm1gIsG3_UQuSYAlsAAsQeAAKu7GBR5yhCW3N3LCYvBA",
+ "_sanitisedPages": [
+  "JaenPage /",
+  "JaenPage /tr/",
+  "JaenPage /ar/",
+  "JaenPage /ar/imprint/",
+  "JaenPage /tr/imprint/",
+  "JaenPage /en/imprint/",
+  "JaenPage /en/",
+  "JaenPage /imprint/"
+ ]
+}
