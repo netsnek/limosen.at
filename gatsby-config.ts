@@ -1,5 +1,14 @@
 import type { GatsbyConfig } from 'gatsby';
 import { messagesByLocale } from './src/gatsby-plugin-jaen/locales/messages'
+import { ACTIVE_VARIANT, SITE } from './src/vars/site-variants'
+
+/**
+ * The brand is chosen with SITE_VARIANT and everything that differs between the
+ * two lives in src/vars/site-variants.ts. Mirroring it into GATSBY_SITE_VARIANT
+ * is what lets the browser bundle pick the right logo: Gatsby inlines GATSBY_*
+ * variables, and gatsby-config is the first thing it evaluates.
+ */
+process.env.GATSBY_SITE_VARIANT = ACTIVE_VARIANT
 
 require('dotenv').config({
   path: `.env.public`
@@ -7,7 +16,7 @@ require('dotenv').config({
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    siteUrl: `https://limosen.at/`
+    siteUrl: `${SITE.siteUrl}/`
   },
   // More easily incorporate content into your pages through automatic TypeScript type generation and better GraphQL IntelliSense.
   // If you use VSCode you can also use the GraphQL plugin
@@ -23,20 +32,20 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         remote: {
-          repository: 'netsnek/limosen.at'
+          repository: SITE.repository
         },
-        siteUrl: 'https://limosen.at',
+        siteUrl: SITE.siteUrl,
         // Renamed from `zitadel` on the jaen branch this site now links against.
         // Same identity server, but jaen reads roles and the profile through
         // zitadel-gql's GraphQL surface instead of REST. The ids are unchanged,
         // so the CMS keeps talking to the same tenant and project.
         zitadelGql: {
-          organizationId: '339284789469124181',
+          organizationId: SITE.organizationId,
           clientId: '268283382465631862@cms',
           authority: 'https://accounts.netsnek.com',
           redirectUri:
             process.env.NODE_ENV === 'production'
-              ? 'https://limosen.at/loading'
+              ? SITE.redirectUri
               : 'http://localhost:8000',
           projectIds: ['268283277977065078']
         },
@@ -69,7 +78,7 @@ const config: GatsbyConfig = {
     {
       resolve: 'gatsby-plugin-i18n-l10n',
       options: {
-        siteUrl: 'https://limosen.at/',
+        siteUrl: `${SITE.siteUrl}/`,
         defaultLocale: 'en-US',
         locales: [
           {
@@ -114,7 +123,7 @@ const config: GatsbyConfig = {
     {
       resolve: `gatsby-jaen-app`,
       options: {
-        pylonUrl: 'https://api.limosen.at/graphql'
+        pylonUrl: SITE.appPylonUrl
       }
     },
     {
@@ -126,7 +135,7 @@ const config: GatsbyConfig = {
         background_color: `#ffffff`,
         theme_color: `#ffffff`,
         display: `standalone`,
-        icon: `src/favicon.ico`
+        icon: SITE.icon
       }
     },
     {
