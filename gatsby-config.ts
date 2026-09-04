@@ -101,6 +101,22 @@ const config: GatsbyConfig = {
       }
     },
     //`gatsby-jaen-lens`
+    /**
+     * The app area, /app/booking, /app/transfers, /app/users, /app/locations,
+     * /app/dashboard and the two detail routes, against the pylon at
+     * api.limosen.at.
+     *
+     * It sits BEFORE the manifest block on purpose. A plugin's own config is
+     * merged with the site's and every gatsby-plugin-manifest instance writes the
+     * same public/manifest.webmanifest, so whichever runs last wins. The site's
+     * KRCLimo manifest has to be the last one.
+     */
+    {
+      resolve: `gatsby-jaen-app`,
+      options: {
+        pylonUrl: 'https://api.limosen.at/graphql'
+      }
+    },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -122,18 +138,6 @@ const config: GatsbyConfig = {
         url: 'https://emailwerk.com/graphql'
       }
     },
-    // gatsby-jaen-app, which serves /app/* against api.limosen.at, has no home
-    // on the jaen branch this site now links against: the package exists only on
-    // the abandoned netsnek/i18n branch, not on dev and not on feat/chakra-v3.
-    // Left out of this build on purpose so the public site can be verified
-    // first. Restoring the app area is its own piece of work and the options are
-    // recorded in the migration notes.
-    // {
-    //   resolve: `gatsby-jaen-app`,
-    //   options: {
-    //     pylonUrl: 'https://api.limosen.at/graphql'
-    //   }
-    // },
   ]
 };
 
