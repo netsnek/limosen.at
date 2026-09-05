@@ -65,12 +65,13 @@ export const SITE: SiteConfig = {
     {label: 'Instagram', href: 'https://www.instagram.com/limosen.at'}
   ],
   /*
-    The place id of the listing that GOOGLE_MAPS_OPEN points at (Google now
-    titles it "LIMOSEN Luxury Limousine & Chauffeur Service"), read off the
-    Maps page on 2026-09-05. Unlike a g.page/r/ short link it needs no
-    Business Profile share code, and search.google.com's writereview
-    endpoint opens the same dialog.
+    The same form as booklimo.at's button. The code after g.page/r/ is not a
+    secret from the Business Profile: it is the listing's CID (the second
+    hex number in any Maps URL of the place, 0xb5eea86a2f486dc5 here) as a
+    protobuf, base64url encoded. booklimo's CZLxG11WDbavEBM decodes to KRC's
+    CID the same way. Opened in a browser on 2026-09-05 it lands on "LIMOSEN
+    Luxury Limousine & Chauffeur Service", the entry GOOGLE_MAPS_OPEN points
+    at, in review mode.
   */
-  googleReviewUrl:
-    'https://search.google.com/local/writereview?placeid=ChIJ6VnYQO-rbUcRxW1IL2qo7rU'
+  googleReviewUrl: 'https://g.page/r/CcVtSC9qqO61EBM/review'
 }
