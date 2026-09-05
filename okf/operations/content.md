@@ -43,12 +43,17 @@ foreign metadata.
 
 A third local file, `2026-09-05-service-images-restored.json`, is last in the
 chain. The 16:53 publish of 2025-11-30 and the 20:53 one after it had replaced
-the three service pictures (airport transfer, chauffeur service, city tour) on
-every language page with blog images from WIENVERS; the sanitising had kept the
-foreign metadata out but not the pictures. The file points the three image
-fields back at the media nodes the 2025-10-02 publish uploaded, which the
-library still holds, and gives `/en/` copies of the root page's nodes because it
-never had its own. A later publish that touches those fields will win again,
+four pictures on the language pages with WIENVERS images: the three service
+cards (airport transfer, chauffeur service, city tour) everywhere, and the
+"About us" photograph on `/`, `/tr/` and `/ar/`. The build of 2026-05, live
+until 2026-09-04, had not shown them; the sanitised copies made on 2026-09-04
+did, because they carried the pictures along with the media library. The file
+points the four image fields back at the media nodes the 2025-10-02 publish
+uploaded, which the library still holds, and gives `/en/` copies of the root
+page's nodes because it never had its own. Verified against the deployment of
+2026-05 image by image: every picture on the four language pages is the one
+it was. The same publishes also added `fleet-*` image fields named after
+WIENVERS target groups; no component reads them and they are left alone. A later publish that touches those fields will win again,
 by the file-order rule above, and then the file has to move to the end.
 
 A local file, `2026-09-04-krc-branding.json`, was removed on 2026-09-04.

@@ -1,5 +1,5 @@
 {
-  "message": "Restore the three service images (airport transfer, chauffeur service, city tour) to the originals of 2025-10-02; the publishes of 2025-11-30 had replaced them with WIENVERS blog images",
+  "message": "Restore the four pictures the publishes of 2025-11-30 replaced with WIENVERS images (airport transfer, chauffeur service, city tour, about us) to the originals of 2025-10-02",
   "createdAt": "2026-09-05T01:10:00.000Z",
   "data": {
     "pages": [
@@ -55,6 +55,21 @@
                   "height": 400,
                   "revisions": [],
                   "jaenPageId": "JaenPage /en/"
+                },
+                "d8e8be1f-b007-4ff2-9880-ae5a2e239537": {
+                  "id": "d8e8be1f-b007-4ff2-9880-ae5a2e239537",
+                  "fileUniqueId": "AgAD8BgAAo3M8VI",
+                  "createdAt": "2026-09-05T01:10:00.000Z",
+                  "modifiedAt": "2026-09-05T01:10:00.000Z",
+                  "description": "about-cars.jpg",
+                  "preview": {
+                    "url": "https://osg.snek.at/storage/AAMCBAADHQR3rOh7AAIDiWjeO2cqLHKxEyyWhXm4wPCr_4UpAALwGAACjczxUvuhyRs-uDg8AQAHbQADLwQ"
+                  },
+                  "url": "https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACA4lo3jtnKixysRMsloV5uMDwq_-FKQAC8BgAAo3M8VL7ockbPrg4PC8E",
+                  "width": 564,
+                  "height": 423,
+                  "revisions": [],
+                  "jaenPageId": "JaenPage /en/"
                 }
               },
               "props": {}
@@ -80,6 +95,10 @@
             "service-private-driver-service-image": {
               "value": "148988d8-f5e6-43e5-8e73-b779d2d970ac",
               "props": {}
+            },
+            "about-image": {
+              "value": "dc043994-d012-4dcd-ae7a-27d74fea43ab",
+              "props": {}
             }
           }
         },
@@ -101,6 +120,10 @@
             },
             "service-private-driver-service-image": {
               "value": "5f5c5052-2260-4910-9970-a87818d21154",
+              "props": {}
+            },
+            "about-image": {
+              "value": "b1691592-33da-43da-9fee-ab843fb14cab",
               "props": {}
             }
           }
@@ -124,6 +147,10 @@
             "service-private-driver-service-image": {
               "value": "eb9ca31e-b247-4718-b606-450887df993f",
               "props": {}
+            },
+            "about-image": {
+              "value": "d8e8be1f-b007-4ff2-9880-ae5a2e239537",
+              "props": {}
             }
           }
         },
@@ -145,6 +172,10 @@
             },
             "service-private-driver-service-image": {
               "value": "875846ef-0a31-4ef3-8db5-243430b921d3",
+              "props": {}
+            },
+            "about-image": {
+              "value": "4da2b488-5bde-4628-bc28-14369d2ad9f7",
               "props": {}
             }
           }
@@ -168,6 +199,10 @@
             "service-private-driver-service-image": {
               "value": "eb49c619-8eb6-495a-a698-4846239ef7d6",
               "props": {}
+            },
+            "about-image": {
+              "value": "b4d51f13-687d-43ba-aa1f-6acfadfcd934",
+              "props": {}
             }
           }
         },
@@ -179,5 +214,5 @@
     },
     "widgets": []
   },
-  "_restoredFrom": "the media nodes of the 2025-10-02 publish (patch 3 of the chain); /en/ had none of its own and received copies of the root page's nodes"
+  "_restoredFrom": "the media nodes of the 2025-10-02 publish (patch 3 of the chain); /en/ had none of its own and received copies of the root page's nodes; the WIENVERS fleet-* fields those publishes added are read by no component and are left alone"
 }
