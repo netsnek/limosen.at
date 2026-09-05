@@ -11,12 +11,13 @@
  * visitor's confirmation. The server enqueues that child itself, to
  * envelope.replyTo, so neither form may send it a second time.
  *
- * TWO THINGS ARE STILL OPEN on the server side, and until they are done a send
- * from a signed-out visitor is refused rather than silently dropped:
- *
- *   1. both rows carry isPublic = false, so the anonymous door does not admit
- *      them
- *   2. both carry senderId = NULL, so there is no verified sender to send from
+ * Both rows are public and carry a verified sender since 2026-09-04. Their
+ * bodies live in mail-templates/ as of 2026-09-05, and
+ * scripts/update-mail-templates.py pushes an edit back in place, by these two
+ * ids, the way the sibling brand's script does. The variables a template may
+ * read are declared there, not here: the booking form sends the ride, the way
+ * back (returnDate, returnTime) and the booking as a person reads it
+ * (bookingCode, code, returnCode), see src/services/booking.tsx.
  *
  * The booking form deliberately keeps pointing at the same template as the
  * contact form, because that is what it did before this change. It wants its own
