@@ -3,7 +3,7 @@ type: OKF Operations
 title: Content
 description: The jaen patch chain, how the CMS publishes, and what the split with the sibling brand left behind.
 tags: [limosen, jaen, cms, content]
-timestamp: 2026-09-04T23:30:00+02:00
+timestamp: 2026-09-05T18:40:00+02:00
 ---
 
 # Content
@@ -73,3 +73,34 @@ Two rules that are not guessable from the code:
   `/storage/<id>` and answers 404 on every other path, `/graphql` included, so
   an upload against it fails without saying so. The plugin option is
   `storageUrl`. Read every upload back and compare bytes.
+
+## The fleet cards
+
+The cards under "Fahrzeugflotte" are the catalogue in
+`src/gatsby-plugin-jaen/locales/i18nHomepage.ts` (the `fleet` entries, one
+set per language, built over `FLEET_BASE` in `src/vars/limosen.tsx`), rendered
+by `FleetVehicleCard` in `src/components/Content.tsx`. This brand's backend
+answers `[]` on the public `fleet` query, its Car table holds no rows, so the
+cards say what the catalogue says. The booking form follows the same rule
+(`src/services/fleet.ts`): the backend's list wins only when it lists
+something.
+
+Every card is a button. Hover and keyboard focus raise the border in the brand
+gold and show the tag `FleetBookVehicle` ("Dieses Fahrzeug buchen", in the four
+languages) over the picture, and a click or Enter opens the booking modal with
+the card's class and its first model already selected. The pair the card hands
+over is the translated class label and the first name of its description split
+at the commas, because that is what the form's two dropdowns hold: the
+description is the vehicle list, so a model that should be bookable has to be
+in it, and the first one is the car a click preselects. The opener is
+`useBookingModal().onOpen({defaults: {carClass, carTitle}})` in
+`src/services/booking.tsx`, and the modal's `defaultValues` takes the pair.
+
+In the CMS the card is not a button. `useContentManagement().isEditing` turns
+the role, the tab stop and the click off, so the editor can replace the picture
+and rewrite the labels without a modal opening on every click. The picture
+field is still `fleet-<name>`, keyed by the catalogue's `name`: rename a
+vehicle and its CMS picture no longer applies. No publish has set one so far.
+
+On a touch screen the tag is always visible, there is no hover to reveal it,
+and `_hover` in Chakra v3 never fires there.
