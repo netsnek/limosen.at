@@ -40,7 +40,9 @@ echo "==> scrub"
 # patches nor the sources nor page-data carry them. A NUL in HTML text is
 # shown as U+FFFD, so the word reads with a "�" in it. Stripped here, and
 # counted, so a build that grows more of them is noticed.
-nuls=$(grep -l -P '\x00' -r public --include='*.html' | wc -l)
+# grep exits 1 when it finds nothing, and under pipefail that used to end the
+# script right here on the one kind of build that needs no scrub at all.
+nuls=$( (grep -l -P '\x00' -r public --include='*.html' || true) | wc -l)
 echo "html files with NUL bytes before scrub: $nuls"
 find public -type f -name '*.html' -exec perl -pi -e 's/\x00//g' {} +
 grep -l -P '\x00' -r public --include='*.html' && { echo "NUL bytes survived the scrub" >&2; exit 1; }
