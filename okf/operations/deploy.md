@@ -61,7 +61,10 @@ left there when the two brands were split. Without it this site would have
 introduced itself as KRC Limousinenservice in all four languages.
 
 `/loading` is where the OIDC redirect lands. Without the route the login bounces
-into a 404.
+into a 404. Since 2026-09-05 the page is bare: the logo, one progress line that
+changes every moment, no footer and no imprint or privacy link (32e9cf8), and
+it carries the app's colour mode rather than the website's forced light, so
+this brand lands dark. Deployed with app 1.1.0.
 
 ## The two flags
 
