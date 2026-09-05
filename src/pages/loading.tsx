@@ -152,6 +152,10 @@ const LoadingPage: React.FC<PageProps> = () => {
         {/* key on the index so every line mounts afresh and replays the pop. */}
         <Box
           key={index}
+          // The line is a status message: what the page is doing right now,
+          // for a screen reader and for anything that looks for the one
+          // element that says so, in place of the spinner it replaced.
+          role="status"
           css={{
             '@keyframes loading-pop': {
               from: {opacity: 0, transform: 'translateY(0.5rem) scale(0.94)'},
