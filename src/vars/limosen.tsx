@@ -60,6 +60,9 @@ export const HERO_SLIDES = [
 export const GOOGLE_MAPS_EMBED =
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2663.3171060027275!2d16.598009087180113!3d48.12340777800851!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476dabef40d859e9%3A0xb5eea86a2f486dc5!2sLIMOSEN%20VIP!5e0!3m2!1sen!2sat!4v1758710306571!5m2!1sen!2sat'
 
+/** Opens Google's review dialog directly, rather than the profile page. */
+export const GOOGLE_REVIEW_URL = SITE.googleReviewUrl
+
 export const GOOGLE_MAPS_OPEN =
   'https://www.google.com/maps/place/LIMOSEN+VIP/@48.1234078,16.5980091,17z/data=!4m6!3m5!1s0x476dabef40d859e9:0xb5eea86a2f486dc5!8m2!3d48.1234043!4d16.60288!16s%2Fg%2F11n0g64y7s?authuser=0&entry=tts&g_ep=EgoyMDI1MDkyMS4wIPu8ASoASAFQAw%3D%3D&skid=df28c45c-0b42-446f-90b0-1bd0e46ed3c5'
 

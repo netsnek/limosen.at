@@ -40,6 +40,13 @@ export interface SiteConfig {
   contactPhoneTel: string
   /** Where the "Follow us" links point. Empty is allowed. */
   socialLinks: Array<{label: string; href: string}>
+  /**
+   * The company's Google Business entry, in the form that opens the review
+   * dialog straight away. The profile page leaves the visitor to find the
+   * rating control; this puts them into the writing view, which is the point
+   * of the button.
+   */
+  googleReviewUrl: string
 }
 
 export const SITE: SiteConfig = {
@@ -56,5 +63,14 @@ export const SITE: SiteConfig = {
   contactPhoneTel: '+436608760606',
   socialLinks: [
     {label: 'Instagram', href: 'https://www.instagram.com/limosen.at'}
-  ]
+  ],
+  /*
+    The place id of the listing that GOOGLE_MAPS_OPEN points at (Google now
+    titles it "LIMOSEN Luxury Limousine & Chauffeur Service"), read off the
+    Maps page on 2026-09-05. Unlike a g.page/r/ short link it needs no
+    Business Profile share code, and search.google.com's writereview
+    endpoint opens the same dialog.
+  */
+  googleReviewUrl:
+    'https://search.google.com/local/writereview?placeid=ChIJ6VnYQO-rbUcRxW1IL2qo7rU'
 }

@@ -57,8 +57,8 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackSubtitle: 'Sehen Sie Ihre Live Google Bewertung auf der Karte.',
       FeedbackBoxTitle: 'Google Bewertung',
       FeedbackBoxText:
-        'Öffnen Sie LIMOSEN VIP in Google Maps um Sterne und Kommentare zu sehen oder eine Bewertung zu schreiben.',
-      FeedbackMapsCta: 'In Google Maps öffnen',
+        'Schreiben Sie eine Bewertung für LIMOSEN auf Google. Der Button öffnet das Bewertungsfenster direkt, Sie müssen nichts suchen.',
+      FeedbackMapsCta: 'Bewertung schreiben',
       AboutTitle: 'Über uns',
       AboutP1:
         `${COMPANY_NAME} bietet seit 2016 an 365 Tagen rund um die Uhr Service und verfolgt die Entwicklungen in Branche und Technik.`,
@@ -336,8 +336,8 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackSubtitle: 'Canlı Google puanınızı haritada görün.',
       FeedbackBoxTitle: 'Google puanı',
       FeedbackBoxText:
-        'Yıldızları ve yorumları görmek ya da yorum yapmak için Google Haritalar’da LIMOSEN VIP sayfasını açın.',
-      FeedbackMapsCta: 'Google Haritalar’da aç',
+        'LIMOSEN için Google\'da bir değerlendirme yazın. Düğme değerlendirme penceresini doğrudan açar, aramanıza gerek yoktur.',
+      FeedbackMapsCta: 'Değerlendirme yazın',
       AboutTitle: 'Hakkımızda',
       AboutP1:
         `${COMPANY_NAME}, 2016 yılından bu yana sektörel ve teknolojik degişimleri takip ederek sizler için 365 gün boyunca 7/24 hizmet vermektedir.`,
@@ -616,8 +616,8 @@ export function getI18nHomepage(code: I18nCode) {
       FeedbackSubtitle: 'شاهد تقييم Google المباشر على الخريطة.',
       FeedbackBoxTitle: 'تقييم Google',
       FeedbackBoxText:
-        'افتح صفحة LIMOSEN VIP في خرائط Google لعرض النجوم والتعليقات أو لكتابة مراجعة.',
-      FeedbackMapsCta: 'فتح في خرائط Google',
+        'اكتب تقييماً لـ LIMOSEN على جوجل. الزر يفتح نافذة التقييم مباشرة، فلا حاجة للبحث عن شيء.',
+      FeedbackMapsCta: 'اكتب تقييماً',
       AboutTitle: 'من نحن',
       AboutP1:
         `تقدم ${COMPANY_NAME} خدمة على مدار الساعة طوال أيام الأسبوع منذ عام 2016 مع متابعة التطورات في القطاع والتقنية.`,
@@ -898,8 +898,8 @@ export function getI18nHomepage(code: I18nCode) {
     FeedbackSubtitle: 'See your live Google rating on the map.',
     FeedbackBoxTitle: 'Google rating',
     FeedbackBoxText:
-      'Open LIMOSEN VIP on Google Maps to view stars and comments or to write a review.',
-    FeedbackMapsCta: 'Open in Google Maps',
+      'Write a review for LIMOSEN on Google. The button opens the review window straight away, so there is nothing to look for.',
+    FeedbackMapsCta: 'Write a review',
     AboutTitle: 'About us',
     AboutP1:
       `Since 2016 ${COMPANY_NAME} has provided service 24 hours a day all year while following developments in the industry and technology.`,

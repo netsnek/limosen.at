@@ -70,7 +70,7 @@ import {
   SERVICE_NAVIGATION_EVENT,
   GOOGLE_MAPS_EMBED,
   GOOGLE_MAPS_OPEN,
-  COMPANY_NAME, CONTACT_PHONE_WHATSAPP} from '../vars/limosen';
+  COMPANY_NAME, CONTACT_PHONE_WHATSAPP, GOOGLE_REVIEW_URL} from '../vars/limosen';
 import { useContactModal } from '../services/contact';
 import { useBookingModal } from '../services/booking';
 import { useIntl } from 'react-intl';
@@ -2024,9 +2024,11 @@ function ReviewsSection() {
                 <HStack pt={2} gap={3} wrap="wrap">
                   {/* v2's `isExternal`, spelled out: v3 has no such prop and
                       jaen's Link only opens `to` in a new tab. */}
+                  {/* The review dialog, not the profile page: the whole
+                      point of this button is that a visitor can write. */}
                   <Button
                     as={Link}
-                    href={GOOGLE_MAPS_OPEN}
+                    href={GOOGLE_REVIEW_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     variant={'limosen' as ButtonProps['variant']}
