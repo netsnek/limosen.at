@@ -75,7 +75,16 @@ const config: GatsbyConfig = {
             }),
         googleAnalytics: {
           trackingIds: ['G-X2816CKYFM']
-        }
+        },
+        /**
+         * The CMS and the app land dark. The public pages have no colour
+         * mode, the plugin forces them light. The palette dark resolves to
+         * is this site's, defined as the _dark halves in
+         * src/styles/theme/system.ts, so the app and the CMS inside jaen's
+         * frame take the brand's charcoal and gold from here rather than
+         * jaen's grey. See okf/decisions/hard-rules.md.
+         */
+        colorMode: {default: 'dark'}
       }
     },
     {
