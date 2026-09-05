@@ -347,11 +347,6 @@ const clients: Client[] = [
     href: 'https://www.dasreinisch.at/',
     name: 'das Reinisch',
     logo: '/images/clients/das_Reinisch _logo.png'
-  },
-  {
-    href: 'https://www.mon-cher.at/',
-    name: 'Mon Cher',
-    logo: '/images/clients/MonCherMain-Black-new.png'
   }
 ];
 
