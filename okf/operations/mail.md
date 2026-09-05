@@ -4,8 +4,8 @@ title: Mail
 description: >
   The contact template pair, and the one flag that meant no enquiry from this
   site ever reached the company.
-tags: [limosen, emailwerk, mail, cors]
-timestamp: 2026-09-04T23:30:00+02:00
+tags: [limosen, emailwerk, mail, cors, transfer-code]
+timestamp: 2026-09-05T19:30:00+02:00
 ---
 
 # Mail
@@ -46,3 +46,43 @@ deployment decides whether it happens at all. `limosen.at`, `www.limosen.at` and
 `new.limosen.at` are on the allowlist. A missing origin answers the preflight
 with 401, which curl from a terminal never sees: the only honest check is a real
 browser.
+
+## The templates have a source in git, 2026-09-05
+
+### Measured
+
+Both rows lived only in the emailwerk database. Every edit was a change in a
+web editor nobody could diff, and the sibling brand had a script and eight
+files while this brand had none. The request listed `transferId`, the
+transfer's uuid, and a return trip was one row without a date.
+
+### What changed
+
+`mail-templates/` holds the two bodies as they were fetched on 2026-09-05
+(`limosen-request.html`, `limosen-confirmation.html`), plus `subjects.json` and
+`ids.json`. The request lists the booking first, "Booking: BQ7Q4W (outbound
+BQ7Q4W-1, return BQ7Q4W-2)", then a "Rückfahrt" row with the return date, time
+and the route swapped, and the copy block for WhatsApp starts with "Buchung
+BQ7Q4W". The confirmation repeats both legs to the visitor. When the pylon
+refused, all three codes are empty and both templates say the booking is not in
+the system yet. The uuid is not a variable any more.
+
+The variables a template may read are declared by the script: contact, ride,
+`returnDate`, `returnTime`, `bookingCode`, `code`, `returnCode`, vehicle,
+payment, `agreeToTerms`, `locale`, `invokedOnUrl`, `year`. None is required, an
+undeclared variable renders empty.
+
+### How to push a template
+
+```sh
+EMAILWERK_AUTH='user:pass' ./scripts/update-mail-templates.py            # dry run
+EMAILWERK_AUTH='user:pass' ./scripts/update-mail-templates.py --commit   # update in place
+```
+
+The script updates the two ids from `ids.json` with `templateUpdate`, never
+creates a row, keeps the recipients, the sender and the parent link, and sets
+the variable list. Check a change without sending anything through
+`templatePreview(args: {content, engine: TWIG, values})`, which renders the
+raw body with the values the form would send; a return booking previewed that
+way shows `BQ7Q4W`, `BQ7Q4W-1` and `BQ7Q4W-2` on both templates, and the "no
+code" line when the three are empty.
