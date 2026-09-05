@@ -257,9 +257,9 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'Services',
         links: [
           { label: 'Registrieren', href: '/signup' },
-          { label: 'Jetzt buchen', href: 'https://limosen.at/de/booking' },
-          { label: 'Impressum', href: 'https://limosen.at/de/imprint' },
-          { label: 'Datenschutz', href: 'https://limosen.at/de/privacy' }
+          { label: 'Jetzt buchen', href: '?booking' },
+          { label: 'Impressum', href: '/de/imprint/' },
+          { label: 'Datenschutz', href: '/de/privacy-policy/' }
         ]
       },
       {
@@ -536,9 +536,9 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'Hizmetler',
         links: [
           { label: 'Kayıt ol', href: '/signup' },
-          { label: 'Hemen rezervasyon', href: 'https://limosen.at/de/booking' },
-          { label: 'Künye', href: 'https://limosen.at/de/imprint' },
-          { label: 'Gizlilik', href: 'https://limosen.at/de/privacy' }
+          { label: 'Hemen rezervasyon', href: '?booking' },
+          { label: 'Künye', href: '/tr/imprint/' },
+          { label: 'Gizlilik', href: '/tr/privacy-policy/' }
         ]
       },
       {
@@ -816,12 +816,12 @@ export function getI18nHomepage(code: I18nCode) {
         title: 'الخدمات',
         links: [
           { label: 'إنشاء حساب', href: '/signup' },
-          { label: 'احجز الآن', href: 'https://limosen.at/de/booking' },
+          { label: 'احجز الآن', href: '?booking' },
           {
             label: 'بيانات الناشر',
-            href: 'https://limosen.at/de/imprint'
+            href: '/ar/imprint/'
           },
-          { label: 'الخصوصية', href: 'https://limosen.at/de/privacy' }
+          { label: 'الخصوصية', href: '/ar/privacy-policy/' }
         ]
       },
       {
@@ -1098,9 +1098,9 @@ export function getI18nHomepage(code: I18nCode) {
       title: 'Services',
       links: [
         { label: 'Sign up', href: '/signup' },
-        { label: 'Book now', href: 'https://limosen.at/de/booking' },
-        { label: 'Imprint', href: 'https://limosen.at/de/imprint' },
-        { label: 'Privacy', href: 'https://limosen.at/de/privacy' }
+        { label: 'Book now', href: '?booking' },
+        { label: 'Imprint', href: '/imprint/' },
+        { label: 'Privacy', href: '/privacy-policy/' }
       ]
     },
     {

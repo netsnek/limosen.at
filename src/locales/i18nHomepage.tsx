@@ -258,8 +258,8 @@ export function getI18nHomepage(code: I18nCode) {
         links: [
           { label: 'Registrieren', href: '/signup' },
           { label: 'Jetzt buchen', href: '?booking' },
-          { label: 'Impressum', href: 'https://limosen.at/de/imprint' },
-          { label: 'Datenschutz', href: 'https://limosen.at/de/privacy' }
+          { label: 'Impressum', href: '/de/imprint/' },
+          { label: 'Datenschutz', href: '/de/privacy-policy/' }
         ]
       },
       {
@@ -537,8 +537,8 @@ export function getI18nHomepage(code: I18nCode) {
         links: [
           { label: 'Kayıt ol', href: '/signup' },
           { label: 'Hemen rezervasyon', href: '?booking' },
-          { label: 'Künye', href: 'https://limosen.at/tr/imprint' },
-          { label: 'Gizlilik', href: 'https://limosen.at/tr/privacy' }
+          { label: 'Künye', href: '/tr/imprint/' },
+          { label: 'Gizlilik', href: '/tr/privacy-policy/' }
         ]
       },
       {
@@ -819,9 +819,9 @@ export function getI18nHomepage(code: I18nCode) {
           { label: 'احجز الآن', href: '?booking' },
           {
             label: 'بيانات الناشر',
-            href: 'https://limosen.at/ar/imprint'
+            href: '/ar/imprint/'
           },
-          { label: 'الخصوصية', href: 'https://limosen.at/ar/privacy' }
+          { label: 'الخصوصية', href: '/ar/privacy-policy/' }
         ]
       },
       {
@@ -1099,8 +1099,8 @@ export function getI18nHomepage(code: I18nCode) {
       links: [
         { label: 'Sign up', href: '/signup' },
         { label: 'Book now', href: '?booking' },
-        { label: 'Imprint', href: 'https://limosen.at/imprint' },
-        { label: 'Privacy', href: 'https://limosen.at/privacy' }
+        { label: 'Imprint', href: '/imprint/' },
+        { label: 'Privacy', href: '/privacy-policy/' }
       ]
     },
     {
