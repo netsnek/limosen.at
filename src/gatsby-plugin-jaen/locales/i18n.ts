@@ -3,7 +3,11 @@ import { getI18nHomepage } from './i18nHomepage'
 import { getI18nContact } from './i18nContact'
 import { getI18nBooking } from './i18nBooking'
 import { getI18nTransfers } from './i18nTransfers'
-import { getI18nJaen } from 'gatsby-plugin-jaen/src/locales/i18nJaen'
+// A relative path through node_modules, not the package name: gatsby-config.ts
+// imports this catalogue, and gatsby compiles that file with Parcel, which
+// bundles relative imports and leaves a package import as a require() that
+// node cannot load from a .ts source. The link resolves to the jaen checkout.
+import { getI18nJaen } from '../../../node_modules/gatsby-plugin-jaen/src/locales/i18nJaen'
 
 export type I18nCode = 'en-US' | 'de-AT' | 'tr-TR' | 'ar-EG'
 
