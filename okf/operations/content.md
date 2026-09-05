@@ -35,7 +35,17 @@ and `2025-11-30-2039-sanitised.json`. They are sanitised copies of two November
 chain. The local copies keep the images and the media library and drop the
 foreign metadata.
 
-A third local file, `2026-09-04-krc-branding.json`, was removed on 2026-09-04.
+A third local file, `2026-09-05-service-images-restored.json`, is last in the
+chain. The 16:53 publish of 2025-11-30 and the 20:53 one after it had replaced
+the three service pictures (airport transfer, chauffeur service, city tour) on
+every language page with blog images from WIENVERS; the sanitising had kept the
+foreign metadata out but not the pictures. The file points the three image
+fields back at the media nodes the 2025-10-02 publish uploaded, which the
+library still holds, and gives `/en/` copies of the root page's nodes because it
+never had its own. A later publish that touches those fields will win again,
+by the file-order rule above, and then the file has to move to the end.
+
+A local file, `2026-09-04-krc-branding.json`, was removed on 2026-09-04.
 It sets every page's title and description to the sibling brand's and belongs
 only in that brand's repository. It was written while both brands still came out
 of one tree and stayed in this list after they were split.
