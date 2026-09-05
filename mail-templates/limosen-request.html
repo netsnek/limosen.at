@@ -574,6 +574,11 @@
                                         direction: ltr;
                                       "
                                     >
+                                      <!-- The booking as a person reads it. The uuid stays out of
+                                           the mail; the six characters are what both legs share. -->
+                                      <li style="margin-bottom: 8px;">
+                                        <strong>Booking: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% if code is not empty %} (outbound {{code}}{% if returnCode is not empty %}, return {{returnCode}}{% endif %}){% endif %}{% else %}Buchung noch nicht im System{% endif %}
+                                      </li>
                                       {% if invokedOnUrl is not empty %}
                                       <li style="margin-bottom: 8px;">
                                         <strong>invokedOnUrl: </strong>
@@ -648,6 +653,11 @@
                                         <strong>Destination address: </strong>{{destinationAddress}}
                                       </li>
                                       {% endif %}
+                                      {% if returnDate is not empty or returnTime is not empty %}
+                                      <li style="margin-bottom: 8px;">
+                                        <strong>Rückfahrt{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}{% if destinationAddress is not empty %}, {{destinationAddress}} &rarr; {{pickupAddress}}{% endif %}
+                                      </li>
+                                      {% endif %}
                                       {% if passengers is not empty %}
                                       <li style="margin-bottom: 8px;">
                                         <strong>Passengers: </strong>{{passengers}}
@@ -695,6 +705,105 @@
                                       </li>
                                       {% endif %}
                                     </ul>
+
+                                    <!--
+                                      Copy block. An HTML mail cannot run
+                                      JavaScript, so a real clipboard button is
+                                      not possible in any client. What works is
+                                      this: one preformatted block that a
+                                      triple click on the desktop or a long
+                                      press on the phone selects whole, plus a
+                                      WhatsApp link that already carries the
+                                      same text, so forwarding an enquiry to a
+                                      driver takes one tap and no selecting at
+                                      all.
+                                    -->
+                                    {% set copySummary = "LIMOSEN Anfrage\n"
+                                      ~ (bookingCode is not empty ? "Buchung " ~ bookingCode ~ "\n" : "Buchung noch nicht im System\n")
+                                      ~ (firstName is not empty or lastName is not empty ? "Name: " ~ firstName ~ " " ~ lastName ~ "\n" : "")
+                                      ~ (phone is not empty ? "Tel: " ~ phone ~ "\n" : "")
+                                      ~ (email is not empty ? "Mail: " ~ email ~ "\n" : "")
+                                      ~ (date is not empty ? "Hinfahrt" ~ (code is not empty ? " " ~ code : "") ~ ": " ~ date ~ (time is not empty ? " " ~ time : "") ~ "\n" : "")
+                                      ~ (returnDate is not empty ? "Rueckfahrt" ~ (returnCode is not empty ? " " ~ returnCode : "") ~ ": " ~ returnDate ~ (returnTime is not empty ? " " ~ returnTime : "") ~ " (" ~ destinationAddress ~ " -> " ~ pickupAddress ~ ")\n" : "")
+                                      ~ (pickupAddress is not empty ? "Von: " ~ pickupAddress ~ "\n" : "")
+                                      ~ (destinationAddress is not empty ? "Nach: " ~ destinationAddress ~ "\n" : "")
+                                      ~ (flightNumber is not empty ? "Flug: " ~ flightNumber ~ "\n" : "")
+                                      ~ (rideCategory is not empty ? "Kategorie: " ~ rideCategory ~ "\n" : "")
+                                      ~ (rideType is not empty ? "Art: " ~ rideType ~ "\n" : "")
+                                      ~ (carTitle is not empty ? "Fahrzeug: " ~ carTitle ~ "\n" : "")
+                                      ~ (carClass is not empty ? "Klasse: " ~ carClass ~ "\n" : "")
+                                      ~ (passengers is not empty ? "Passagiere: " ~ passengers ~ "\n" : "")
+                                      ~ (luggage is not empty ? "Gepaeck: " ~ luggage ~ "\n" : "")
+                                      ~ (childSeats is not empty ? "Kindersitze: " ~ childSeats ~ "\n" : "")
+                                      ~ (extraTime is not empty ? "Zusatzzeit (h): " ~ extraTime ~ "\n" : "")
+                                      ~ (paymentOption is not empty ? "Zahlung: " ~ paymentOption ~ "\n" : "")
+                                      ~ (message is not empty ? "Wuensche: " ~ message ~ "\n" : "") %}
+                                    <p
+                                      style="
+                                        margin: 24px 0 6px 0;
+                                        -webkit-text-size-adjust: none;
+                                        -ms-text-size-adjust: none;
+                                        mso-line-height-rule: exactly;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
+                                        font-size: 13px;
+                                        line-height: 18px;
+                                        color: #d4af37;
+                                        text-transform: uppercase;
+                                        letter-spacing: 1px;
+                                      "
+                                    >Zum Kopieren und Weiterleiten</p>
+                                    <pre
+                                      style="
+                                        margin: 0 0 12px 0;
+                                        padding: 14px;
+                                        background-color: #111111;
+                                        border: 1px solid #d4af37;
+                                        border-radius: 4px;
+                                        font-family: 'courier new', courier, monospace;
+                                        font-size: 13px;
+                                        line-height: 19px;
+                                        color: #e6e6e6;
+                                        white-space: pre-wrap;
+                                        word-break: break-word;
+                                      "
+                                    >{{copySummary}}</pre>
+                                    <table
+                                      cellpadding="0"
+                                      cellspacing="0"
+                                      role="presentation"
+                                      style="
+                                        mso-table-lspace: 0pt;
+                                        mso-table-rspace: 0pt;
+                                        border-collapse: separate;
+                                        border-spacing: 0px;
+                                      "
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          bgcolor="#25d366"
+                                          style="
+                                            margin: 0;
+                                            padding: 10px 20px;
+                                            border-radius: 4px;
+                                            background-color: #25d366;
+                                          "
+                                        >
+                                          <a
+                                            href="https://wa.me/?text={{copySummary|url_encode}}"
+                                            target="_blank"
+                                            style="
+                                              display: inline-block;
+                                              font-family: arial, 'helvetica neue', helvetica, sans-serif;
+                                              font-size: 14px;
+                                              font-weight: bold;
+                                              color: #ffffff;
+                                              text-decoration: none;
+                                            "
+                                          >Per WhatsApp weiterleiten</a>
+                                        </td>
+                                      </tr>
+                                    </table>
                                   </td>
                                 </tr>
                               </table>

@@ -634,6 +634,21 @@
                                         direction: ltr;
                                       "
                                     >
+                                      <!-- The booking as a person reads it: the six characters both
+                                           legs share, then each leg with its own code. -->
+                                      <li style="margin-bottom: 8px;">
+                                        <strong>Booking: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}not yet in the system, we will be in touch{% endif %}
+                                      </li>
+                                      {% if date is not empty %}
+                                      <li style="margin-bottom: 8px;">
+                                        <strong>Outbound{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, {{pickupAddress}} &rarr; {{destinationAddress}}{% endif %}
+                                      </li>
+                                      {% endif %}
+                                      {% if returnDate is not empty %}
+                                      <li style="margin-bottom: 8px;">
+                                        <strong>Return{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}{% if destinationAddress is not empty %}, {{destinationAddress}} &rarr; {{pickupAddress}}{% endif %}
+                                      </li>
+                                      {% endif %}
                                       {% if firstName is not empty or lastName is not empty %}
                                       <li
                                         style="
