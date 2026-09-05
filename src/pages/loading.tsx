@@ -1,7 +1,7 @@
 import React from 'react'
 import type {PageProps} from 'gatsby'
 import {navigate} from 'gatsby'
-import {Center, Spinner, Stack} from '@chakra-ui/react'
+import {Box, Center, Stack, Text} from '@chakra-ui/react'
 import {PageConfig} from 'jaen'
 
 import {Logo} from '../gatsby-plugin-jaen/components/Logo'
@@ -10,20 +10,23 @@ import {Logo} from '../gatsby-plugin-jaen/components/Logo'
  * The OIDC redirect target.
  *
  * Zitadel sends the browser back to the `redirectUri` registered on the OIDC
- * client, which is this path, and the page's only job is to send the visitor
- * on: an installed PWA goes to the app dashboard, a normal browser to the
- * start page. The manifest's `start_url: /login` depends on that.
+ * client, which is this path, and the page's job is to send the visitor on:
+ * an installed PWA goes to the app dashboard, a normal browser to the start
+ * page. The manifest's `start_url: /login` depends on that.
  *
- * What it shows meanwhile is the logo and a spinner, nothing else. It used to
- * render inside jaen's content layout, which puts the imprint, privacy and
- * terms footer under every page, and on a phone that footer was the most
- * visible thing on the screen for the second the page is up. A visitor who
- * has just signed in and sees legal links instead of the app assumes the login
- * failed. The `bare` layout type exists for this page.
+ * What the visitor sees meanwhile is the logo, centred, and one short line
+ * under it that changes every moment and says what is going on: the sign-in
+ * is being completed, the session set up, the app loaded. No footer, no
+ * spinner. The page used to render inside jaen's content layout with the
+ * imprint and privacy footer under a spinner, and on a phone that footer was
+ * the most visible thing for the second the page is up: a visitor who has
+ * just signed in and sees legal links assumes the login failed. The lines
+ * exist so the wait reads as progress and not as a crash, which is why the
+ * page stays for a moment even when the redirect could happen at once.
  *
- * The page carries the colour mode of the app, not the website's forced light
- * (see gatsby-plugin-jaen's color-mode-scope), so on a dark brand there is no
- * white flash between the login and the dashboard.
+ * The page carries the colour mode of the app, not the website's forced
+ * light (gatsby-plugin-jaen's color-mode-scope), so a dark brand does not
+ * flash white between the login and the dashboard.
  */
 const isPwa = () => {
   if (typeof window === 'undefined') {
@@ -35,20 +38,92 @@ const isPwa = () => {
   return Boolean(mediaQuery?.matches || (window.navigator as any)?.standalone)
 }
 
-const LoadingPage: React.FC<PageProps> = () => {
-  React.useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
+/** The lines, in the order they appear. German first, like every product string. */
+const LINES: Record<'de' | 'en' | 'tr' | 'ar', string[]> = {
+  de: [
+    'Anmeldung wird abgeschlossen',
+    'Sitzung wird eingerichtet',
+    'App wird geladen',
+    'Gleich geht es los'
+  ],
+  en: [
+    'Completing your sign-in',
+    'Setting up your session',
+    'Loading the app',
+    'Almost there'
+  ],
+  tr: [
+    'Giriş tamamlanıyor',
+    'Oturum hazırlanıyor',
+    'Uygulama yükleniyor',
+    'Neredeyse hazır'
+  ],
+  ar: [
+    'جارٍ إكمال تسجيل الدخول',
+    'جارٍ إعداد الجلسة',
+    'جارٍ تحميل التطبيق',
+    'أوشكنا على الانتهاء'
+  ]
+}
 
-    navigate(isPwa() ? '/app/dashboard/' : '/', {replace: true})
+/** The browser's language, reduced to the four the sites speak. German otherwise. */
+const language = (): keyof typeof LINES => {
+  if (typeof navigator === 'undefined') return 'de'
+  const code = (navigator.language || '').toLowerCase().slice(0, 2)
+  return code === 'en' || code === 'tr' || code === 'ar' ? code : 'de'
+}
+
+/** How long one line stays, and the least time the page stays at all. */
+const LINE_MS = 1400
+const MIN_STAY_MS = 2 * LINE_MS
+
+const LoadingPage: React.FC<PageProps> = () => {
+  const [lang, setLang] = React.useState<keyof typeof LINES>('de')
+  const [index, setIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    setLang(language())
+    const ticker = window.setInterval(() => {
+      setIndex(i => (i + 1) % LINES.de.length)
+    }, LINE_MS)
+    const leave = window.setTimeout(() => {
+      navigate(isPwa() ? '/app/dashboard/' : '/', {replace: true})
+    }, MIN_STAY_MS)
+    return () => {
+      window.clearInterval(ticker)
+      window.clearTimeout(leave)
+    }
   }, [])
 
+  const lines = LINES[lang]
+
   return (
-    <Center minH="100dvh" bg="bg" px="8">
-      <Stack align="center" gap="8">
+    <Center minH="100dvh" bg="bg" px="8" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <Stack align="center" gap="10">
         <Logo width="min(60vw, 16rem)" height="auto" />
-        <Spinner size="lg" colorPalette="brand" color="colorPalette.solid" borderWidth="3px" />
+        {/* key on the index so every line mounts afresh and replays the pop. */}
+        <Box
+          key={index}
+          css={{
+            '@keyframes loading-pop': {
+              from: {opacity: 0, transform: 'translateY(0.5rem) scale(0.94)'},
+              '60%': {opacity: 1, transform: 'translateY(0) scale(1.03)'},
+              to: {opacity: 1, transform: 'translateY(0) scale(1)'}
+            },
+            animation: 'loading-pop 520ms cubic-bezier(0.22, 1, 0.36, 1) both'
+          }}>
+          <Text
+            textStyle="lg"
+            fontWeight="medium"
+            color="fg.muted"
+            textAlign="center"
+            aria-live="polite">
+            {lines[index]}
+            <Text as="span" aria-hidden="true">
+              …
+            </Text>
+          </Text>
+        </Box>
       </Stack>
     </Center>
   )
