@@ -33,7 +33,7 @@ export interface BookingFormValues {
   email: string;
   phone?: string;
   flightNumber?: string;
-  message: string;
+  message?: string;
 
   // Consent
   agreeToTerms: boolean;
@@ -761,16 +761,19 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       </Field.Root>
                     </HStack>
 
-                    <Field.Root required invalid={!!errors.message}>
+                    {/* Optional. Most bookings are an address, a time and a
+                        car, and demanding a sentence about wishes before the
+                        form will submit turns a two minute booking into a
+                        moment of wondering what to write. */}
+                    <Field.Root invalid={!!errors.message}>
                       <Field.Label htmlFor="message" fontSize="sm">
                         {t('LabelWishes', 'Wishes')}
-                        <Field.RequiredIndicator />
                       </Field.Label>
                       <Textarea
                         id="message"
                         placeholder={t('WishesPlaceholder', 'Wishes or note')}
                         defaultValue={defaultValues?.message}
-                        {...register('message', { required: true })}
+                        {...register('message')}
                         _focus={{ borderColor: 'brand.500' }}
                       />
                       <Field.ErrorText fontSize="sm">
