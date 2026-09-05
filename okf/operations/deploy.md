@@ -70,7 +70,8 @@ a spinner. And the hand over from this dark page to the forced-light home
 page once left the cookie consent banner in its dark theme on a light page,
 because jaen mirrored the colour mode into the banner's class only when its
 hook changed, which a client-side route change does not do. jaen `2df0678`
-watches the class on `<html>` instead, verified with the second 1.1.0 deploy:
+watches the class on `<html>` instead, verified with the 1.1.0 deploys of
+the evening:
 after `/loading` the banner on `/` is white with dark text, as on a cold
 load.
 
