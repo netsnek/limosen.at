@@ -82,9 +82,14 @@ const classKeyOf = (category?: string): string | undefined => {
   const c = (category ?? '').toLowerCase();
 
   if (!c) return undefined;
-  if (c.includes('van') || c.includes('bus')) return 'BUSINESS_VAN';
-  if (c.includes('elek') || c.includes('electr') || c.includes('elektr')) return 'ELECTRIC_CLASS';
-  if (c.includes('first') || c.includes('erste') || c.includes('luxus')) return 'FIRST_CLASS';
+  // "bus" only as a whole word: "business" contains it, and matching that
+  // substring made "Business Class" a van while the real business class went
+  // unlabelled and vanished from the form. The Arabic words are the ones the
+  // ar-EG catalogue uses (فان, كهرب, الأولى) and have no Latin letters to fall
+  // back on.
+  if (c.includes('van') || /\bbus\b/.test(c) || c.includes('فان')) return 'BUSINESS_VAN';
+  if (c.includes('elek') || c.includes('electr') || c.includes('كهرب')) return 'ELECTRIC_CLASS';
+  if (c.includes('first') || c.includes('erste') || c.includes('luxus') || c.includes('الأولى')) return 'FIRST_CLASS';
   return 'BUSINESS_CLASS';
 };
 
