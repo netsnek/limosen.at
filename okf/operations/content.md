@@ -17,17 +17,23 @@ wins and the order is not decoration.
 sequenceDiagram
     participant E as Editor in the CMS
     participant J as jaen pylon
-    participant R as this repository
-    participant D as deploy script
+    participant R as this repository, main on GitHub
+    participant L as a checkout with ../jaen beside it
     participant P as Cloudflare Pages
 
     E->>J: Publish
     J->>J: writes the patch, gets a URL
     J->>R: repository_dispatch with the migration URL
-    R->>R: appends the URL to jaen-data/patches.txt
-    D->>R: reads jaen-data, builds in place
-    D->>P: wrangler pages deploy public
+    R->>R: jaen-publish.yaml appends the URL to jaen-data/patches.txt on main
+    L->>R: git pull
+    L->>L: scripts/deploy.sh builds and checks
+    L->>P: wrangler pages deploy public
 ```
+
+The workflow refuses a URL outside the storage gateway, skips one that is
+already in the chain, and rebases on a publish that landed in between. It
+does not build: see [deploy.md](deploy.md) for why. A publish is therefore
+live only after somebody pulls and runs the deploy script.
 
 Two entries are local files rather than URLs: `2025-11-30-1653-sanitised.json`
 and `2025-11-30-2039-sanitised.json`. They are sanitised copies of two November

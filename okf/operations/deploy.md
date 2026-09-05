@@ -72,7 +72,23 @@ deploy Pages and read the zone list. It cannot touch DNS.
 
 `link:` dependencies pointing at a sibling checkout of an unpublished branch. A
 runner has no such sibling. It stops being true when the jaen packages are
-published.
+published. On 2026-09-05 the sibling was ten commits and an uncommitted
+working tree ahead of `netsnek/jaen@feat/chakra-v3`, so even a checkout of
+that branch would have built a different site.
+
+Two workflows that pretended otherwise were removed the same day:
+`deploy.yaml` called `atsnek/jaen`'s reusable deploy on every push to main and
+had failed on every run since 2025-11-27, and `publish.yaml` built a Docker
+image nobody consumed. What is left, `jaen-publish.yaml`, only records a CMS
+publish (see [content.md](content.md)); the deploy after it is this script,
+after a pull.
+
+## The branch
+
+The site is built from `main`, and `main` on GitHub is the Chakra v3 tree
+since 2026-09-05. Before that the tree lived only on a local branch,
+`feat/chakra-v3`, while GitHub's `main` still ended at the publish of
+2025-11-30, so every CMS publish landed on a branch nobody built from.
 
 ## Rolling back
 
