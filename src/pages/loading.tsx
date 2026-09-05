@@ -1,21 +1,29 @@
 import React from 'react'
 import type {PageProps} from 'gatsby'
 import {navigate} from 'gatsby'
+import {Center, Spinner, Stack} from '@chakra-ui/react'
 import {PageConfig} from 'jaen'
 
+import {Logo} from '../gatsby-plugin-jaen/components/Logo'
+
 /**
- * The OIDC redirect target, restored into the site.
+ * The OIDC redirect target.
  *
  * Zitadel sends the browser back to the `redirectUri` registered on the OIDC
- * client, and for both variants that is `/loading`. The old jaen shipped this
- * page itself; the version this site now links against does not, so after the
- * migration a successful login landed on a 404 and the session was dropped.
- * Changing the redirect instead would mean changing the registration in Zitadel,
- * which is not ours to change.
+ * client, which is this path, and the page's only job is to send the visitor
+ * on: an installed PWA goes to the app dashboard, a normal browser to the
+ * start page. The manifest's `start_url: /login` depends on that.
  *
- * The behaviour is the old page's, verbatim: an installed PWA goes on to the app
- * dashboard, a normal browser goes to the start page. That is what the live site
- * does today, and the manifest's `start_url: /login` depends on it.
+ * What it shows meanwhile is the logo and a spinner, nothing else. It used to
+ * render inside jaen's content layout, which puts the imprint, privacy and
+ * terms footer under every page, and on a phone that footer was the most
+ * visible thing on the screen for the second the page is up. A visitor who
+ * has just signed in and sees legal links instead of the app assumes the login
+ * failed. The `bare` layout type exists for this page.
+ *
+ * The page carries the colour mode of the app, not the website's forced light
+ * (see gatsby-plugin-jaen's color-mode-scope), so on a dark brand there is no
+ * white flash between the login and the dashboard.
  */
 const isPwa = () => {
   if (typeof window === 'undefined') {
@@ -37,9 +45,12 @@ const LoadingPage: React.FC<PageProps> = () => {
   }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-t-transparent border-black rounded-full animate-spin" />
-    </div>
+    <Center minH="100dvh" bg="bg" px="8">
+      <Stack align="center" gap="8">
+        <Logo width="min(60vw, 16rem)" height="auto" />
+        <Spinner size="lg" colorPalette="brand" color="colorPalette.solid" borderWidth="3px" />
+      </Stack>
+    </Center>
   )
 }
 
@@ -49,7 +60,8 @@ export const pageConfig: PageConfig = {
   label: 'Loading',
   withoutJaenFrame: true,
   layout: {
-    name: 'jaen'
+    name: 'jaen',
+    type: 'bare'
   }
 }
 
