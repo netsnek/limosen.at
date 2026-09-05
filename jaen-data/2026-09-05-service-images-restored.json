@@ -1,0 +1,183 @@
+{
+  "message": "Restore the three service images (airport transfer, chauffeur service, city tour) to the originals of 2025-10-02; the publishes of 2025-11-30 had replaced them with WIENVERS blog images",
+  "createdAt": "2026-09-05T01:10:00.000Z",
+  "data": {
+    "pages": [
+      {
+        "id": "JaenPage /cms/media/",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:MEDIA_NODES": {
+            "media_nodes": {
+              "value": {
+                "6a625062-ca7c-4514-b68f-e4f9b0ed3982": {
+                  "id": "6a625062-ca7c-4514-b68f-e4f9b0ed3982",
+                  "fileUniqueId": "AgAD8RgAAo3M8VI",
+                  "createdAt": "2026-09-05T01:10:00.000Z",
+                  "modifiedAt": "2026-09-05T01:10:00.000Z",
+                  "description": "service-airport-transfer.jpg",
+                  "preview": {
+                    "url": "https://osg.snek.at/storage/AAMCBAADHQR3rOh7AAIDimjeO2dMWONCtgb6nVR11Z7a0UBFAALxGAACjczxUm0UcZ8-foGUAQAHbQADLwQ"
+                  },
+                  "url": "https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACA4po3jtnTFjjQrYG-p1UddWe2tFARQAC8RgAAo3M8VJtFHGfPn6BlC8E",
+                  "width": 470,
+                  "height": 353,
+                  "revisions": [],
+                  "jaenPageId": "JaenPage /en/"
+                },
+                "410918e8-8c9c-4e0a-a85a-ca5f9d7cba72": {
+                  "id": "410918e8-8c9c-4e0a-a85a-ca5f9d7cba72",
+                  "fileUniqueId": "AgAD8hgAAo3M8VI",
+                  "createdAt": "2026-09-05T01:10:00.000Z",
+                  "modifiedAt": "2026-09-05T01:10:00.000Z",
+                  "description": "service-driver.jpg",
+                  "preview": {
+                    "url": "https://osg.snek.at/storage/AAMCBAADHQR3rOh7AAIDi2jeO2fBqEeIiTCNW-GZfsoYM56sAALyGAACjczxUnjqnN38zxNwAQAHbQADLwQ"
+                  },
+                  "url": "https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACA4to3jtnwahHiIkwjVvhmX7KGDOerAAC8hgAAo3M8VJ46pzd_M8TcC8E",
+                  "width": 563,
+                  "height": 338,
+                  "revisions": [],
+                  "jaenPageId": "JaenPage /en/"
+                },
+                "eb9ca31e-b247-4718-b606-450887df993f": {
+                  "id": "eb9ca31e-b247-4718-b606-450887df993f",
+                  "fileUniqueId": "AgAD8xgAAo3M8VI",
+                  "createdAt": "2026-09-05T01:10:00.000Z",
+                  "modifiedAt": "2026-09-05T01:10:00.000Z",
+                  "description": "service-limousine.jpg",
+                  "preview": {
+                    "url": "https://osg.snek.at/storage/AAMCBAADHQR3rOh7AAIDjGjeO2fjUB7oC6KWNNbsW8R8kNkTAALzGAACjczxUi2Befam0SzJAQAHbQADLwQ"
+                  },
+                  "url": "https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACA4xo3jtn41Ae6AuiljTW7FvEfJDZEwAC8xgAAo3M8VItgXn2ptEsyS8E",
+                  "width": 533,
+                  "height": 400,
+                  "revisions": [],
+                  "jaenPageId": "JaenPage /en/"
+                }
+              },
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      },
+      {
+        "id": "JaenPage /",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:ImageField": {
+            "service-airport-transfer-image": {
+              "value": "bb432951-7ecf-4e0d-8a3e-dbd7e6c377bb",
+              "props": {}
+            },
+            "service-city-tour-image": {
+              "value": "2344ae56-09e7-4952-88e5-0b1b33a5336b",
+              "props": {}
+            },
+            "service-private-driver-service-image": {
+              "value": "148988d8-f5e6-43e5-8e73-b779d2d970ac",
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      },
+      {
+        "id": "JaenPage /de/",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:ImageField": {
+            "service-airport-transfer-image": {
+              "value": "558fbf2a-0523-4e31-b86e-dc335e871c78",
+              "props": {}
+            },
+            "service-city-tour-image": {
+              "value": "b9e0de5d-1eb7-4f48-99ff-778c2f01d4f6",
+              "props": {}
+            },
+            "service-private-driver-service-image": {
+              "value": "5f5c5052-2260-4910-9970-a87818d21154",
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      },
+      {
+        "id": "JaenPage /en/",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:ImageField": {
+            "service-airport-transfer-image": {
+              "value": "6a625062-ca7c-4514-b68f-e4f9b0ed3982",
+              "props": {}
+            },
+            "service-city-tour-image": {
+              "value": "410918e8-8c9c-4e0a-a85a-ca5f9d7cba72",
+              "props": {}
+            },
+            "service-private-driver-service-image": {
+              "value": "eb9ca31e-b247-4718-b606-450887df993f",
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      },
+      {
+        "id": "JaenPage /tr/",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:ImageField": {
+            "service-airport-transfer-image": {
+              "value": "ffcdbbcf-5d68-433a-a52f-e36cd4b30558",
+              "props": {}
+            },
+            "service-city-tour-image": {
+              "value": "9ddfd9f3-7803-4b85-8a70-3baf12f9fb3c",
+              "props": {}
+            },
+            "service-private-driver-service-image": {
+              "value": "875846ef-0a31-4ef3-8db5-243430b921d3",
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      },
+      {
+        "id": "JaenPage /ar/",
+        "childPages": [],
+        "sections": [],
+        "jaenFields": {
+          "IMA:ImageField": {
+            "service-airport-transfer-image": {
+              "value": "c6ab20c8-47f4-44c3-9bff-0a734500afda",
+              "props": {}
+            },
+            "service-city-tour-image": {
+              "value": "5794ce70-e12f-4868-ad8f-52a0786659c3",
+              "props": {}
+            },
+            "service-private-driver-service-image": {
+              "value": "eb49c619-8eb6-495a-a698-4846239ef7d6",
+              "props": {}
+            }
+          }
+        },
+        "modifiedAt": "2026-09-05T01:10:00.000Z"
+      }
+    ],
+    "site": {
+      "siteMetadata": {}
+    },
+    "widgets": []
+  },
+  "_restoredFrom": "the media nodes of the 2025-10-02 publish (patch 3 of the chain); /en/ had none of its own and received copies of the root page's nodes"
+}
