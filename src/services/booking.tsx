@@ -14,8 +14,22 @@ import {useIntl} from 'react-intl'
 
 import {bookTransfer} from './book-transfer'
 
+/**
+ * What a caller may put into the form before the visitor sees it.
+ *
+ * `carClass` is the translated class label the form's class dropdown lists
+ * ('First Class', 'الدرجة الأولى'), not the database value, and `carTitle` is
+ * one of the model names the vehicle dropdown offers for that class. The fleet
+ * cards on the home page pass exactly the pair they show, so a click on a card
+ * lands in a form that already names the car.
+ */
+export interface BookingDefaults {
+  carClass?: string
+  carTitle?: string
+}
+
 export interface BookingModalContextProps {
-  onOpen: (args?: {meta?: Record<string, any>}) => void
+  onOpen: (args?: {meta?: Record<string, any>; defaults?: BookingDefaults}) => void
   onClose: () => void
 }
 
@@ -97,6 +111,7 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
   const {isCalled, paramValue} = useQueryRouter(location, 'booking')
 
   const [meta, setMeta] = React.useState<Record<string, any> | null>(null)
+  const [defaults, setDefaults] = React.useState<BookingDefaults | null>(null)
   const [isOpen, setIsOpen] = React.useState(false)
 
   // v3 dropped useToast for a store whose create() reads `type`, not `status`.
@@ -130,6 +145,9 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
       ...args?.meta
     }
     setMeta(updatedMeta)
+    // A caller that names no car clears the last one: the nav's "book online"
+    // after a card click must not still carry that card's class.
+    setDefaults(args?.defaults ?? null)
     setIsOpen(true)
   }
 
@@ -155,13 +173,15 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
   }, [authentication.user])
 
   const defaultValues = useMemo(() => {
-    if (!isCalled) {
+    if (!isCalled && !defaults) {
       return undefined
     }
     return {
-      message: paramValue
+      message: isCalled ? paramValue : undefined,
+      carClass: defaults?.carClass,
+      carTitle: defaults?.carTitle
     }
-  }, [isCalled, paramValue])
+  }, [isCalled, paramValue, defaults])
 
   const mergeFixedIntoSubmit = React.useCallback(
     (data: BookingFormValues): BookingFormValues => {
