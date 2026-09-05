@@ -195,7 +195,11 @@ const brandColorPalette = {
  * The light halves are jaen's own, repeated rather than left out, because a
  * token given only a `_dark` here would still be merged as a whole object and
  * take the light value from whichever side merged last. Repeating them makes
- * the site's system and jaen's agree in both modes.
+ * the site's system and jaen's agree in both modes. Two of them are written
+ * as hex rather than as a reference: jaen's canvas is its gray.25 (#fcfdfe)
+ * and its subtle surface its gray.50 (#f4f8fa), and this ramp has no 25 and a
+ * different 50 (#F7FAFC), so a reference would resolve to a different grey in
+ * each of the two systems. The hex is the same colour in both.
  *
  * `_light`, NOT `base`, for every name v3 defines itself: the three DEFAULTs,
  * bg.panel, bg.emphasized, bg.inverted, bg.subtle, bg.muted, fg.muted,
@@ -216,9 +220,9 @@ const surfaceSemanticTokens = {
     panel: {value: {_light: '{colors.white}', _dark: dark.surface}},
     emphasized: {value: {_light: '{colors.gray.300}', _dark: dark.muted}},
     inverted: {value: {_light: '{colors.black}', _dark: dark.fg}},
-    canvas: {value: {base: '{colors.gray.50}', _dark: dark.canvas}},
+    canvas: {value: {base: '#fcfdfe', _dark: dark.canvas}},
     surface: {value: {base: '{colors.white}', _dark: dark.surface}},
-    subtle: {value: {_light: '{colors.gray.50}', _dark: dark.subtle}},
+    subtle: {value: {_light: '#f4f8fa', _dark: dark.subtle}},
     muted: {value: {_light: '{colors.gray.100}', _dark: dark.muted}},
     translucent: {
       value: {base: 'rgba(255, 255, 255, 0.8)', _dark: 'hsl(0 0% 10% / 0.85)'}
