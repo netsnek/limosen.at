@@ -90,6 +90,40 @@ const limosenAccentScale = {
 }
 
 /**
+ * The dark palette, the old app's, measured rather than chosen.
+ *
+ * The values are the `.dark` block of the app's former tokens.css, which is
+ * still readable at `git show 265b18a:app/shared/styles/tokens.css` in the
+ * taxi-app repository and again in limosen-dashboard-chakra's system.ts. The
+ * page was charcoal hsl(0 0% 10%), the cards the same charcoal set off by a
+ * border, muted surfaces hsl(0 0% 20%), muted text hsl(0 0% 75%), and the
+ * primary a gold hsl(48 96% 53%) with black on it.
+ *
+ * Spelled as hsl() strings, not as entries of a ramp, because none of them
+ * is a step of the gold or grey ramp above and inventing steps for them would
+ * be a second source for the same numbers.
+ */
+const dark = {
+  canvas: 'hsl(0 0% 10%)',
+  surface: 'hsl(0 0% 10%)',
+  subtle: 'hsl(0 0% 15%)',
+  muted: 'hsl(0 0% 20%)',
+  fg: 'hsl(0 0% 100%)',
+  fgEmphasized: 'hsl(0 0% 90%)',
+  fgMuted: 'hsl(0 0% 75%)',
+  fgSubtle: 'hsl(0 0% 60%)',
+  border: 'hsl(0 0% 20%)',
+  borderEmphasized: 'hsl(0 0% 27%)',
+  borderActive: 'hsl(0 0% 35%)',
+  gold: 'hsl(48 96% 53%)',
+  goldHover: 'hsl(48 96% 47%)',
+  goldActive: 'hsl(48 96% 42%)',
+  goldEmphasized: 'hsl(48 96% 62%)',
+  goldSubtle: 'hsl(48 96% 53% / 0.16)',
+  goldMuted: 'hsl(48 96% 53% / 0.28)'
+}
+
+/**
  * The eight slots a `colorPalette` resolves against, filled for `brand`.
  *
  * v2's theme set `defaultProps: {colorScheme: 'brand'}` on Button and on
@@ -100,8 +134,8 @@ const limosenAccentScale = {
  * custom property is invalid at computed-value time rather than an error, so
  * tsc and gatsby build stay green while it happens.
  *
- * The values are what v2's brand-schemed button actually produced, read off
- * @chakra-ui/theme rather than chosen:
+ * The light values are what v2's brand-schemed button actually produced, read
+ * off @chakra-ui/theme rather than chosen:
  *
  *   solid     variantSolid  bg         `${c}.500`
  *   contrast  variantSolid  color      white
@@ -114,18 +148,96 @@ const limosenAccentScale = {
  * `semanticTokens.colors.brand` off this system through the theme shadow and
  * merges it into the CMS chrome, so a divergence here recolours the CMS.
  *
- * The site is light only, so no slot carries a `_dark` half. Every semantic
- * token in theme.ts had a single value and the site never mounted a dark mode.
+ * `solidHover` and `solidActive` are jaen's two extra slots. jaen's button
+ * recipe reads them for its hover and pressed states, and so does the app's
+ * every primary button, so they are filled here or jaen's own brand.600 and
+ * brand.700 halves show through, which in dark would be a brown on charcoal.
+ *
+ * The dark halves are the old app's gold on charcoal, see `dark` above: the
+ * primary is the bright gold with black on it, the active and hover surfaces
+ * (`subtle`, `muted`) are that gold at low alpha so a selected row or nav item
+ * reads as a gold tint and not as a yellow block, and `fg` is the gold itself,
+ * legible on charcoal where light mode's brand.600 would not be.
+ *
+ * `base` for the light half: `brand.*` is a name neither v3 nor jaen's
+ * defaults reserve, so there is no `_light` to outrank.
  */
 const brandColorPalette = {
-  solid: {value: '{colors.brand.500}'},
-  contrast: {value: '{colors.white}'},
-  fg: {value: '{colors.brand.600}'},
-  muted: {value: '{colors.brand.100}'},
-  subtle: {value: '{colors.brand.50}'},
-  emphasized: {value: '{colors.brand.600}'},
-  border: {value: '{colors.brand.500}'},
-  focusRing: {value: '{colors.brand.500}'}
+  solid: {value: {base: '{colors.brand.500}', _dark: dark.gold}},
+  solidHover: {value: {base: '{colors.brand.600}', _dark: dark.goldHover}},
+  solidActive: {value: {base: '{colors.brand.700}', _dark: dark.goldActive}},
+  contrast: {value: {base: '{colors.white}', _dark: '{colors.black}'}},
+  fg: {value: {base: '{colors.brand.600}', _dark: dark.gold}},
+  muted: {value: {base: '{colors.brand.100}', _dark: dark.goldMuted}},
+  subtle: {value: {base: '{colors.brand.50}', _dark: dark.goldSubtle}},
+  emphasized: {value: {base: '{colors.brand.600}', _dark: dark.goldEmphasized}},
+  border: {value: {base: '{colors.brand.500}', _dark: dark.gold}},
+  focusRing: {value: {base: '{colors.brand.500}', _dark: dark.gold}}
+}
+
+/**
+ * The surfaces, the text and the borders, both halves.
+ *
+ * These are the names the app's screens and jaen's CMS read: bg.canvas,
+ * bg.surface, bg.subtle, bg.muted, fg.default, fg.muted, border.default and
+ * their siblings. gatsby-plugin-jaen merges the three groups off this system
+ * into its own (packages/gatsby-plugin-jaen/src/theme/system.ts), which is the
+ * system in scope on every route inside jaen's frame, /app included. So this
+ * is the one place the brand's dark mode is decided, and neither jaen nor the
+ * app carries a limosen colour.
+ *
+ * The public website has no colour mode: gatsby-plugin-jaen forces light on
+ * every route outside the CMS and /app, so the `_dark` halves below only ever
+ * render inside jaen and the app. The marketing pages keep the palette they
+ * always had, and nothing here changes their light rendering: every light
+ * half repeats the value jaen's or v3's foundations already resolve to.
+ *
+ * The light halves are jaen's own, repeated rather than left out, because a
+ * token given only a `_dark` here would still be merged as a whole object and
+ * take the light value from whichever side merged last. Repeating them makes
+ * the site's system and jaen's agree in both modes.
+ *
+ * `_light`, NOT `base`, for every name v3 defines itself: the three DEFAULTs,
+ * bg.panel, bg.emphasized, bg.inverted, bg.subtle, bg.muted, fg.muted,
+ * fg.subtle, fg.inverted and border.emphasized. v3 spells
+ * its own light value `_light`, a `base` beside it survives the merge and
+ * lands on a weaker selector, and v3's grey wins every time. The rest are
+ * jaen's names and take `base`. Measured against v3.36.1, and explained in
+ * jaen's foundations/semantic-tokens.ts.
+ */
+const surfaceSemanticTokens = {
+  bg: {
+    // v3's bare `bg`, `bg.panel` (every Dialog, Popover and Menu panel),
+    // `bg.emphasized` and `bg.inverted`. Their light halves are v3's own, so
+    // light mode does not move. Without the dark halves a dialog in dark sits
+    // on v3's gray.950, a blue-black that is not the brand's charcoal, and
+    // the old app's popover was the same 10% grey as its page.
+    DEFAULT: {value: {_light: '{colors.white}', _dark: dark.canvas}},
+    panel: {value: {_light: '{colors.white}', _dark: dark.surface}},
+    emphasized: {value: {_light: '{colors.gray.300}', _dark: dark.muted}},
+    inverted: {value: {_light: '{colors.black}', _dark: dark.fg}},
+    canvas: {value: {base: '{colors.gray.50}', _dark: dark.canvas}},
+    surface: {value: {base: '{colors.white}', _dark: dark.surface}},
+    subtle: {value: {_light: '{colors.gray.50}', _dark: dark.subtle}},
+    muted: {value: {_light: '{colors.gray.100}', _dark: dark.muted}},
+    translucent: {
+      value: {base: 'rgba(255, 255, 255, 0.8)', _dark: 'hsl(0 0% 10% / 0.85)'}
+    }
+  },
+  fg: {
+    DEFAULT: {value: {_light: '{colors.black}', _dark: dark.fg}},
+    default: {value: {base: '{colors.gray.900}', _dark: dark.fg}},
+    emphasized: {value: {base: '{colors.gray.700}', _dark: dark.fgEmphasized}},
+    muted: {value: {_light: '{colors.gray.600}', _dark: dark.fgMuted}},
+    subtle: {value: {_light: '{colors.gray.500}', _dark: dark.fgSubtle}},
+    inverted: {value: {_light: '{colors.white}', _dark: dark.canvas}}
+  },
+  border: {
+    DEFAULT: {value: {_light: '{colors.gray.200}', _dark: dark.border}},
+    default: {value: {base: '{colors.gray.200}', _dark: dark.border}},
+    emphasized: {value: {_light: '{colors.gray.300}', _dark: dark.borderEmphasized}},
+    active: {value: {base: '{colors.gray.400}', _dark: dark.borderActive}}
+  }
 }
 
 /**
@@ -670,6 +782,7 @@ export const siteConfig = defineConfig({
     semanticTokens: {
       colors: {
         brand: brandColorPalette,
+        ...surfaceSemanticTokens,
         limosen: limosenSemanticTokens
       }
     },
