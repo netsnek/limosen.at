@@ -17,9 +17,13 @@ export function getI18nBooking(code: I18nCode) {
         CategoryFlatrate: 'Flatrate',
         LabelType: 'Art',
         TypeOneWay: 'Einweg',
-        TypeReturn: 'Rückkehr',
+        TypeReturn: 'Rückfahrt',
         LabelDate: 'Datum',
         LabelTime: 'Abholzeit',
+        LabelReturnDate: 'Rückfahrtdatum',
+        LabelReturnTime: 'Abholzeit Rückfahrt',
+        ReturnRequired: 'Für eine Rückfahrt erforderlich',
+        ReturnAfterOutbound: 'Die Rückfahrt muss nach der Hinfahrt liegen',
         LabelPickup: 'Abholadresse',
         LabelDestination: 'Zieladresse',
         LabelPassengers: 'Passagieranzahl',
@@ -51,6 +55,10 @@ export function getI18nBooking(code: I18nCode) {
           'Ich bin damit einverstanden, dass meine Angaben zur Kontaktaufnahme und für Rückfragen gespeichert werden.',
         ConsentError: 'Bitte bestätige die Bedingungen zur Kontaktaufnahme',
         SubmitCta: 'Reservieren',
+        LabelBooking: 'Buchung',
+        ToastApiBookingErrorTitle: 'Buchung noch nicht im System',
+        ToastApiBookingErrorDesc:
+          'Wir konnten die Buchung nicht in unserem System anlegen. Deine Anfrage wird trotzdem per E-Mail gesendet.',
 
         // Booking view (dashboard)
         BookingsHeading: 'Meine Buchungen ({count})',
@@ -100,9 +108,13 @@ export function getI18nBooking(code: I18nCode) {
         CategoryFlatrate: 'Sabit ücret',
         LabelType: 'Tür',
         TypeOneWay: 'Tek yön',
-        TypeReturn: 'Dönüş',
+        TypeReturn: 'Gidiş-dönüş',
         LabelDate: 'Tarih',
         LabelTime: 'Alış saati',
+        LabelReturnDate: 'Dönüş tarihi',
+        LabelReturnTime: 'Dönüş alış saati',
+        ReturnRequired: 'Dönüş için gereklidir',
+        ReturnAfterOutbound: 'Dönüş, gidişten sonra olmalıdır',
         LabelPickup: 'Alış adresi',
         LabelDestination: 'Varış adresi',
         LabelPassengers: 'Yolcu sayısı',
@@ -134,6 +146,10 @@ export function getI18nBooking(code: I18nCode) {
           'İletişim ve geri dönüş için verilerimin saklanmasına izin veriyorum.',
         ConsentError: 'Lütfen iletişim iznini onaylayın',
         SubmitCta: 'Rezervasyon',
+        LabelBooking: 'Rezervasyon',
+        ToastApiBookingErrorTitle: 'Rezervasyon henüz sistemde değil',
+        ToastApiBookingErrorDesc:
+          'Rezervasyonu sistemimizde oluşturamadık. Talebiniz yine de e-posta ile gönderilecek.',
 
         // Booking view (dashboard)
         BookingsHeading: 'Rezervasyonlarım ({count})',
@@ -186,6 +202,10 @@ export function getI18nBooking(code: I18nCode) {
         TypeReturn: 'ذهاب وعودة',
         LabelDate: 'التاريخ',
         LabelTime: 'وقت الاستلام',
+        LabelReturnDate: 'تاريخ العودة',
+        LabelReturnTime: 'وقت الاستلام للعودة',
+        ReturnRequired: 'مطلوب لرحلة العودة',
+        ReturnAfterOutbound: 'يجب أن تكون العودة بعد رحلة الذهاب',
         LabelPickup: 'عنوان الاستلام',
         LabelDestination: 'عنوان الوجهة',
         LabelPassengers: 'عدد الركاب',
@@ -216,6 +236,10 @@ export function getI18nBooking(code: I18nCode) {
           'أوافق على حفظ بياناتي لغرض التواصل والرد على الاستفسارات.',
         ConsentError: 'يرجى تأكيد إذن التواصل',
         SubmitCta: 'إرسال الحجز',
+        LabelBooking: 'الحجز',
+        ToastApiBookingErrorTitle: 'الحجز لم يُسجَّل في النظام بعد',
+        ToastApiBookingErrorDesc:
+          'تعذر إنشاء الحجز في نظامنا. سيتم إرسال طلبك عبر البريد الإلكتروني على أي حال.',
 
         // Booking view (dashboard)
         BookingsHeading: 'حجوزاتي ({count})',
@@ -268,6 +292,10 @@ export function getI18nBooking(code: I18nCode) {
       TypeReturn: 'Return',
       LabelDate: 'Date',
       LabelTime: 'Pickup time',
+      LabelReturnDate: 'Return date',
+      LabelReturnTime: 'Return pickup time',
+      ReturnRequired: 'Required for a return trip',
+      ReturnAfterOutbound: 'The return must be after the outbound ride',
       LabelPickup: 'Pickup address',
       LabelDestination: 'Destination address',
       LabelPassengers: 'Passengers',
@@ -297,6 +325,10 @@ export function getI18nBooking(code: I18nCode) {
       ConsentText: 'I agree that my details may be stored for contact and follow-up.',
       ConsentError: 'Please confirm the contact permission',
       SubmitCta: 'Reserve',
+      LabelBooking: 'Booking',
+      ToastApiBookingErrorTitle: 'Booking not yet in the system',
+      ToastApiBookingErrorDesc:
+        'We could not create the booking in our system. Your request will still be sent by email.',
 
       // Booking view (dashboard)
       BookingsHeading: 'My bookings ({count})',

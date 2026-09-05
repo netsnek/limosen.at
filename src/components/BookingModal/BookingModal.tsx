@@ -43,6 +43,10 @@ export interface BookingFormValues {
   rideType?: RideType;
   date?: string;
   time?: string;
+  // The way back, only when rideType is RETURN. The service turns them into
+  // one returnPickupDateTime and the pylon creates the second leg from it.
+  returnDate?: string;
+  returnTime?: string;
   pickupAddress?: string;
   destinationAddress?: string;
 
@@ -255,9 +259,44 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   }, [fleetData]);
 
   const selectedCarClass = watch('carClass');
-  const vehicleOptions = selectedCarClass
-    ? vehiclesByCategory[selectedCarClass] ?? []
-    : [];
+  const selectedCarTitle = watch('carTitle');
+  const vehicleOptions = React.useMemo(() => {
+    const list = selectedCarClass
+      ? vehiclesByCategory[selectedCarClass] ?? []
+      : [];
+    // A model handed in through defaultValues has to be an option, or the
+    // native select falls back to its placeholder and submits nothing. The
+    // list may not hold it yet while the backend's fleet is still loading.
+    return selectedCarTitle && !list.includes(selectedCarTitle)
+      ? [...list, selectedCarTitle]
+      : list;
+  }, [selectedCarClass, selectedCarTitle, vehiclesByCategory]);
+
+  const isReturn = watch('rideType') === 'RETURN';
+
+  /**
+   * A return has a date and a time of its own, and both have to be there: the
+   * pylon creates the second leg from them, and a "Rückfahrt" without a when
+   * is the flag on one row that the office had to complete by phone before.
+   * The two validators only run while the fields are rendered, which is only
+   * for a return, so a one way booking is not asked for them.
+   */
+  const returnRules = {
+    required: t('ReturnRequired', 'Required for a return trip'),
+    validate: (_: unknown, values: BookingFormValues) => {
+      // Only once both instants are complete. A half typed return gets the
+      // required message on the missing half, not an order complaint here.
+      if (!values.date || !values.time || !values.returnDate || !values.returnTime) {
+        return true;
+      }
+      const outbound = `${values.date}T${values.time}`;
+      const back = `${values.returnDate}T${values.returnTime}`;
+      return (
+        back > outbound ||
+        t('ReturnAfterOutbound', 'The return must be after the outbound ride')
+      );
+    }
+  };
 
   React.useEffect(() => {
     reset({
@@ -274,9 +313,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // Clear the vehicle when the visitor changes the class. Not on the first
+  // class the form sees: a class and a model handed in together through
+  // defaultValues would otherwise lose the model the moment the class lands.
+  const previousCarClass = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
-    // Clear vehicle selection when class changes
-    setValue('carTitle', undefined);
+    const previous = previousCarClass.current;
+    previousCarClass.current = selectedCarClass;
+    if (previous !== undefined && previous !== selectedCarClass) {
+      setValue('carTitle', undefined);
+    }
   }, [selectedCarClass, setValue]);
 
   return (
@@ -415,6 +461,42 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           {errors.time?.toString()}
                         </Field.ErrorText>
                       </Field.Root>
+
+                      {isReturn && (
+                        <>
+                          <Field.Root required invalid={!!errors.returnDate}>
+                            <Field.Label htmlFor="returnDate" fontSize="sm">
+                              {t('LabelReturnDate', 'Return date')}
+                              <Field.RequiredIndicator />
+                            </Field.Label>
+                            <Input
+                              id="returnDate"
+                              type="date"
+                              {...register('returnDate', returnRules)}
+                              _focus={{ borderColor: 'brand.500' }}
+                            />
+                            <Field.ErrorText fontSize="sm">
+                              {errors.returnDate?.message}
+                            </Field.ErrorText>
+                          </Field.Root>
+
+                          <Field.Root required invalid={!!errors.returnTime}>
+                            <Field.Label htmlFor="returnTime" fontSize="sm">
+                              {t('LabelReturnTime', 'Return pickup time')}
+                              <Field.RequiredIndicator />
+                            </Field.Label>
+                            <Input
+                              id="returnTime"
+                              type="time"
+                              {...register('returnTime', returnRules)}
+                              _focus={{ borderColor: 'brand.500' }}
+                            />
+                            <Field.ErrorText fontSize="sm">
+                              {errors.returnTime?.message}
+                            </Field.ErrorText>
+                          </Field.Root>
+                        </>
+                      )}
 
                       <Field.Root>
                         <Field.Label htmlFor="pickupAddress" fontSize="sm">
