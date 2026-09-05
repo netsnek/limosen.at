@@ -37,6 +37,15 @@ Three environment settings are not decoration:
   publishes AAAA records it cannot reach and node's fetch tries IPv6 first. The
   build downloads every media file from the storage gateway.
 
+## The scrub
+
+Gatsby's HTML renderer leaves two NUL bytes inside Arabic words on
+`public/ar/index.html`, at a different place on every build, and they were in
+the build of 2026-05 as much as in today's. Neither the patches nor the
+sources nor `page-data` carry them. A NUL in HTML text is displayed as U+FFFD,
+so a word reads with a "�" in it. The script strips them from every HTML file
+after the build and refuses to deploy if any survive.
+
 ## The checks
 
 ```

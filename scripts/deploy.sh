@@ -34,6 +34,17 @@ env -u SITE_VARIANT -u GATSBY_SITE_VARIANT \
   NODE_OPTIONS="--max-old-space-size=8192 --no-network-family-autoselection" \
   npx gatsby build
 
+echo "==> scrub"
+# Gatsby's HTML renderer leaves two NUL bytes inside Arabic words on
+# public/ar/index.html, at a different place on every build; neither the
+# patches nor the sources nor page-data carry them. A NUL in HTML text is
+# shown as U+FFFD, so the word reads with a "�" in it. Stripped here, and
+# counted, so a build that grows more of them is noticed.
+nuls=$(grep -l -P '\x00' -r public --include='*.html' | wc -l)
+echo "html files with NUL bytes before scrub: $nuls"
+find public -type f -name '*.html' -exec perl -pi -e 's/\x00//g' {} +
+grep -l -P '\x00' -r public --include='*.html' && { echo "NUL bytes survived the scrub" >&2; exit 1; }
+
 echo "==> checks"
 grep -q "https://limosen.at" public/index.html || { echo "built with the wrong site url" >&2; exit 1; }
 test -d public/loading || { echo "no /loading route, the login redirect would 404" >&2; exit 1; }
