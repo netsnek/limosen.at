@@ -1,62 +1,55 @@
-# Workflow that receives a migrationUrl via a dispatch event
+# Receives a jaen publish.
+#
+# The CMS (gatsby-plugin-jaen, `remote.repository` in gatsby-config.ts) sends a
+# repository_dispatch with the URL of the delta it wrote, and this appends that
+# URL to jaen-data/patches.txt on main, which is the branch the site is built
+# from. Nothing else: the build cannot run here, because the jaen packages are
+# `link:` dependencies on a sibling checkout the runner does not have
+# (okf/operations/deploy.md). The deploy stays `scripts/deploy.sh`, run after
+# a pull.
+#
+# Until 2026-09-05 this pushed with --force to a main that was not the branch
+# the site was built from, and then called a reusable deploy workflow that
+# failed on every run since 2025-11.
 
 name: Publish
 
-# https://help.github.com/en/articles/workflow-syntax-for-github-actions#on
 on:
-  # https://help.github.com/en/articles/workflow-syntax-for-github-actions
   repository_dispatch:
     types: [UPDATE_JAEN_RESOURCE]
 
+permissions:
+  contents: write
+
 jobs:
-  migrate:
-    # https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idruns-on
+  record:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#
-        working-directory: ${{github.event.client_payload.cwd}}
-
+    if: ${{ github.event.client_payload.migrationURL }}
     steps:
-      # https://github.com/actions/checkout
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
-        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepswith
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          # Relative path under $GITHUB_WORKSPACE to place the repository
-          path: '.'
+          ref: main
 
-      # https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstepsid
-      - name: Configure GitHub Authentication 🔧
-        # https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+      - name: Append the delta to the chain
+        env:
+          MIGRATION_URL: ${{ github.event.client_payload.migrationURL }}
         run: |
-          # Git: set identity
-          git config user.name "snekmin"
+          set -euo pipefail
+          case "$MIGRATION_URL" in
+            https://osg.snek.at/storage/*|https://osg.netsnek.com/storage/*) ;;
+            *) echo "refusing a migration URL outside the storage gateway: $MIGRATION_URL" >&2; exit 1 ;;
+          esac
+          if grep -qxF "$MIGRATION_URL" jaen-data/patches.txt; then
+            echo "already in the chain, nothing to do"
+            exit 0
+          fi
+          printf '%s\n' "$MIGRATION_URL" >> jaen-data/patches.txt
+          git config user.name "jaen publish"
           git config user.email "noreply.snek.at@gmail.com"
-
-          # Git: set remote  
-          # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
-          git remote set-url origin "https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git"
-
-      - name: Migrate Jaen Data 📝
-        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#
-        working-directory: ${{github.event.client_payload.cwd}}
-        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsif
-        if: ${{github.event.client_payload.migrationURL}}
-        # https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-        run: |
-          # Create gh-pages branch without history
-          #git checkout --orphan gh-pages
-          git checkout main
-
-          echo "${{github.event.client_payload.migrationURL}}" >> ./jaen-data/patches.txt
-
-          # Git: add, commit, and push changes
-          git add .
-          git commit -m "jaen-publish: migrate jaen-data" || echo "Nothing to commit, working tree clean."
-          GIT_TRACE=1 git push -f --verbose origin main
-
-  build:
-    needs: migrate
-    uses: ./.github/workflows/deploy.yaml
-    secrets: inherit
+          git add jaen-data/patches.txt
+          git commit -m "jaen-publish: migrate jaen-data"
+          # Another publish may have landed since the checkout; replay on top
+          # of it rather than overwriting it.
+          git pull --rebase origin main
+          git push origin main
