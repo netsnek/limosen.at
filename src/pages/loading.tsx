@@ -2,7 +2,7 @@ import React from 'react'
 import type {PageProps} from 'gatsby'
 import {navigate} from 'gatsby'
 import {Box, Center, Stack, Text} from '@chakra-ui/react'
-import {PageConfig} from 'jaen'
+import {PageConfig, useAuth} from 'jaen'
 
 import {Logo} from '../gatsby-plugin-jaen/components/Logo'
 
@@ -23,6 +23,20 @@ import {Logo} from '../gatsby-plugin-jaen/components/Logo'
  * just signed in and sees legal links assumes the login failed. The lines
  * exist so the wait reads as progress and not as a crash, which is why the
  * page stays for a moment even when the redirect could happen at once.
+ *
+ * It has to wait before it leaves, and that is the subtlety of this file.
+ * Zitadel arrives here with `?code=&state=`, and jaen's OIDC runtime sits
+ * behind a `React.lazy` import, so it mounts a chunk request later than this
+ * page does. Navigating away in the first effect, which this page once did,
+ * strips the query before the provider ever sees it: nobody is signed in,
+ * `/app/dashboard` is gated and sends the visitor to `/login`, `/login`
+ * starts a new sign-in, Zitadel still has the session and answers at once,
+ * and the browser is back here with a fresh code. An endless login loop that
+ * never shows an error. So while a code is in the url the page does nothing;
+ * the provider clears it in `onSigninCallback`, the auth state changes, and
+ * that re-runs the effect. A failed exchange goes to the start page, not the
+ * dashboard, because the dashboard would restart the same loop, and a
+ * fifteen second timeout makes sure nothing waits here forever.
  *
  * The page carries the colour mode of the app, not the website's forced
  * light (gatsby-plugin-jaen's color-mode-scope), so a dark brand does not
@@ -73,27 +87,61 @@ const language = (): keyof typeof LINES => {
   return code === 'en' || code === 'tr' || code === 'ar' ? code : 'de'
 }
 
-/** How long one line stays, and the least time the page stays at all. */
+/** True while the provider still has an authorization response to exchange. */
+const hasPendingResponse = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  const params = new URLSearchParams(window.location.search)
+
+  return (
+    (params.has('code') && params.has('state')) ||
+    (params.has('error') && params.has('state'))
+  )
+}
+
+/** How long one line stays, the least time the page stays, and the most. */
 const LINE_MS = 1400
 const MIN_STAY_MS = 2 * LINE_MS
+const GIVE_UP_MS = 15000
 
 const LoadingPage: React.FC<PageProps> = () => {
+  const auth = useAuth()
   const [lang, setLang] = React.useState<keyof typeof LINES>('de')
   const [index, setIndex] = React.useState(0)
+  const [stayedEnough, setStayedEnough] = React.useState(false)
+  const [gaveUp, setGaveUp] = React.useState(false)
 
   React.useEffect(() => {
     setLang(language())
     const ticker = window.setInterval(() => {
       setIndex(i => (i + 1) % LINES.de.length)
     }, LINE_MS)
-    const leave = window.setTimeout(() => {
-      navigate(isPwa() ? '/app/dashboard/' : '/', {replace: true})
-    }, MIN_STAY_MS)
+    const stay = window.setTimeout(() => setStayedEnough(true), MIN_STAY_MS)
+    const giveUp = window.setTimeout(() => setGaveUp(true), GIVE_UP_MS)
     return () => {
       window.clearInterval(ticker)
-      window.clearTimeout(leave)
+      window.clearTimeout(stay)
+      window.clearTimeout(giveUp)
     }
   }, [])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    if (!gaveUp) {
+      if (hasPendingResponse() || auth.isLoading || !stayedEnough) {
+        return
+      }
+    }
+
+    navigate(auth.isAuthenticated && isPwa() ? '/app/dashboard/' : '/', {
+      replace: true
+    })
+  }, [auth.isAuthenticated, auth.isLoading, stayedEnough, gaveUp])
 
   const lines = LINES[lang]
 
