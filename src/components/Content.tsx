@@ -38,7 +38,7 @@ import {
   chakra,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { Field } from 'jaen';
+import { Field, useContentManagement } from 'jaen';
 import { ChevronDownIcon } from './icons/chakra';
 import { DialogCloseButton } from './DialogCloseButton';
 import {FaEnvelopeOpen} from '@react-icons/all-files/fa/FaEnvelopeOpen';
@@ -1788,16 +1788,204 @@ function FAQSection() {
   );
 }
 
+interface FleetVehicle {
+  image: string;
+  category: string;
+  name: string;
+  description: string;
+  passengers: number;
+  luggage: number;
+  /** The backend's class key, where the catalogue carries one. */
+  carClass?: string;
+}
+
+/**
+ * The models a card stands for, by the rule the booking form uses for its
+ * vehicle dropdown: the description split at its commas, the name when the
+ * description lists none. The first of them is the car a click on the card
+ * preselects, so it has to be a string the dropdown actually offers.
+ */
+const fleetModelsOf = (vehicle: FleetVehicle): string[] => {
+  const models = (vehicle.description || '')
+    .split(',')
+    .map(model => model.trim())
+    .filter(Boolean);
+  return models.length ? models : vehicle.name ? [vehicle.name] : [];
+};
+
+/**
+ * One vehicle of the fleet, and the way into the booking with that car chosen.
+ *
+ * The whole card is the button: a click or Enter opens the booking modal with
+ * the card's class and its first model already selected, and the tag that
+ * says so appears over the picture on hover and on keyboard focus, together
+ * with the border in the brand colour. On a touch screen there is no hover,
+ * so the tag stays visible there, otherwise nothing would tell a visitor that
+ * the card does anything.
+ *
+ * In the CMS the card is not a button at all: the editor clicks the picture
+ * to replace it and the labels to rewrite them, and a modal opening on every
+ * such click would make the section uneditable.
+ */
+function FleetVehicleCard({
+  vehicle,
+  bookLabel,
+  interactive,
+  onBook
+}: {
+  vehicle: FleetVehicle;
+  bookLabel: string;
+  interactive: boolean;
+  onBook: (vehicle: FleetVehicle) => void;
+}) {
+  const intl = useIntl();
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onBook(vehicle);
+    }
+  };
+
+  const raised = {
+    borderColor: 'limosen.accent',
+    boxShadow: '0 0 0 1px {colors.limosen.accent}, {shadows.xl}'
+  };
+
+  return (
+    <Box
+      className="group"
+      data-fleet-card={vehicle.carClass ?? vehicle.name}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-label={
+        interactive
+          ? `${bookLabel}: ${vehicle.category}, ${vehicle.name}`
+          : undefined
+      }
+      onClick={interactive ? () => onBook(vehicle) : undefined}
+      onKeyDown={interactive ? handleKeyDown : undefined}
+      cursor={interactive ? 'pointer' : undefined}
+      bg="limosen.bg.card"
+      borderRadius="lg"
+      overflow="hidden"
+      boxShadow="lg"
+      border="1px solid"
+      borderColor="limosen.border.faint"
+      transition="border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
+      _hover={interactive ? { ...raised, transform: 'translateY(-4px)' } : undefined}
+      _focusVisible={interactive ? { ...raised, outline: 'none' } : undefined}
+    >
+      <Box
+        position="relative"
+        w="100%"
+        h={{ base: '220px', md: '260px' }}
+        overflow="hidden"
+        bg="white"
+      >
+        {/* keep Field.Image unchanged */}
+        <Field.Image
+          name={`fleet-${vehicle.name}`}
+          defaultValue={vehicle.image as string}
+          alt={vehicle.name as string}
+          style={{ width: '100%', height: '100%' }}
+          objectFit="cover"
+        />
+        {interactive && (
+          <Box
+            data-fleet-book-tag
+            position="absolute"
+            bottom={3}
+            insetStart={3}
+            px={3}
+            py={1}
+            borderRadius="full"
+            bg="limosen.accent"
+            color="black"
+            fontSize="sm"
+            fontWeight="semibold"
+            lineHeight="short"
+            pointerEvents="none"
+            opacity={0}
+            transform="translateY(4px)"
+            transition="opacity 0.2s ease, transform 0.2s ease"
+            _groupHover={{ opacity: 1, transform: 'none' }}
+            _groupFocusVisible={{ opacity: 1, transform: 'none' }}
+            css={{ '@media (hover: none)': { opacity: 1, transform: 'none' } }}
+          >
+            {bookLabel}
+          </Box>
+        )}
+      </Box>
+
+      <Stack gap={3} p={6}>
+        <Heading size="md" color="limosen.text.primary">
+          {vehicle.category}
+        </Heading>
+        <Text fontWeight="semibold" color="limosen.text.muted">
+          {vehicle.name}
+        </Text>
+        <Text color="limosen.text.secondary">{vehicle.description}</Text>
+
+        <Wrap gap={6} pt={2}>
+          <WrapItem>
+            <HStack gap={2}>
+              <Icon as={FaUser} color="limosen.accent" />
+              <Text color="limosen.text.secondary" fontWeight="medium">
+                <Field.Text
+                  as={chakra.span}
+                  name={`FleetPassengersLabel_${vehicle.name}`}
+                  defaultValue={intl.formatMessage({
+                    id: 'FleetPassengersLabel'
+                  })}
+                />{' '}
+                {vehicle.passengers}
+              </Text>
+            </HStack>
+          </WrapItem>
+
+          <WrapItem>
+            <HStack gap={2}>
+              <Icon as={FaSuitcaseRolling} color="limosen.accent" />
+              <Text color="limosen.text.secondary" fontWeight="medium">
+                <Field.Text
+                  as={chakra.span}
+                  name={`FleetLuggageLabel_${vehicle.name}`}
+                  defaultValue={intl.formatMessage({
+                    id: 'FleetLuggageLabel'
+                  })}
+                />{' '}
+                {vehicle.luggage}
+              </Text>
+            </HStack>
+          </WrapItem>
+        </Wrap>
+      </Stack>
+    </Box>
+  );
+}
+
 function FleetSection() {
   const intl = useIntl();
-  const vehicles: Array<{
-    image: string;
-    category: string;
-    name: string;
-    description: string;
-    passengers: number;
-    luggage: number;
-  }> = ((intl.messages as any)?.fleet as any) ?? [];
+  const bookingModal = useBookingModal();
+  const { isEditing } = useContentManagement();
+  const catalogue: FleetVehicle[] =
+    ((intl.messages as any)?.fleet as FleetVehicle[] | undefined) ?? [];
+
+  const vehicles = catalogue;
+
+  const bookLabel = intl.formatMessage({ id: 'FleetBookVehicle' });
+
+  const handleBook = (vehicle: FleetVehicle) => {
+    bookingModal.onOpen({
+      meta: {},
+      defaults: {
+        carClass: vehicle.category,
+        carTitle: fleetModelsOf(vehicle)[0]
+      }
+    });
+  };
 
   return (
     <Box as="section" id="fleet" bg="limosen.bg.fleet" py={{ base: 12, md: 20 }}>
@@ -1813,75 +2001,13 @@ function FleetSection() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 8, md: 10 }}>
             {vehicles.map(vehicle => (
-              <Box
+              <FleetVehicleCard
                 key={vehicle.name}
-                bg="limosen.bg.card"
-                borderRadius="lg"
-                overflow="hidden"
-                boxShadow="lg"
-                border="1px solid"
-                borderColor="limosen.border.faint"
-              >
-                <Box
-                  w="100%"
-                  h={{ base: '220px', md: '260px' }}
-                  overflow="hidden"
-                  bg="white"
-                >
-                  {/* keep Field.Image unchanged */}
-                  <Field.Image
-                    name={`fleet-${vehicle.name}`}
-                    defaultValue={vehicle.image as string}
-                    alt={vehicle.name as string}
-                    style={{ width: '100%', height: '100%' }}
-                    objectFit="cover"
-                  />
-                </Box>
-
-                <Stack gap={3} p={6}>
-                  <Heading size="md" color="limosen.text.primary">
-                    {vehicle.category}
-                  </Heading>
-                  <Text fontWeight="semibold" color="limosen.text.muted">
-                    {vehicle.name}
-                  </Text>
-                  <Text color="limosen.text.secondary">{vehicle.description}</Text>
-
-                  <Wrap gap={6} pt={2}>
-                    <WrapItem>
-                      <HStack gap={2}>
-                        <Icon as={FaUser} color="limosen.accent" />
-                        <Text color="limosen.text.secondary" fontWeight="medium">
-                          <Field.Text
-                            as={chakra.span}
-                            name={`FleetPassengersLabel_${vehicle.name}`}
-                            defaultValue={intl.formatMessage({
-                              id: 'FleetPassengersLabel'
-                            })}
-                          />{' '}
-                          {vehicle.passengers}
-                        </Text>
-                      </HStack>
-                    </WrapItem>
-
-                    <WrapItem>
-                      <HStack gap={2}>
-                        <Icon as={FaSuitcaseRolling} color="limosen.accent" />
-                        <Text color="limosen.text.secondary" fontWeight="medium">
-                          <Field.Text
-                            as={chakra.span}
-                            name={`FleetLuggageLabel_${vehicle.name}`}
-                            defaultValue={intl.formatMessage({
-                              id: 'FleetLuggageLabel'
-                            })}
-                          />{' '}
-                          {vehicle.luggage}
-                        </Text>
-                      </HStack>
-                    </WrapItem>
-                  </Wrap>
-                </Stack>
-              </Box>
+                vehicle={vehicle}
+                bookLabel={bookLabel}
+                interactive={!isEditing}
+                onBook={handleBook}
+              />
             ))}
           </SimpleGrid>
         </VStack>
