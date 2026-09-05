@@ -176,6 +176,37 @@ const brandColorPalette = {
 }
 
 /**
+ * The same eight slots for `gray`, the palette everything that is not a button
+ * resolves against.
+ *
+ * `html {colorPalette: gray}` below, and jaen's frame says the same, so every
+ * avatar, close button, segment control, tag and spinner inside the CMS and the
+ * app reads `gray.fg`, `gray.muted`, `gray.subtle` and their siblings. v3
+ * defines those slots itself, off its grey ramp, and the ramp in this system
+ * and in jaen's is v2's blue-tinted one: in dark the avatar sat on gray.800
+ * (#1A202C) with gray.200 on it, measured on the live site on every screen of
+ * the app and the CMS, and no `bg.*` or `fg.*` token could reach it because
+ * the avatar never reads one.
+ *
+ * The dark halves are the charcoal scale above, the same values `bg.subtle`,
+ * `bg.muted`, `border.emphasized` and `fg.emphasized` resolve to, so a grey
+ * component and a surface next to it agree. `solid` and `contrast` are left
+ * to v3: white and black, no grey in either.
+ *
+ * `_light` throughout, because v3 defines every one of these names, see
+ * surfaceSemanticTokens below. The light halves are v3's own, repeated, so
+ * light mode does not move.
+ */
+const grayColorPalette = {
+  fg: {value: {_light: '{colors.gray.800}', _dark: dark.fgEmphasized}},
+  subtle: {value: {_light: '{colors.gray.100}', _dark: dark.subtle}},
+  muted: {value: {_light: '{colors.gray.200}', _dark: dark.muted}},
+  emphasized: {value: {_light: '{colors.gray.300}', _dark: dark.borderEmphasized}},
+  focusRing: {value: {_light: '{colors.gray.400}', _dark: dark.fgSubtle}},
+  border: {value: {_light: '{colors.gray.200}', _dark: dark.border}}
+}
+
+/**
  * The surfaces, the text and the borders, both halves.
  *
  * These are the names the app's screens and jaen's CMS read: bg.canvas,
@@ -786,8 +817,23 @@ export const siteConfig = defineConfig({
     semanticTokens: {
       colors: {
         brand: brandColorPalette,
+        gray: grayColorPalette,
         ...surfaceSemanticTokens,
         limosen: limosenSemanticTokens
+      },
+      shadows: {
+        /**
+         * jaen's focus halo, `boxShadow: 'focus'` on every primary, secondary
+         * and text button of the frame. jaen's dark half is a 4px ring of
+         * gray.700 (#2D3748), a blue-grey that no charcoal surface has, and
+         * the frame merges this group off the site's system the same way it
+         * takes the colours. The light half is jaen's own, repeated. No
+         * component of this site reads the name, so nothing outside the
+         * frame changes.
+         */
+        focus: {
+          value: {base: '0 0 0 4px #EDF2F7', _dark: `0 0 0 4px ${dark.borderActive}`}
+        }
       }
     },
     // signup.tsx reads `limosen.page`. `limosen.surface` had no call site in v2
@@ -871,7 +917,10 @@ export const system = createSystem(
         // universal rule, gray.200 in light mode. Without it a border-width with
         // no colour of its own falls back to CSS's initial `currentColor`, so
         // every such rule takes the text colour instead of the grey line v2 drew.
-        borderColor: {base: 'gray.200', _dark: 'whiteAlpha.300'}
+        // The dark half is the charcoal border, not v2's whiteAlpha.300: the
+        // public site never renders dark, and the one place this rule was
+        // seen in dark is inside jaen's frame, see the body rule below.
+        borderColor: {base: 'gray.200', _dark: dark.border}
       },
       /**
        * v3's own baseline, put back after stripping its globalCss.
@@ -909,11 +958,22 @@ export const system = createSystem(
        * lineHeight is not restored. v2 set 1.5 here, and jaen's provider still
        * puts 1.5 on `html` through the global styles it inherits from v3's
        * defaults, so the site would only be declaring it a second time.
+       *
+       * The dark halves are the charcoal, not v2's gray.800 and whiteAlpha.900.
+       * The public site is forced light, so v2's dark pair never rendered on a
+       * public page again, but this rule does reach jaen's frame: Gatsby
+       * renders the site's Layout around a page before the page config says
+       * `jaen`, the emitted `body` rule stays in the document, and it competes
+       * with jaen's own `body {bg: bg.canvas}` on equal specificity. Measured
+       * on the live site in dark: /settings/, /app/me/ and the first screen
+       * after the login redirect showed a gray.800 (#1A202C) body under
+       * charcoal cards. With the same charcoal here, whichever rule wins paints
+       * the same colour.
        */
       body: {
         fontFamily: 'body',
-        bg: {base: 'white', _dark: 'gray.800'},
-        color: {base: 'gray.800', _dark: 'whiteAlpha.900'},
+        bg: {base: 'white', _dark: dark.canvas},
+        color: {base: 'gray.800', _dark: dark.fg},
         transitionProperty: 'background-color',
         // v2's `durations.normal`. v3's scale renamed it away, so the value is
         // spelled out.
