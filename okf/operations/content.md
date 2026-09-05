@@ -104,3 +104,18 @@ vehicle and its CMS picture no longer applies. No publish has set one so far.
 
 On a touch screen the tag is always visible, there is no hover to reveal it,
 and `_hover` in Chakra v3 never fires there.
+
+Measured on 2026-09-05 on a local production build with playwright
+(`fleet-check.py` in the session's scratchpad, results in
+`fleet-check-<site>.json`): hover and keyboard focus turn the border to
+`rgb(212, 175, 55)` and show the tag in de, en, tr and ar, and a click or Enter
+opens the modal with the card's class selected. The model was not selected on
+the first run: the form held it, but the vehicle select stayed on its
+placeholder, because `reset()` in `BookingModal.tsx` writes the native select
+in the render before the class has put the model's option into the list, and
+a registered, uncontrolled select is never written again. An effect that
+writes `carTitle` once more when `vehicleOptions` holds it fixes it, verified
+on both brands in all four languages. It is a change to `BookingModal.tsx`,
+handed to the integrator as `booking-modal-cartitle-sync.patch` rather than
+committed here, because that file was being changed for the return trip at the
+same time.
