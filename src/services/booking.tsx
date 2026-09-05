@@ -12,7 +12,13 @@ import {useQueryRouter} from '../hooks/use-query-router'
 import {useT} from '../contexts/language'
 import {useIntl} from 'react-intl'
 
-import {bookTransfer} from './book-transfer'
+import {
+  BookedTransfer,
+  bookTransfer,
+  bookingStemOf,
+  returnCodeOf
+} from './book-transfer'
+import {classKeyOf} from '../components/BookingModal/BookingModal'
 
 /**
  * What a caller may put into the form before the visitor sees it.
@@ -201,7 +207,7 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
   const createBookingInApi = async (
     data: BookingFormValues,
     invokedOnUrl: string
-  ): Promise<string | null> => {
+  ): Promise<BookedTransfer | null> => {
     // Map modal values -> IAM booking mutation input
     // NOTE: booking should work even when NOT authenticated.
     const input: ApiTransferCreateInput = {
@@ -255,10 +261,21 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
       return null
     }
 
+    // A return trip is the same booking with a second leg. The form has
+    // asked for the way back's date and time, and the pylon creates the
+    // second row from the one instant. Nothing else about the return is sent:
+    // the addresses are the outbound's swapped, the passengers the same.
+    const isReturn = data.rideType === 'RETURN'
+    const returnPickupDateTime =
+      isReturn && data.returnDate && data.returnTime
+        ? `${data.returnDate}T${data.returnTime}:00`
+        : undefined
+
     try {
-      const transferId = await bookTransfer({
+      const booked = await bookTransfer({
         // The form collects a date and a time; the backend takes one instant.
         pickupDateTime: `${input.rideDateISO}T${input.rideTime}:00`,
+        returnPickupDateTime,
         pickupLocation: input.pickup,
         dropoffLocation: input.dropoff,
         subject: input.roomOrName,
@@ -274,17 +291,19 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
           flightNumber: details.flightNumber,
           message: details.message,
           transferCategory: details.rideCategory,
-          transferType: details.rideType,
           luggage: details.luggage,
           childSeats: details.childSeats,
           extraTime: details.extraTime,
-          preferredCarClass: details.carClass,
+          // The form holds the class as its translated label, the backend
+          // stores an enum. Sent as the label it was silently dropped to
+          // null, so no booking ever carried the class the visitor picked.
+          preferredCarClass: classKeyOf(details.carClass),
           preferredCarName: details.carTitle
         }
       })
 
-      setMeta(prev => ({...(prev ?? {}), transferId}))
-      return typeof transferId === 'string' ? transferId : null
+      setMeta(prev => ({...(prev ?? {}), transferId: booked?.id}))
+      return booked
     } catch (err) {
       // The visitor gets a calm sentence, but somebody debugging this needs the
       // actual reason. Swallowing it whole is how a schema mismatch stayed
@@ -310,8 +329,15 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
     const data = mergeFixedIntoSubmit(rawData)
     const invokedOnUrl = meta?.url ?? getCurrentUrl() ?? 'unknown'
 
-    // 1) Create booking in API (no auth requirement assumed)
-    const transferId = await createBookingInApi(data, invokedOnUrl)
+    // 1) Create the booking first. The mails carry the code the pylon
+    //    minted, so they cannot go out before the answer is in. When the
+    //    booking fails they still go out, without a code, and the template
+    //    says so: "Buchung noch nicht im System".
+    const booked = await createBookingInApi(data, invokedOnUrl)
+    const code = booked?.code ?? ''
+    const bookingCode = bookingStemOf(code) ?? ''
+    const isReturn = data.rideType === 'RETURN'
+    const returnCode = isReturn ? returnCodeOf(code) ?? '' : ''
 
     // 2) Send email
     // `ok` rather than `errors`, for the reason spelled out in contact.tsx: a
@@ -334,11 +360,19 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
 
           // Ride details
           rideCategory: data.rideCategory || '',
-          rideType: data.rideType || '',
+          // The word the visitor chose, not the form's enum: the office reads
+          // "Rückfahrt" in the copy block, not RETURN.
+          rideType: isReturn
+            ? t('TypeReturn', 'Return')
+            : t('TypeOneWay', 'One-way'),
           date: data.date || '',
           time: data.time || '',
           pickupAddress: data.pickupAddress || '',
           destinationAddress: data.destinationAddress || '',
+          // The way back, empty unless a return was chosen. The template
+          // renders the second leg from these two and the addresses swapped.
+          returnDate: isReturn ? data.returnDate || '' : '',
+          returnTime: isReturn ? data.returnTime || '' : '',
           passengers: data.passengers ?? '',
           luggage: data.luggage ?? '',
           childSeats: data.childSeats ?? '',
@@ -349,10 +383,17 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
           carTitle: data.carTitle || '',
           paymentOption: data.paymentOption || '',
 
+          // The booking as a person reads it: the six characters both legs
+          // share, and the two legs. Empty when the pylon refused, and the
+          // template says so. The uuid stays out of the mail on purpose.
+          bookingCode,
+          code,
+          returnCode,
+          agreeToTerms: data.agreeToTerms ? 'yes' : '',
+
           // Meta
           locale,
-          invokedOnUrl,
-          transferId: transferId || ''
+          invokedOnUrl
         }
       }
     )
@@ -368,11 +409,11 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
     } else {
       toast({
         title: t('ToastSuccessTitle', 'Success'),
-        description: transferId
+        description: bookingCode
           ? t(
-              'ToastSuccessDescWithId',
+              'ToastSuccessDesc',
               'Your reservation request has been sent successfully.'
-            ) + ` (ID: ${transferId})`
+            ) + ` (${t('LabelBooking', 'Booking')} ${bookingCode})`
           : t(
               'ToastSuccessDesc',
               'Your reservation request has been sent successfully.'

@@ -90,7 +90,7 @@ export interface BookingModalProps {
  * German, English, Turkish or Arabic label keep its wording while the list
  * behind it comes from the backend.
  */
-const classKeyOf = (category?: string): string | undefined => {
+export const classKeyOf = (category?: string): string | undefined => {
   const c = (category ?? '').toLowerCase();
 
   if (!c) return undefined;

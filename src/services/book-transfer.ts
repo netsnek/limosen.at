@@ -79,25 +79,17 @@ const toText = (value?: string | number): string | undefined => {
   return value
 }
 
-/** A return trip says so; everything else is one way. */
-const toType = (value?: string): EnumValue | undefined => {
-  if (!value) return undefined
-  const v = value.toLowerCase()
-
-  if (
-    v.includes('zurück') || v.includes('zurueck') || v.includes('retour') ||
-    v.includes('return') || v.includes('gidiş-dönüş') || v.includes('dönüş') ||
-    v.includes('ذهاب وإياب') || v.includes('إياب')
-  ) {
-    return new EnumValue('RETURN_TRIP')
-  }
-
-  return new EnumValue('ONE_WAY')
-}
-
 export interface BookTransferInput {
   /** One ISO instant. The form collects a date and a time separately. */
   pickupDateTime: string
+  /**
+   * The way back, one ISO instant, only for a return trip. The pylon creates
+   * the second leg from it: addresses swapped, the same passengers, and the
+   * booking's code with `-2`. The form no longer sends a type. A return used
+   * to be RETURN_TRIP on one row, without a date, and the office typed the
+   * way back by hand without knowing when.
+   */
+  returnPickupDateTime?: string
   pickupLocation: string
   dropoffLocation: string
   subject?: string
@@ -114,7 +106,6 @@ export interface BookTransferInput {
     flightNumber?: string
     message?: string
     transferCategory?: string
-    transferType?: string
     luggage?: string | number
     childSeats?: string | number
     extraTime?: string | number
@@ -123,16 +114,45 @@ export interface BookTransferInput {
   }
 }
 
+/**
+ * What the pylon answers for a booking. `id` is the machine's key and stays
+ * out of every screen and mail. `code` is what a person reads, the six
+ * characters with `-1`; the return leg, when one was asked for, carries the
+ * same stem with `-2`, see `returnCodeOf`.
+ */
+export interface BookedTransfer {
+  id: string
+  code: string | null
+}
+
+/**
+ * The return leg's code, derived rather than read. The pylon mints the
+ * return as the outbound's stem with the next leg number, and a booking from
+ * the website always starts a fresh stem, so the way back is `-2`. It is not
+ * read off the answer because a signed-out visitor may not walk
+ * `referencedBy`: the one row they hold is the one the mutation answered.
+ */
+export const returnCodeOf = (code: string | null | undefined): string | null => {
+  if (!code) return null
+  const stem = code.split('-')[0]
+  return stem ? `${stem}-2` : null
+}
+
+/** The six characters both legs share, what the mails call the booking. */
+export const bookingStemOf = (code: string | null | undefined): string | null => {
+  if (!code) return null
+  return code.split('-')[0] || null
+}
+
 export const bookTransfer = async (
   input: BookTransferInput
-): Promise<string | null> => {
+): Promise<BookedTransfer | null> => {
   const args = {
     ...input,
     details: input.details
       ? {
           ...input.details,
           transferCategory: toCategory(input.details.transferCategory),
-          transferType: toType(input.details.transferType),
           // The schema types these three as String and the form registers them
           // with valueAsNumber, so a visitor who typed a suitcase count sent
           // `luggage: 2` unquoted and the booking came back as "String cannot
@@ -150,7 +170,7 @@ export const bookTransfer = async (
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      query: `mutation { bookTransfer(args: ${literal(args)}) { id } }`
+      query: `mutation { bookTransfer(args: ${literal(args)}) { id code } }`
     })
   })
 
@@ -160,7 +180,8 @@ export const bookTransfer = async (
     throw new Error(String(payload.errors[0]?.message ?? 'bookTransfer failed'))
   }
 
-  const id = payload?.data?.bookTransfer?.id
+  const row = payload?.data?.bookTransfer
+  if (typeof row?.id !== 'string') return null
 
-  return typeof id === 'string' ? id : null
+  return { id: row.id, code: typeof row.code === 'string' ? row.code : null }
 }
