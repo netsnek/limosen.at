@@ -71,4 +71,7 @@ echo "==> deploy"
 # --branch main because it would otherwise infer the git branch and publish a
 # preview that never reaches limosen.at. The token comes from .env, which
 # wrangler loads by itself.
-npx wrangler pages deploy public --project-name limosen --branch main --commit-dirty=true
+# The same AAAA problem as the build above: wrangler is node and its upload
+# died with "fetch failed" on 2026-09-05 when the flag was only on the build.
+NODE_OPTIONS="--no-network-family-autoselection" \
+  npx wrangler pages deploy public --project-name limosen --branch main --commit-dirty=true
