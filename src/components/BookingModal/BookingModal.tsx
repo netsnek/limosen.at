@@ -73,6 +73,14 @@ export interface BookingModalProps {
   };
   defaultValues?: {
     message?: string;
+    /**
+     * A class to land on, either as the class dropdown labels it ('First
+     * Class') or as the backend spells it (FIRST_CLASS). The fleet cards open
+     * the form this way, so a click on a car lands in a form that names it.
+     */
+    carClass?: string;
+    /** A model name as the vehicle dropdown lists it under that class. */
+    carTitle?: string;
   };
 }
 
@@ -298,13 +306,31 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
+  // The class the caller asked for, in the spelling the dropdown uses. A
+  // label is taken as it is; a backend key is matched through classKeyOf, so
+  // FIRST_CLASS lands on 'First Class' in English and on 'الدرجة الأولى' in
+  // Arabic. Nothing while the list does not offer the class.
+  const preselectedCarClass = React.useMemo(() => {
+    const wanted = defaultValues?.carClass;
+    if (!wanted) return undefined;
+    if (fleetCategories.includes(wanted)) return wanted;
+    return fleetCategories.find(cat => classKeyOf(cat) === wanted);
+  }, [defaultValues?.carClass, fleetCategories]);
+
+  // The class the form last saw, so the effect below can tell a visitor's
+  // change of class from a class the caller put in.
+  const previousCarClass = React.useRef<string | undefined>(undefined);
+
   React.useEffect(() => {
+    previousCarClass.current = preselectedCarClass;
     reset({
       ...fixedValues,
-      message: defaultValues?.message
+      message: defaultValues?.message,
+      carClass: preselectedCarClass,
+      carTitle: preselectedCarClass ? defaultValues?.carTitle : undefined
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fixedValues, defaultValues]);
+  }, [fixedValues, defaultValues, preselectedCarClass]);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -313,10 +339,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  // Clear the vehicle when the visitor changes the class. Not on the first
-  // class the form sees: a class and a model handed in together through
+  // Clear the vehicle when the visitor changes the class. Not on a class the
+  // caller put in: a class and a model handed in together through
   // defaultValues would otherwise lose the model the moment the class lands.
-  const previousCarClass = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
     const previous = previousCarClass.current;
     previousCarClass.current = selectedCarClass;
