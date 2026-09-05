@@ -139,7 +139,8 @@ const config: GatsbyConfig = {
         // The project role that marks somebody as a driver. The dispatch
         // screen's driver picker filters by it, because offering every account
         // there put customers and hotel front desks in a driver dropdown.
-        driverRoleKey: 'limosen:driver'
+        driverRoleKey: 'limosen:driver',
+        customerRoleKey: 'limosen:customer'
       }
     },
     {
