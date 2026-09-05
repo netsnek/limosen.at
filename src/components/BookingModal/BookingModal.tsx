@@ -20,6 +20,7 @@ import { CheckboxStyled } from './CheckboxStyled';
 import { DialogCloseButton } from '../DialogCloseButton';
 import { useT } from '../../contexts/language';
 import { useIntl } from 'react-intl';
+import { useFleet } from '../../services/fleet';
 
 export type RideCategory = 'DISTANCE' | 'HOURLY' | 'FLATRATE';
 export type RideType = 'ONEWAY' | 'RETURN';
@@ -70,6 +71,22 @@ export interface BookingModalProps {
     message?: string;
   };
 }
+
+/**
+ * The database class a translated category name stands for. The four classes
+ * are fixed by the schema, and matching on the translated word is what lets a
+ * German, English, Turkish or Arabic label keep its wording while the list
+ * behind it comes from the backend.
+ */
+const classKeyOf = (category?: string): string | undefined => {
+  const c = (category ?? '').toLowerCase();
+
+  if (!c) return undefined;
+  if (c.includes('van') || c.includes('bus')) return 'BUSINESS_VAN';
+  if (c.includes('elek') || c.includes('electr') || c.includes('elektr')) return 'ELECTRIC_CLASS';
+  if (c.includes('first') || c.includes('erste') || c.includes('luxus')) return 'FIRST_CLASS';
+  return 'BUSINESS_CLASS';
+};
 
 export const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
@@ -147,19 +164,69 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     return [];
   }, [rawFleetCategoriesMsg, fleetFromIntl]);
 
-  const fleetData: any[] = fleetFromIntl.length
-    ? fleetFromIntl
-    : (t as any).fleet ?? [];
+  /**
+   * The backend's fleet wins over the translated list, but only when it has
+   * something to say.
+   *
+   * The translations carry a vehicle list per language, which has to be edited
+   * four times and drifts from the cars the company actually runs. `fleet` is
+   * the same data the dispatch app sees, minus the plates and the driver
+   * assignment, so the form offers what exists. The translated list stays as
+   * the fallback in two cases: while the backend has not answered or cannot be
+   * reached, and when it answers an empty list. The second case is this brand's
+   * state today, its Car table holds no rows, and a form with no class to pick
+   * would turn every visitor away. The labels for the classes always come from
+   * the translations.
+   */
+  const fleetFromApi = useFleet();
+  const fleetFromApiIsUsable = !!fleetFromApi?.length;
 
-  const fleetCategories: string[] = fleetCategoriesFromIntl.length
-    ? fleetCategoriesFromIntl
-    : Array.from(
-        new Set(
-          (Array.isArray(fleetData) ? fleetData : [])
-            .map((v: any) => v?.category)
-            .filter(Boolean)
-        )
-      );
+  const fleetData: any[] = React.useMemo(() => {
+    const translated = fleetFromIntl.length
+      ? fleetFromIntl
+      : ((t as any).fleet ?? []);
+
+    if (!fleetFromApi?.length) return translated;
+
+    return fleetFromApi.map(entry => {
+      // The class name a visitor reads stays translated: the API answers with
+      // BUSINESS_VAN, which is a database value and not a label.
+      const label =
+        (translated as any[]).find(
+          (v: any) => classKeyOf(v?.category) === entry.carClass
+        )?.category ?? entry.carClass;
+
+      return {
+        category: label,
+        description: entry.models.join(', ')
+      };
+    });
+  }, [fleetFromApi, fleetFromIntl, t]);
+
+  // The class dropdown must list exactly the classes the vehicle dropdown can
+  // fill. With the backend's fleet in use, that is what the fleet contains, in
+  // the order the translations put the classes in; with the translated
+  // fallback, it is the translated category list itself.
+  const fleetCategories: string[] = React.useMemo(() => {
+    const fromData = Array.from(
+      new Set(
+        (Array.isArray(fleetData) ? fleetData : [])
+          .map((v: any) => v?.category)
+          .filter(Boolean)
+      )
+    ) as string[];
+
+    if (!fleetFromApiIsUsable) {
+      return fleetCategoriesFromIntl.length ? fleetCategoriesFromIntl : fromData;
+    }
+
+    const rank = (cat: string) => {
+      const i = fleetCategoriesFromIntl.indexOf(cat);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+
+    return [...fromData].sort((a, b) => rank(a) - rank(b));
+  }, [fleetData, fleetFromApiIsUsable, fleetCategoriesFromIntl]);
 
   // Build vehicle names per category from comma-separated description
   const vehiclesByCategory: Record<string, string[]> = React.useMemo(() => {
