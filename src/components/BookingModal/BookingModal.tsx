@@ -280,6 +280,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       : list;
   }, [selectedCarClass, selectedCarTitle, vehiclesByCategory]);
 
+  // A native select takes a value only when the option is there, and the
+  // model handed in through defaultValues arrives through reset() one render
+  // before its class has put the option into the list: the form holds the
+  // model, the DOM select stays on its placeholder, and nothing writes the
+  // value again because the field is registered, not controlled. Write it
+  // once more when the option exists.
+  React.useEffect(() => {
+    if (selectedCarTitle && vehicleOptions.includes(selectedCarTitle)) {
+      setValue('carTitle', selectedCarTitle);
+    }
+  }, [vehicleOptions, selectedCarTitle, setValue]);
+
   const isReturn = watch('rideType') === 'RETURN';
 
   /**
