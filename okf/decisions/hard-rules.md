@@ -55,3 +55,19 @@ evidence.
 
 `link:` dependencies on an unpublished branch cannot resolve on a CI runner. A
 workflow that cannot pass is worse than no workflow.
+
+## The public website has no colour mode, the CMS and the app default to dark
+
+`colorMode: {default: 'dark'}` in gatsby-config's `gatsby-plugin-jaen` block
+applies to jaen's own pages and to `/app/*` only. Every public page is forced
+light by the plugin, whatever a visitor stored, so the marketing site is exactly
+the site it always was and needs no dark audit. Inside the CMS and the app the
+first paint is dark and the toggle still reaches light. The palette dark
+resolves to is this site's, not the app's and not jaen's: the app's screens
+read `bg.*`, `fg.*`, `border.*` and the `brand` palette from the `_dark`
+halves in `src/styles/theme/system.ts`, and jaen merges them over its own
+grey. The values are the old app's charcoal and gold, measured from
+`git show 265b18a:app/shared/styles/tokens.css` in the taxi-app repository,
+and they are written there once as `dark`. A dark colour that needs changing
+is changed there, never in `gatsby-jaen-app` and never as a hardcoded value in
+a component.
