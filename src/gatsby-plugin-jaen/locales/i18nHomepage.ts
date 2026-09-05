@@ -225,7 +225,7 @@ export function getI18nHomepage(code: I18nCode) {
           };
         case 'first-class-sedan':
           return {
-            name: 'Mercedes Benz S vehicle.name',
+            name: 'Mercedes Benz S Klasse',
             category: 'First Class',
             description:
               'Mercedes Benz S 500 L 4MATIC, Mercedes Benz EQS 580 4MATIC',
