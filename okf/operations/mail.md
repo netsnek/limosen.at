@@ -86,3 +86,35 @@ the variable list. Check a change without sending anything through
 raw body with the values the form would send; a return booking previewed that
 way shows `BQ7Q4W`, `BQ7Q4W-1` and `BQ7Q4W-2` on both templates, and the "no
 code" line when the three are empty.
+
+## The chain, measured 2026-09-06
+
+The confirmation to the visitor is emailwerk's one level of public
+children: the site sends the parent, the server delivers every public child
+template to the requester address (`envelope.replyTo`, else `values.email`).
+Read from the emailwerk API on 2026-09-06: booklimo's four language pairs are
+linked and public, and its message log shows request plus confirmation for
+every booking, in the form's language. This site's are not: the live pair is
+the English "Contact" (`…2pa47hpmc5`, to office@limosen.at, office@erebos.xyz,
+limosen@netsnek.com) with the English "Confirmation of Your Contact Request"
+(`…2p216pcfwn`) as its only child, used for all four languages of both the
+booking and the contact form. The German, Turkish and Arabic templates exist
+(`DE Contact …2pzrfi73rb`, `TR Contact …2pqsano4c2`, `AR Contact …2pj8pi6ron`
+with their confirmations) but are unpublished, the German and Arabic
+confirmations carry no parent, and their recipient is limosen@netsnek.com
+alone. A German visitor gets an English confirmation.
+
+Rule (owner, 2026-09-06): the confirmation is decided by the language the
+booking or the contact was made in, on both brands, for the booking form and
+the contact form alike. Target: four pairs "Limosen DE|EN|TR|AR Booking
+Request" (to office@limosen.at and limosen@netsnek.com) each with a public
+confirmation child in the same language, filed as `mail-templates/*.html`
+with `subjects.json` and `ids.json` and pushed by a `scripts/create-mail-
+templates.py` like booklimo's, the site choosing the pair by locale in
+`src/services/mail-templates.ts` the way booklimo does, the contact form
+included. The old English pair stays until the switch is verified and is
+then unpublished. Acceptance: `templatePreview` of a Turkish booking shows the
+Turkish confirmation as the child, and a test booking in each language logs
+one request per office address and one confirmation to the visitor in that
+language.
+
