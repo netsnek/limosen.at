@@ -760,7 +760,21 @@ const nativeSelectSlotRecipe = {
   }
 }
 
-export const siteConfig = defineConfig({
+export /**
+ * jaen's two radii, by name, for the one site control that renders inside
+ * jaen's frame under the site's own system: the search in the bar (see
+ * gatsby-plugin-jaen/components/Toolbar.tsx). jaen declares them in its
+ * foundations and every control and surface inside the frame reads them
+ * (design-consistency.md, rule 1). This module cannot import them, because
+ * jaen's system imports this one through the theme shadow, so the two values
+ * are written out: 8 px for a control, 12 px for a surface.
+ */
+const jaenRadii = {
+  control: {value: '0.5rem'},
+  surface: {value: '0.75rem'}
+}
+
+const siteConfig = defineConfig({
   // The site hard-codes no `var(--chakra-...)` anywhere, checked across src, so
   // the prefix is free. It stays `chakra` because jaen takes `jaen` for its own
   // system and two disjoint prefixes cannot collide whatever selector they land
@@ -781,6 +795,8 @@ export const siteConfig = defineConfig({
       '2xl': '1536px'
     },
     tokens: {
+      // jaen's two radii by name, see jaenRadii above.
+      radii: jaenRadii,
       colors: {
         // v2's black was #000000, v3's is #09090B. Five call sites ask for
         // `black` and the solid button label is one of them, so all five were

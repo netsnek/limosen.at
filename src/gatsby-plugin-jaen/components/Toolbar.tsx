@@ -36,7 +36,13 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         desktop that is merely narrow.
       */}
       <Box hideBelow="md">
-        <SearchMenu />
+        {/*
+          radii.control, so the search sits at the 8 px of every other button
+          in the bar (design-consistency.md, rule 1). The site's own button
+          recipe rounds at 6 px, which is right for the public pages and was
+          the third corner in this bar.
+        */}
+        <SearchMenu rounded="control" />
       </Box>
     </ChakraProvider>
   );
