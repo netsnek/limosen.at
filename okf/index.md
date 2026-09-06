@@ -41,6 +41,7 @@ its own Zitadel organization and its data behind `api.limosen.at`.
 - [operations/content.md](operations/content.md) — the jaen patch chain and how the CMS publishes
 - [operations/booking.md](operations/booking.md) — the one call the booking form makes
 - [operations/mail.md](operations/mail.md) — the contact template and why it delivered nothing
+- [operations/offer-confirmation.md](operations/offer-confirmation.md) — the page behind the offer mail's two links, what it reads and writes without an account, the states in words
 - [decisions/hard-rules.md](decisions/hard-rules.md) — what must not be reopened
 - [provenance/timeline.md](provenance/timeline.md) — how it got here
 - [what was live without a source, across the platform](https://github.com/netsnek/taxi-app/blob/main/okf/provenance/lost-and-found.md) — including this site's own unpushed branch and its content on osg.snek.at
