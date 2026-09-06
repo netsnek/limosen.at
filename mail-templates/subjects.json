@@ -1,4 +1,10 @@
 {
- "limosen-request": "New contact inquiry was submitted on limosen.at",
- "limosen-confirmation": "Confirmation of Your Contact Request"
+ "limosen-de-request": "New contact inquiry was submitted on limosen.at",
+ "limosen-de-confirmation": "Bestätigung Ihrer Kontaktanfrage",
+ "limosen-en-request": "New contact inquiry was submitted on limosen.at",
+ "limosen-en-confirmation": "Confirmation of Your Contact Request",
+ "limosen-tr-request": "New contact inquiry was submitted on limosen.at",
+ "limosen-tr-confirmation": "İletişim Talebinizin Onayı",
+ "limosen-ar-request": "New contact inquiry was submitted on limosen.at",
+ "limosen-ar-confirmation": "تأكيد طلب التواصل الخاص بك"
 }
