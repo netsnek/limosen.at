@@ -110,6 +110,9 @@ The site is built from `main`, and `main` on GitHub is the Chakra v3 tree
 since 2026-09-05. Before that the tree lived only on a local branch,
 `feat/chakra-v3`, while GitHub's `main` still ended at the publish of
 2025-11-30, so every CMS publish landed on a branch nobody built from.
+Since 2026-09-06 the local checkout is on `main` as well: `scripts/deploy.sh`
+runs on the branch the site is published from, a CMS publish and a deploy
+see the same history, and `feat/chakra-v3` is no longer checked out anywhere.
 
 ## Rolling back
 
