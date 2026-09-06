@@ -1,7 +1,7 @@
 // src/services/booking.tsx
 import React, {useMemo} from 'react'
 import {sendTemplateMail} from 'gatsby-jaen-emailwerk'
-import {BOOKING_TEMPLATE_ID} from './mail-templates'
+import {templateForLocale} from './mail-templates'
 import {useLocation} from '@reach/router'
 import {
   BookingFormValues,
@@ -339,12 +339,14 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
     const isReturn = data.rideType === 'RETURN'
     const returnCode = isReturn ? returnCodeOf(code) ?? '' : ''
 
-    // 2) Send email
+    // 2) Send email, the parent only, in the language the form was filled
+    //    in. The server delivers the confirmation child of that parent to
+    //    replyTo, the visitor, so a second send here would double it.
     // `ok` rather than `errors`, for the reason spelled out in contact.tsx: a
     // failure that is not a GraphQL error left `errors` undefined and the visitor
     // saw the success toast.
     const {ok} = await sendTemplateMail(
-      BOOKING_TEMPLATE_ID,
+      templateForLocale(locale),
       {
         envelope: {
           replyTo: data.email

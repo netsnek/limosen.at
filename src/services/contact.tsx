@@ -1,12 +1,13 @@
 // src/services/contact.tsx
 import React, { useMemo } from "react"
 import { sendTemplateMail } from "gatsby-jaen-emailwerk"
-import { CONTACT_TEMPLATE_ID } from "./mail-templates"
+import { templateForLocale } from "./mail-templates"
 import { useLocation } from "@reach/router"
 import { ContactFormValues, ContactModal } from "../components/ContactModal/ContactModal"
 import { useAuth, useNotificationsContext } from "jaen"
 import { useQueryRouter } from "../hooks/use-query-router"
 import { useT } from "../contexts/language"
+import { useIntl } from "react-intl"
 
 export interface ContactModalContextProps {
   onOpen: (args?: { meta?: Record<string, any> }) => void
@@ -41,6 +42,9 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
   // and is already mounted above every page, so the calls below keep the
   // placement, timing and close button they had.
   const { toast } = useNotificationsContext()
+  // The mail goes out in the language the visitor is reading the site in, and
+  // so does the confirmation the server sends back to them.
+  const { locale } = useIntl()
   const authentication = useAuth()
 
   const getCurrentUrl = React.useCallback(() => {
@@ -85,8 +89,10 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
     // `ok` rather than `errors`: the client reports a transport or validation
     // failure through the flag, and only a GraphQL error also fills `errors`. The
     // old check therefore showed the success toast for every non-GraphQL failure.
+    // The parent only: the server delivers the confirmation child of that
+    // parent to replyTo, the visitor, so a second send here would double it.
     const { ok } = await sendTemplateMail(
-      CONTACT_TEMPLATE_ID,
+      templateForLocale(locale),
       {
         envelope: {
           replyTo: data.email,
