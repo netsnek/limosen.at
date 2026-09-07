@@ -13,3 +13,4 @@ https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACBDBpLK7P6BdTKdqW5mvka8yZSqVeOwAC
 https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACBDhpcChk_BX3Xt6cMab3EopCEv3QAgAClhsAAsgtgVNbuZMLZahJwC8E
 https://osg.snek.at/storage/BQACAgQAAx0Ed6zoewACBDppofLRcs0Tqbkxs4X60WbWOI7K0wACYxwAAkywEFFSsV3gC87-wC8E
 2026-09-05-service-images-restored.json
+2026-09-07-legal-pages.json
