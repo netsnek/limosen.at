@@ -74,14 +74,28 @@ const config: GatsbyConfig = {
          * their audience is identical, and it is the organisation behind the
          * caller's `jaen:admin` that decides which of the two they may write.
          *
+         * One Worker answers both sites, under one custom domain per site:
+         * `agent.jaen.netsnek.com` cannot be it, because a Worker custom
+         * domain needs its zone in the Worker's own Cloudflare account and
+         * netsnek.com is a zone of another one.
+         *
          * JAEN_AGENT_URL points a local production build at a wrangler dev of
          * the agent. See jaen/docs/architecture/draft-state.md.
          */
         agent: {
           url:
             process.env.JAEN_AGENT_URL ||
-            'https://agent.jaen.netsnek.com/graphql',
-          site: SITE.repository.split('/')[1]
+            'https://jaen-agent.limosen.at/graphql',
+          site: SITE.repository.split('/')[1],
+          // 2500 and not the 5000 the design defaults to. Measured on the
+          // live site on 2026-09-07: a text change reached the second editor
+          // in 9.0 s and a picture in the media library in 12.1 s, and the
+          // poll interval is the tail of both. The saved change is already
+          // committed by then, so this only decides how long the other CMS
+          // waits before it asks. A poll whose sinceSha is still the head
+          // answers `changed: false` with no body out of the agent's KV, so
+          // the shorter interval costs the agent almost nothing.
+          pollMs: 2500
         },
         remote: {
           repository: SITE.repository
