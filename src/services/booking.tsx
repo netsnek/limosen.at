@@ -19,6 +19,11 @@ import {
   returnCodeOf
 } from './book-transfer'
 import {classKeyOf} from '../components/BookingModal/BookingModal'
+import {
+  countryForLanguage,
+  formatPhone,
+  parsePhone
+} from 'gatsby-jaen-app/shared/phone'
 
 /**
  * What a caller may put into the form before the visitor sees it.
@@ -107,6 +112,19 @@ const emptyToUndef = (v?: string | null) => {
   const t = v.trim()
   return t.length ? t : undefined
 }
+
+/**
+ * The number as the platform stores it, E.164 and nothing else
+ * (okf/architecture/dispatch.md section 13). The visitor's language names
+ * the country a national number belongs to, so `0660 876 06 06` on the
+ * German form becomes `+436608760606`. The form has already refused what
+ * cannot be read; this answers undefined for it rather than sending a
+ * number the pylon would refuse a second time, which on this path would
+ * cost the visitor the whole booking.
+ */
+const toStoredPhone = (value: string | undefined, locale: string) =>
+  parsePhone(emptyToUndef(value) ?? '', countryForLanguage(locale)).e164 ??
+  undefined
 
 export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
   children
@@ -227,13 +245,13 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
       passengerFirstName: emptyToUndef(data.firstName),
       passengerLastName: emptyToUndef(data.lastName),
       passengerEmail: emptyToUndef(data.email),
-      passengerPhone: emptyToUndef(data.phone || ''),
+      passengerPhone: toStoredPhone(data.phone, locale),
 
       // customer (same as passenger for self-booking)
       customerFirstName: emptyToUndef(data.firstName),
       customerLastName: emptyToUndef(data.lastName),
       customerEmail: emptyToUndef(data.email),
-      customerPhone: emptyToUndef(data.phone || ''),
+      customerPhone: toStoredPhone(data.phone, locale),
 
       // rest
       flightNumber: emptyToUndef(data.flightNumber || ''),
@@ -356,7 +374,10 @@ export const BookingModalProvider: React.FC<BookingModalDrawerProps> = ({
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
-          phone: data.phone || '',
+          // The mail is read by a person and by the office, whose copy
+          // block goes on to a driver, so the number carries its country
+          // and its groups (dispatch.md section 13).
+          phone: formatPhone(toStoredPhone(data.phone, locale)) || data.phone || '',
           flightNumber: data.flightNumber || '',
           message: data.message,
 

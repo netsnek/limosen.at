@@ -21,6 +21,7 @@ import { DialogCloseButton } from '../DialogCloseButton';
 import { useT } from '../../contexts/language';
 import { useIntl } from 'react-intl';
 import { useFleet } from '../../services/fleet';
+import { countryForLanguage, parsePhone } from 'gatsby-jaen-app/shared/phone';
 
 export type RideCategory = 'DISTANCE' | 'HOURLY' | 'FLATRATE';
 export type RideType = 'ONEWAY' | 'RETURN';
@@ -799,12 +800,27 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           id="phone"
                           placeholder="+43 660 000 0000"
                           type="tel"
-                          {...register('phone')}
+                          {...register('phone', {
+                            // Every number the platform stores carries its
+                            // country (okf/architecture/dispatch.md section
+                            // 13). The form reads a national number with the
+                            // country the visitor's language books in, so
+                            // 0660 876 06 06 on the German form is Austrian
+                            // and 0532 ... on the Turkish one is Turkish, and
+                            // refuses what carries neither.
+                            validate: (value?: string) =>
+                              !value?.trim() ||
+                              Boolean(
+                                parsePhone(value, countryForLanguage(intl.locale))
+                                  .e164
+                              ) ||
+                              t('PhoneNeedsCountry', 'Please enter the country code')
+                          })}
                           disabled={!!fixedValues?.phone}
                           _focus={{ borderColor: 'brand.500' }}
                         />
                         <Field.ErrorText fontSize="sm">
-                          {errors.phone?.toString()}
+                          {errors.phone?.message}
                         </Field.ErrorText>
                       </Field.Root>
                     </HStack>
