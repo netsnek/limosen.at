@@ -914,6 +914,7 @@
                                       {% if total is not empty %}<li style="margin-bottom:8px;"><strong>الإجمالي: </strong>{{total}}</li>{% endif %}
                                       {% if validUntil is not empty %}<li style="margin-bottom:8px;"><strong>صالح حتى: </strong>{{validUntil}}</li>{% endif %}
                                     </ul>
+<!-- ride link -->{% if rideUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" align="right" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#d4af37" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #d4af37;"><a href="{{rideUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #1b1b1b; text-decoration: none;">افتح رحلتك</a></td></tr></table>{% endif %}
                                   </td>
                                 </tr>
                               </table>
