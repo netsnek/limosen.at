@@ -61,6 +61,28 @@ const config: GatsbyConfig = {
       resolve: `gatsby-plugin-jaen`,
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
+        /**
+         * The jaen agent, the one service that holds the shared draft. Every
+         * change an editor makes is committed to this repository by the agent
+         * as it happens and every other open CMS takes the new head from a
+         * poll, so a colleague sees a draft, and a picture uploaded on a
+         * phone, without a publish and without a build.
+         *
+         * `site` is this site's key in the agent's SITES table, which names
+         * the repository. It is not derived from the audience: limosen.at and
+         * booklimo.at sign in against the same Zitadel project and client, so
+         * their audience is identical, and it is the organisation behind the
+         * caller's `jaen:admin` that decides which of the two they may write.
+         *
+         * JAEN_AGENT_URL points a local production build at a wrangler dev of
+         * the agent. See jaen/docs/architecture/draft-state.md.
+         */
+        agent: {
+          url:
+            process.env.JAEN_AGENT_URL ||
+            'https://agent.jaen.netsnek.com/graphql',
+          site: SITE.repository.split('/')[1]
+        },
         remote: {
           repository: SITE.repository
         },
