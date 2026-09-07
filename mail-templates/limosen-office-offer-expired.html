@@ -2,8 +2,8 @@
 <html
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
-  lang="ar"
-  dir="rtl"
+  lang="de"
+  dir="ltr"
   style="font-family: arial, 'helvetica neue', helvetica, sans-serif"
 >
   <head>
@@ -12,7 +12,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>تم تأكيد الرحلة</title>
+    <title>Angebot verfallen</title>
     <!--[if (mso 16)
       ]><style type="text/css">
         a {
@@ -44,7 +44,6 @@
         text-decoration: none !important;
       }
 
-      /* لا تغيّر لون الروابط المكتشفة تلقائياً في Apple */
       a[x-apple-data-detectors] {
         text-decoration: none !important;
         font-size: inherit !important;
@@ -53,7 +52,7 @@
         line-height: inherit !important;
       }
 
-      /* حالة التحويم للروابط – تعمل فقط في بعض العملاء (Apple Mail/Outlook for Mac/Gmail ويب) */
+      /* Link hover (supported in some clients: Apple Mail, Outlook Mac, webmail) */
       a.hover-link,
       a.hover-link:link,
       a.hover-link:visited {
@@ -71,7 +70,7 @@
         text-decoration: underline !important;
       }
 
-      /* دعم إضافي لبعض بيئات Gmail على iOS */
+      /* Extra support for some Gmail iOS environments */
       u + #email-body a.hover-link:hover {
         color: #b8932f !important;
         text-decoration: underline !important;
@@ -106,38 +105,38 @@
 
         h1 {
           font-size: 36px !important;
-          text-align: right;
+          text-align: left;
         }
 
         h2 {
           font-size: 26px !important;
-          text-align: right;
+          text-align: left;
         }
 
         h3 {
           font-size: 20px !important;
-          text-align: right;
+          text-align: left;
         }
 
         .es-header-body h1 a,
         .es-content-body h1 a,
         .es-footer-body h1 a {
           font-size: 36px !important;
-          text-align: right;
+          text-align: center;
         }
 
         .es-header-body h2 a,
         .es-content-body h2 a,
         .es-footer-body h2 a {
           font-size: 26px !important;
-          text-align: right;
+          text-align: left;
         }
 
         .es-header-body h3 a,
         .es-content-body h3 a,
         .es-footer-body h3 a {
           font-size: 20px !important;
-          text-align: right;
+          text-align: left;
         }
 
         .es-menu td a {
@@ -375,15 +374,15 @@
           padding-top: 20px !important;
         }
 
-        .es-m-p20ب {
+        .es-m-p20b {
           padding-bottom: 20px !important;
         }
 
-        .es-m-p20ر {
+        .es-m-p20r {
           padding-right: 20px !important;
         }
 
-        .es-m-p20ل {
+        .es-m-p20l {
           padding-left: 20px !important;
         }
 
@@ -487,7 +486,7 @@
       margin: 0;
       background:#1b1b1b;
       color:#e6e6e6;
-      text-align: right;
+      text-align: left;
     "
   >
     <div class="es-wrapper-color" style="background-color: #1b1b1b">
@@ -594,7 +593,7 @@
                                       height: 20px;
                                     "
                                   >
-                                    <!-- شعار اختياري -->
+                                    <!-- Optionales Logo -->
                                   </td>
                                 </tr>
                               </table>
@@ -703,9 +702,9 @@
                                         font-style: normal;
                                         font-weight: bold;
                                         color: #d4af37;
-                                        text-align: right;
+                                        text-align: left;
                                       "
-                                    >تم تأكيد الرحلة</h1>
+                                    >Angebot verfallen</h1>
                                   </td>
                                 </tr>
                               </table>
@@ -787,12 +786,12 @@
                                 <tr>
                                   <td
                                     align="center"
-                                    class="es-m-p0ر es-m-p0ل"
+                                    class="es-m-p0r es-m-p0l"
                                     style="
                                       margin: 0;
                                       padding-top: 5px;
                                       padding-bottom: 5px;
-                                      padding-left: 40px;
+                                      padding-right: 40px;
                                       color:#e6e6e6;
                                     "
                                   >
@@ -807,7 +806,7 @@
                                         line-height: 21px;
                                         color: #e6e6e6;
                                         font-size: 14px;
-                                        text-align: right;
+                                        text-align: left;
                                       "
                                     >
                                       {{ "now"|date('d/m/Y') }}
@@ -817,12 +816,12 @@
                                 <tr>
                                   <td
                                     align="center"
-                                    class="es-m-p0ر es-m-p0ل"
+                                    class="es-m-p0r es-m-p0l"
                                     style="
                                       margin: 0;
                                       padding-top: 5px;
                                       padding-bottom: 15px;
-                                      padding-left: 40px;
+                                      padding-right: 40px;
                                       color:#e6e6e6;
                                     "
                                   >
@@ -837,10 +836,10 @@
                                         line-height: 21px;
                                         color: #e6e6e6;
                                         font-size: 14px;
-                                        text-align: right;
+                                        text-align: left;
                                       "
                                     >
-                                      شكرًا لك، لقد أكدت عرضنا <strong>{{number}}</strong> لرحلتك <strong>{{code}}</strong> بتاريخ {{statusDate}} الساعة {{statusTime}}. بذلك تم حجز الرحلة لك. بمجرد تعيين سائق ستصلك رسالة أخرى من <a href="https://limosen.at/" target="_blank" class="hover-link" style="color:#d4af37; text-decoration:underline;" >LIMOSEN&nbsp;KG</a >.
+                                      Das Angebot <strong>{{number}}</strong> für die Fahrt <strong>{{code}}</strong> wurde bis {{validUntil}} nicht bestätigt und ist verfallen. Die Fahrt ist storniert.
                                     </p>
                                   </td>
                                 </tr>
@@ -905,17 +904,35 @@
                                       padding-bottom: 20px;
                                     "
                                   >
-                                    <!-- بدون زخرفة للقائمة -->
-                                    <ul style="color:#e6e6e6; padding-right:0; margin:0; list-style:none; text-align:right; direction: rtl;">
-                                      {% if number is not empty %}<li style="margin-bottom:8px;"><strong>العرض: </strong>{{number}}</li>{% endif %}
-                                      <li style="margin-bottom:8px;"><strong>الحجز: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}ليس في النظام بعد{% endif %}</li>
-                                      {% if date is not empty %}<li style="margin-bottom:8px;"><strong>الذهاب{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, <span dir="ltr">{{pickupAddress}} &rarr; {{destinationAddress}}</span>{% endif %}</li>{% endif %}
-                                      {% if returnDate is not empty %}<li style="margin-bottom:8px;"><strong>العودة{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}{% if destinationAddress is not empty %}, <span dir="ltr">{{destinationAddress}} &rarr; {{pickupAddress}}</span>{% endif %}</li>{% endif %}
-                                      {% if total is not empty %}<li style="margin-bottom:8px;"><strong>الإجمالي: </strong>{{total}}</li>{% endif %}
-                                      {% if statusDate is not empty %}<li style="margin-bottom:8px;"><strong>تم التأكيد في: </strong>{{statusDate}} {{statusTime}}</li>{% endif %}
+                                    <!-- No list decoration -->
+                                    <!-- The copy block: one preformatted block a triple click or a long
+     press selects whole, and a WhatsApp link that already carries the
+     same text. Office and driver only, never a customer row. -->
+{% set copySummary = "LIMOSEN Angebot verfallen\n"
+  ~ (code is not empty ? code ~ "\n" : (bookingCode is not empty ? bookingCode ~ "\n" : ""))
+  ~ (date is not empty ? date ~ (time is not empty ? " " ~ time : "") ~ "\n" : "")
+  ~ (pickupAddress is not empty ? "Von: " ~ pickupAddress ~ "\n" : "")
+  ~ (destinationAddress is not empty ? "Nach: " ~ destinationAddress ~ "\n" : "")
+  ~ (returnDate is not empty ? "Rueckfahrt: " ~ returnDate ~ (returnTime is not empty ? " " ~ returnTime : "") ~ "\n" : "")
+  ~ (passengerCount is not empty ? "Personen: " ~ passengerCount ~ "\n" : "")
+  ~ (phone is not empty ? "Tel: " ~ phone ~ "\n" : "")
+  ~ (total is not empty ? "Preis: " ~ total ~ "\n" : "")
+  ~ (note is not empty ? "Anmerkung: " ~ note ~ "\n" : "") %}
+<p style="margin: 0 0 6px 0; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; mso-line-height-rule: exactly; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 13px; line-height: 18px; color: #d4af37; text-transform: uppercase; letter-spacing: 1px;">Zum Kopieren und Weiterleiten</p>
+<pre style="margin: 0 0 12px 0; padding: 14px; background-color: #111111; border: 1px solid #d4af37; border-radius: 4px; font-family: 'courier new', courier, monospace; font-size: 13px; line-height: 19px; color: #e6e6e6; white-space: pre-wrap; word-break: break-word;">{{copySummary}}</pre>
+<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-bottom: 20px;"><tr><td align="center" bgcolor="#25d366" style="margin: 0; padding: 10px 20px; border-radius: 4px; background-color: #25d366;"><a href="https://wa.me/?text={{copySummary|url_encode}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">Per WhatsApp weiterleiten</a></td></tr></table>
+<ul style="color:#e6e6e6; padding-left:0; margin:0; list-style:none; text-align:left; direction: ltr;">
+                                      <li style="margin-bottom:8px;"><strong>Buchung: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}noch nicht im System{% endif %}</li>
+                                      {% if date is not empty %}<li style="margin-bottom:8px;"><strong>Hinfahrt{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, <span dir="ltr">{{pickupAddress}} &rarr; {{destinationAddress}}</span>{% endif %}</li>{% endif %}
+                                      {% if returnDate is not empty %}<li style="margin-bottom:8px;"><strong>Rückfahrt{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}</li>{% endif %}
+                                      {% if passengerCount is not empty %}<li style="margin-bottom:8px;"><strong>Personen: </strong>{{passengerCount}}</li>{% endif %}
+                                      {% if phone is not empty %}<li style="margin-bottom:8px;"><strong>Telefon: </strong><span dir="ltr">{{phone}}</span></li>{% endif %}
+                                      {% if note is not empty %}<li style="margin-bottom:8px;"><strong>Anmerkung: </strong>{{note}}</li>{% endif %}
+                                      {% if total is not empty %}<li style="margin-bottom:8px;"><strong>Gesamtpreis: </strong>{{total}}</li>{% endif %}
                                     </ul>
-<!-- ride link -->{% if rideUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#d4af37" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #d4af37;"><a href="{{rideUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #1b1b1b; text-decoration: none;">افتح رحلتك</a></td></tr></table>{% endif %}
-                                  </td>
+{% if appUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#1b1b1b" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #1b1b1b; border: 1px solid #d4af37;"><a href="{{appUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #d4af37; text-decoration: none;">Auf dem Board öffnen</a></td></tr></table>{% endif %}
+{% if rideUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#1b1b1b" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #1b1b1b; border: 1px solid #d4af37;"><a href="{{rideUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #d4af37; text-decoration: none;">Ihre Fahrt öffnen</a></td></tr></table>{% endif %}
+</td>
                                 </tr>
                               </table>
                             </td>
@@ -1057,10 +1074,10 @@
                                     line-height: 21px;
                                     color: #e6e6e6;
                                     font-size: 14px;
-                                    text-align: right;
+                                    text-align: left;
                                   "
                                 >
-                                هل لديك أي أسئلة؟ راسلنا على
+                                Haben Sie Fragen? Schreiben Sie uns an
                                   <a
                                     href="mailto:office@limosen.at"
                                     target="_blank"
@@ -1075,7 +1092,7 @@
                                     "
                                     >office@limosen.at</a
                                   >
-                                  <br />أو اتصل بنا على
+                                  <br />oder rufen Sie uns unter
                                   <a
                                   href="tel:+436608760606"
                                   target="_blank"
@@ -1088,7 +1105,7 @@
                                     color: #d4af37;
                                     font-size: 14px;
                                   "
-                                  >+43 660 876 06 06</a>.
+                                  >+43 660 876 06 06</a> an.
                                 </p>
                                   </td>
                                 </tr>
@@ -1199,7 +1216,7 @@
                                         border-spacing: 0px;
                                       "
                                     >
-                                      <!-- بدون أيقونات تواصل -->
+                                      <!-- Keine Social Icons -->
                                     </table>
                                   </td>
                                 </tr>
@@ -1226,7 +1243,7 @@
                                     text-align: center;
                                   "
                                 >
-                                    جميع الحقوق محفوظة.&nbsp;© {{ year | default("2026") }} LIMOSEN&nbsp;KG
+                                    Alle Rechte vorbehalten.&nbsp;© {{ year | default("2026") }} LIMOSEN&nbsp;KG
                                 </p>
                                 <p
                                   style="
@@ -1242,9 +1259,9 @@
                                     text-align: center;
                                   "
                                 >
-                                  Margaretengürtel&nbsp;42/3/16,&nbsp;1050&nbsp;Vienna,&nbsp;Austria &nbsp;|&nbsp;
-                                  Mannswörther&nbsp;Straße&nbsp;59–61/12/5,&nbsp;2320&nbsp;Schwechat,&nbsp;Austria &nbsp;&nbsp;
-                                  Gürtlgasse&nbsp;24,&nbsp;2401&nbsp;Fischamend, Austria
+                                  Margaretengürtel&nbsp;42/3/16,&nbsp;1050&nbsp;Wien,&nbsp;Österreich &nbsp;|&nbsp;
+                                  Mannswörther&nbsp;Straße&nbsp;59–61/12/5,&nbsp;2320&nbsp;Schwechat,&nbsp;Österreich &nbsp;|&nbsp;
+                                  Gürtlgasse&nbsp;24,&nbsp;2401&nbsp;Fischamend
                                 </p>
                                   </td>
                                 </tr>
@@ -1294,7 +1311,7 @@
                                               font-size: 12px;
                                               text-align: center;
                                             "
-                                            >الموقع الإلكتروني</a
+                                            >Website</a
                                           >
                                         </td>
                                         <td
@@ -1328,7 +1345,7 @@
                                               font-size: 12px;
                                               text-align: center;
                                             "
-                                            >البيانات القانونية</a
+                                            >Impressum</a
                                           >
                                         </td>
                                         <td
@@ -1342,7 +1359,7 @@
                                             padding-top: 5px;
                                             padding-bottom: 5px;
                                             border: 0;
-                                            border-left: 1px solid #2f2f2ف;
+                                            border-left: 1px solid #2f2f2f;
                                           "
                                         >
                                           <a
@@ -1362,7 +1379,7 @@
                                               font-size: 12px;
                                               text-align: center;
                                             "
-                                            >سياسة الخصوصية</a
+                                            >Datenschutzerklärung</a
                                           >
                                         </td>
                                       </tr>

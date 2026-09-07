@@ -15,7 +15,7 @@
     <meta name="x-apple-disable-message-reformatting" /> 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>Your invoice</title>
+    <title>Ride cancelled</title>
     <!--[if (mso 16)]>
       <style type="text/css">
         a { text-decoration: none; }
@@ -387,7 +387,7 @@
                                         color: #d4af37;
                                         text-align: center;
                                       "
-                                    >Your invoice</h1>
+                                    >Ride cancelled</h1>
                                   </td>
                                 </tr>
                               </table>
@@ -545,7 +545,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Thank you for your ride <strong>{{code}}</strong> with <a href="https://limosen.at/" target="_blank" class="hover-link" style=" color: #d4af37; text-decoration: underline; " >LIMOSEN&nbsp;KG</a>. Please find our invoice <strong>{{number}}</strong> attached as a PDF. You can also open the invoice using the button below.
+                                      Your ride <strong>{{code}}</strong> has been cancelled. There is no charge for it. If this was a mistake or you would like a new date, please get in touch with <a href="https://limosen.at/" target="_blank" class="hover-link" style=" color: #d4af37; text-decoration: underline; " >LIMOSEN&nbsp;KG</a>.
                                     </p>
                                   </td>
                                 </tr>
@@ -613,25 +613,14 @@
                                       padding-bottom: 20px;
                                     "
                                   >
-                                    <ul
-                                      style="
-                                        color: #e6e6e6;
-                                        padding-left: 0;
-                                        margin: 0;
-                                        list-style: none;
-                                        text-align: left;
-                                        direction: ltr;
-                                      "
-                                    >
-                                      {% if number is not empty %}<li style="margin-bottom:8px;"><strong>Invoice: </strong>{{number}}</li>{% endif %}
+                                    <ul style="color:#e6e6e6; padding-left:0; margin:0; list-style:none; text-align:left; direction: ltr;">
                                       <li style="margin-bottom:8px;"><strong>Booking: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}not yet in the system{% endif %}</li>
                                       {% if date is not empty %}<li style="margin-bottom:8px;"><strong>Outbound{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, <span dir="ltr">{{pickupAddress}} &rarr; {{destinationAddress}}</span>{% endif %}</li>{% endif %}
-                                      {% if returnDate is not empty %}<li style="margin-bottom:8px;"><strong>Return{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}{% if destinationAddress is not empty %}, <span dir="ltr">{{destinationAddress}} &rarr; {{pickupAddress}}</span>{% endif %}</li>{% endif %}
-                                      {% if total is not empty %}<li style="margin-bottom:8px;"><strong>Total: </strong>{{total}}</li>{% endif %}
+                                      {% if returnDate is not empty %}<li style="margin-bottom:8px;"><strong>Return{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}</li>{% endif %}
+                                      {% if statusDate is not empty %}<li style="margin-bottom:8px;"><strong>Cancelled on: </strong>{{statusDate}} {{statusTime}}</li>{% endif %}
                                     </ul>
-{% if documentUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#d4af37" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #d4af37; "><a href="{{documentUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #1b1b1b; text-decoration: none;">Open invoice</a></td></tr></table>{% endif %}
-<!-- ride link -->{% if rideUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#d4af37" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #d4af37;"><a href="{{rideUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #1b1b1b; text-decoration: none;">Open your ride</a></td></tr></table>{% endif %}
-                                  </td>
+{% if rideUrl is not empty %}<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;"><tr><td align="center" bgcolor="#d4af37" style="margin: 0; padding: 12px 24px; border-radius: 4px; background-color: #d4af37; "><a href="{{rideUrl}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #1b1b1b; text-decoration: none;">Open your ride</a></td></tr></table>{% endif %}
+</td>
                                 </tr>
                               </table>
                             </td>
