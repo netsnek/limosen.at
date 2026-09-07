@@ -26,13 +26,18 @@ cd "$HERE"
 # The token is the personal access token of this organisation's storage
 # machine user; the file is 0600 and lives beside the taxi platform's own
 # token files. See jaen docs/architecture/private-storage.md, "The build".
-if [ -z "${OSG_TOKEN:-}" ] && [ -f "$HOME/.config/jaen/osg.env" ]; then
-  # shellcheck disable=SC1091
-  set -a && . "$HOME/.config/jaen/osg.env" && set +a
-fi
+# One machine user per organisation, so the brand's own file wins over the
+# shared one: a token of the other organisation reads none of this site's
+# files and the build would stop on the first of them.
+for f in "$HOME/.config/jaen/osg-limosen.env" "$HOME/.config/jaen/osg.env"; do
+  if [ -z "${OSG_TOKEN:-}" ] && [ -f "$f" ]; then
+    # shellcheck disable=SC1090
+    set -a && . "$f" && set +a
+  fi
+done
 [ -n "${OSG_TOKEN:-}" ] || {
   echo "OSG_TOKEN is required to fetch media from the storage gateway." >&2
-  echo "Put it in ~/.config/jaen/osg.env (mode 0600) or export it." >&2
+  echo "Put it in ~/.config/jaen/osg-limosen.env (mode 0600) or export it." >&2
   exit 1
 }
 
