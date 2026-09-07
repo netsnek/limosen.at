@@ -295,6 +295,34 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const isReturn = watch('rideType') === 'RETURN';
 
   /**
+   * No ride in the past, okf/architecture/dispatch.md section 12. The pylon
+   * refuses a pickup earlier than fifteen minutes from now with
+   * `PICKUP_IN_PAST`, and the form asks the same question first, so the
+   * visitor reads the sentence under the field instead of watching the
+   * booking fail and the mail go out without a code. The fifteen minutes are
+   * a lead time: no limousine is on its way in less than that.
+   */
+  const PICKUP_MIN_LEAD_MS = 15 * 60 * 1000;
+
+  const pickupRules = {
+    validate: (_: unknown, values: BookingFormValues) => {
+      // An incomplete pair is unfinished, not in the past.
+      if (!values.date || !values.time) return true;
+      const at = new Date(`${values.date}T${values.time}`);
+      if (Number.isNaN(at.getTime())) return true;
+      return (
+        at.getTime() >= Date.now() + PICKUP_MIN_LEAD_MS ||
+        t('PickupInPast', 'The pickup time is in the past')
+      );
+    }
+  };
+
+  // The rule lives on the date, and the time re-runs it: react-hook-form
+  // validates one field at a time, so without `deps` a corrected time would
+  // leave yesterday's complaint standing under the date.
+  const pickupTimeRules = { deps: ['date' as const] };
+
+  /**
    * A return has a date and a time of its own, and both have to be there: the
    * pylon creates the second leg from them, and a "Rückfahrt" without a when
    * is the flag on one row that the office had to complete by phone before.
@@ -469,33 +497,33 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         </NativeSelect.Root>
                       </Field.Root>
 
-                      <Field.Root>
+                      <Field.Root invalid={!!errors.date}>
                         <Field.Label htmlFor="date" fontSize="sm">
                           {t('LabelDate', 'Date')}
                         </Field.Label>
                         <Input
                           id="date"
                           type="date"
-                          {...register('date')}
+                          {...register('date', pickupRules)}
                           _focus={{ borderColor: 'brand.500' }}
                         />
                         <Field.ErrorText fontSize="sm">
-                          {errors.date?.toString()}
+                          {errors.date?.message}
                         </Field.ErrorText>
                       </Field.Root>
 
-                      <Field.Root>
+                      <Field.Root invalid={!!errors.date || !!errors.time}>
                         <Field.Label htmlFor="time" fontSize="sm">
                           {t('LabelTime', 'Pickup time')}
                         </Field.Label>
                         <Input
                           id="time"
                           type="time"
-                          {...register('time')}
+                          {...register('time', pickupTimeRules)}
                           _focus={{ borderColor: 'brand.500' }}
                         />
                         <Field.ErrorText fontSize="sm">
-                          {errors.time?.toString()}
+                          {errors.time?.message}
                         </Field.ErrorText>
                       </Field.Root>
 
