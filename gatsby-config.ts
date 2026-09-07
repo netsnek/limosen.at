@@ -87,15 +87,21 @@ const config: GatsbyConfig = {
             process.env.JAEN_AGENT_URL ||
             'https://jaen-agent.limosen.at/graphql',
           site: SITE.repository.split('/')[1],
-          // 2500 and not the 5000 the design defaults to. Measured on the
-          // live site on 2026-09-07: a text change reached the second editor
-          // in 9.0 s and a picture in the media library in 12.1 s, and the
-          // poll interval is the tail of both. The saved change is already
-          // committed by then, so this only decides how long the other CMS
-          // waits before it asks. A poll whose sinceSha is still the head
-          // answers `changed: false` with no body out of the agent's KV, so
-          // the shorter interval costs the agent almost nothing.
-          pollMs: 2500
+          // The poll is the tail of the ten second acceptance: the saved
+          // change is already committed by the time it runs, so the interval
+          // only decides how long the other editor's CMS waits before it asks.
+          // A poll whose sinceSha is still the head answers `changed: false`
+          // with no body out of the agent's KV, so a short interval costs the
+          // agent almost nothing.
+          //
+          // Measured with two editors on booklimo.at against the live agent.
+          // At one flat 2500: a text change reached the second editor in
+          // 9.3 s and a picture in 9.3 s. With the split below, and with the
+          // picture and the settled text field no longer waiting out the save
+          // debounce: 6.9 s and 7.3 s. See
+          // jaen/docs/architecture/draft-state.md, "The budget".
+          pollMs: 5000,
+          activePollMs: 1500
         },
         remote: {
           repository: SITE.repository
