@@ -19,6 +19,23 @@ cd "$HERE"
   exit 1
 }
 
+# The storage gateway is private, so the build has to be able to read this
+# site's media: gatsby-source-jaen fetches every file the jaen data names with
+# OSG_TOKEN and writes them into public/osg/, and the published site serves
+# them itself. Without the token the build stops on the first media node.
+# The token is the personal access token of this organisation's storage
+# machine user; the file is 0600 and lives beside the taxi platform's own
+# token files. See jaen docs/architecture/private-storage.md, "The build".
+if [ -z "${OSG_TOKEN:-}" ] && [ -f "$HOME/.config/jaen/osg.env" ]; then
+  # shellcheck disable=SC1091
+  set -a && . "$HOME/.config/jaen/osg.env" && set +a
+fi
+[ -n "${OSG_TOKEN:-}" ] || {
+  echo "OSG_TOKEN is required to fetch media from the storage gateway." >&2
+  echo "Put it in ~/.config/jaen/osg.env (mode 0600) or export it." >&2
+  exit 1
+}
+
 echo "==> build"
 rm -rf public .cache
 # SENTRY_OFF because gatsby-plugin-jaen derives SENTRY_URL from the DSN origin,

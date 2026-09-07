@@ -1,0 +1,40 @@
+# The Actions deploy of limosen.at, and where its storage credential is named.
+#
+# This workflow does not run on a push, and that is deliberate. The build
+# cannot happen on a runner today: the jaen packages are `link:` dependencies
+# on a sibling checkout the runner does not have, so what actually ships is
+# `scripts/deploy.sh` on the maintainer's machine (okf/operations/deploy.md),
+# and the reusable workflow called below has failed on every run since 2025-11
+# in the sibling repository that still calls it.
+#
+# It exists so this site's build has one place that names OSG_TOKEN. The
+# storage gateway is private: gatsby-source-jaen fetches every media file the
+# jaen data names with that token and writes the files into the site's own
+# output, so the published site never asks the gateway for anything. A build
+# without the token stops on the first media node with a message naming it,
+# rather than shipping blank images. See jaen
+# docs/architecture/private-storage.md, "The build".
+
+name: Deploy
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: atsnek/jaen/.github/workflows/jaen-deploy.yaml@main
+    with:
+      CLOUDFLARE_PROJECT_NAME: 'limosen'
+    secrets:
+      # The storage machine user of this organisation. Its value is set in the
+      # deploy phase; this is the reference the build reads.
+      OSG_TOKEN: ${{ secrets.OSG_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
