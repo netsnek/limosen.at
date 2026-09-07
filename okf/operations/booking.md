@@ -101,3 +101,44 @@ outbound, a complete return posts `bookTransfer` first and the mail second with
 still sends the mail with an empty code. 32 checks, all passing on 2026-09-05.
 The two legs in the rendered mail are checked through emailwerk's
 `templatePreview`, see [mail.md](mail.md).
+
+## The phone number carries its country, and the refusal a language, 2026-09-08
+
+The form parses what a visitor types with the country of the page's language
+and sends E.164 (`taxi-app/okf/architecture/dispatch.md`, section 13). What it
+could not read it refuses inline, keeps the value in the field and sends
+nothing.
+
+**The refusal was English on every page for a day.** The four sentences were
+added to `src/locales/i18nBooking.tsx` when the phone half shipped, and that
+file is imported by nothing: the catalogue the `IntlProvider` is fed with is
+the shadow under `src/gatsby-plugin-jaen/locales/`, which `gatsby-config.ts`
+reads through `messages.ts`. React-intl answers an id it does not hold with the
+`defaultMessage` of the call site, and `BookingModal` passes
+`t('PhoneNeedsCountry', 'Please enter the country code')`, so every reader of
+every language got the English sentence and no warning was logged anywhere.
+Measured on the live site on 2026-09-08: the German page at `/de/` drew
+"Reservierungsanfrage", "Telefon" and "Vorname" and, under the phone field,
+"Please enter the country code".
+
+The four sentences live in the shadow catalogue now, the same four the app
+uses, and `src/locales/` is gone: it was a full second copy of the four
+catalogues that nothing outside itself imported, which is exactly how a string
+lands where no reader can reach it.
+
+**Which language the form is drawn in is the path, not the browser.** The site
+is `gatsby-plugin-i18n-l10n` with `defaultLocale: 'en-US'` and the prefixes
+`/de/`, `/tr/`, `/ar/`. `/` is English by design, whatever `Accept-Language`
+says, and seeding `jaen:uiLocale` does not move it either. A check that expects
+a German sentence opens `/de/`.
+
+Read on the live booklimo.at after the deploy, the testing brand of this
+platform, one submission per language with the unreadable `12ab`, so the write
+is refused before anything is created and no mail leaves. Nothing was submitted
+on limosen.at, which is in production use; the same build shipped to both
+brands and the chunk the two sites serve is byte for byte the one that was
+read: `/` "Please enter the country code", `/de/` "Bitte mit
+Landesvorwahl", `/tr/` "Lütfen ülke kodunu girin", `/ar/`
+"يرجى إدخال رمز الدولة", each time with the form still open and `12ab` still in
+the field. The passenger address of those four was the plus address of the
+office, the recipient rule of `taxi-app/okf/decisions/hard-rules.md`.
