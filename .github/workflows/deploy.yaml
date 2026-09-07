@@ -32,9 +32,22 @@ jobs:
     with:
       CLOUDFLARE_PROJECT_NAME: 'limosen'
     secrets:
-      # The storage machine user of this organisation. Its value is set in the
-      # deploy phase; this is the reference the build reads.
-      OSG_TOKEN: ${{ secrets.OSG_TOKEN }}
+      # OSG_TOKEN IS NOT PASSED HERE, and that is the fix rather than an
+      # omission. `atsnek/jaen/.github/workflows/jaen-deploy.yaml@main` does
+      # not declare OSG_TOKEN under `on.workflow_call.secrets`, and a caller
+      # that maps a secret the callee never declared is a `startup_failure`:
+      # the run ends before a job starts, so the site does not deploy and no
+      # log says why. Measured on every Deploy run of this repository between
+      # 2026-09-07T20:39 and the commit that removed this line.
+      #
+      # The build's storage credential lives on as the repository secret
+      # OSG_TOKEN (the machine user of this site's organisation, holding
+      # storage:read). What is missing is on the other side: the reusable
+      # workflow has to declare OSG_TOKEN and export it into the Gatsby build
+      # step beside SENTRY_AUTH_TOKEN. Until it does, the build that ships is
+      # `scripts/deploy.sh` on the maintainer's machine, which reads the token
+      # from ~/.config/jaen/osg-<brand>.env. See jaen
+      # docs/architecture/private-storage.md, "The build".
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
