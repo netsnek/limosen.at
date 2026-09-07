@@ -29,7 +29,34 @@ const config: GatsbyConfig = {
     DEV_SSR: false
   },
   plugins: [
-    `gatsby-plugin-cloudflare-pages`,
+    {
+      /**
+       * The app's documents are never held anywhere but the origin.
+       *
+       * okf/architecture/offline.md, "The installed app never goes white
+       * after a deploy". The service worker is network first on /app since
+       * app 1.6.3, and that is worth nothing if the browser or the edge
+       * answers the navigation out of an HTTP cache of its own: the document
+       * would be yesterday's, naming chunks this deploy has taken away, and
+       * the page would be white again for the same reason.
+       *
+       * Cloudflare Pages already answers HTML with max-age=0 and
+       * must-revalidate, and the plugin already writes `no-cache` for
+       * /sw.js. These three say the same thing out loud for the app, its
+       * shell and app-data.json, the file that carries the build's
+       * compilation hash and is how Gatsby notices there is a new build at
+       * all. Everything else keeps the plugin's headers, the immutable year
+       * on /static/* included.
+       */
+      resolve: `gatsby-plugin-cloudflare-pages`,
+      options: {
+        headers: {
+          '/app/*': ['Cache-Control: no-cache'],
+          '/offline-plugin-app-shell-fallback/*': ['Cache-Control: no-cache'],
+          '/app-data.json': ['Cache-Control: no-cache']
+        }
+      }
+    },
     {
       resolve: `gatsby-plugin-jaen`,
       options: {
