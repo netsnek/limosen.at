@@ -11,6 +11,8 @@ import {
 } from '@chakra-ui/react'
 import {PageConfig, useAuth} from 'jaen'
 
+import {RideMap} from 'gatsby-jaen-app/shared/components/rides'
+
 import {Logo} from '../../gatsby-plugin-jaen/components/Logo'
 import {SITE} from '../../vars/site-variants'
 import {
@@ -671,6 +673,32 @@ const RidePage: React.FC<PageProps> = ({params}) => {
                   )}
                 </Flex>
               </Stack>
+
+              {/*
+                Where the limousine is: the pickup pin, the destination and,
+                from ON_THE_WAY to ONGOING, the driver's own marker with the
+                car's cover picture on the card under it, read through this
+                page's token alone and polled every ten seconds while the tab
+                is visible. The map is the app's own (section 2's TrackingMap)
+                and lives in the app package, so both brands draw the same one
+                and a fix to it is one edit rather than two.
+              */}
+              <Box
+                borderWidth="1px"
+                borderColor={PAPER.rule}
+                borderRadius="sm"
+                p="4"
+                data-testid="ride-where">
+                <RideMap
+                  token={token}
+                  state={ride.state}
+                  pickupAddress={ride.pickupLocation}
+                  dropoffAddress={ride.dropoffLocation}
+                  language={lang}
+                  car={accepted ? ride.car : null}
+                  pylonUrl={SITE.appPylonUrl}
+                />
+              </Box>
 
               {/*
                 "Ihr Fahrzeug" once the driver said yes, with the picture, the
