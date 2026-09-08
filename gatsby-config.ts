@@ -62,47 +62,27 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         /**
-         * The jaen agent, the one service that holds the shared draft. Every
-         * change an editor makes is committed to this repository by the agent
-         * as it happens and every other open CMS takes the new head from a
-         * poll, so a colleague sees a draft, and a picture uploaded on a
-         * phone, without a publish and without a build.
+         * The jaen agent option is deliberately absent.
          *
-         * `site` is this site's key in the agent's SITES table, which names
-         * the repository. It is not derived from the audience: limosen.at and
-         * booklimo.at sign in against the same Zitadel project and client, so
-         * their audience is identical, and it is the organisation behind the
-         * caller's `jaen:admin` that decides which of the two they may write.
+         * The first build of the shared draft had the agent commit every save
+         * to this repository and named its head files in
+         * `jaen-data/patches.txt`, so an unfinished edit was part of the
+         * published site and an afternoon of editing was an afternoon of
+         * commits. Both are the wrong direction and are undone
+         * (`okf/decisions/hard-rules.md`, "The CMS's draft is not the site's
+         * content"). The head that existed became one ordinary migration and
+         * the site is taken off the agent until the redesigned one exists, a
+         * Durable Object per site that no repository and no gateway file ever
+         * sees.
          *
-         * One Worker answers both sites, under one custom domain per site:
-         * `agent.jaen.netsnek.com` cannot be it, because a Worker custom
-         * domain needs its zone in the Worker's own Cloudflare account and
-         * netsnek.com is a zone of another one.
+         * Without this option `__JAEN_AGENT__` is undefined, `agentConfig()`
+         * answers null and the CMS keeps its draft in `localStorage` alone,
+         * which is the rollback the design names and the way this site
+         * behaved before the shared draft. Nothing an editor has written is
+         * affected: a draft is per browser again, and publishing is unchanged.
          *
-         * JAEN_AGENT_URL points a local production build at a wrangler dev of
-         * the agent. See jaen/docs/architecture/draft-state.md.
+         * See jaen `docs/architecture/draft-state.md`, "The transition".
          */
-        agent: {
-          url:
-            process.env.JAEN_AGENT_URL ||
-            'https://jaen-agent.limosen.at/graphql',
-          site: SITE.repository.split('/')[1],
-          // The poll is the tail of the ten second acceptance: the saved
-          // change is already committed by the time it runs, so the interval
-          // only decides how long the other editor's CMS waits before it asks.
-          // A poll whose sinceSha is still the head answers `changed: false`
-          // with no body out of the agent's KV, so a short interval costs the
-          // agent almost nothing.
-          //
-          // Measured with two editors on booklimo.at against the live agent.
-          // At one flat 2500: a text change reached the second editor in
-          // 9.3 s and a picture in 9.3 s. With the split below, and with the
-          // picture and the settled text field no longer waiting out the save
-          // debounce: 6.9 s and 7.3 s. See
-          // jaen/docs/architecture/draft-state.md, "The budget".
-          pollMs: 5000,
-          activePollMs: 1500
-        },
         remote: {
           repository: SITE.repository
         },
