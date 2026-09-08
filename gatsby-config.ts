@@ -62,27 +62,69 @@ const config: GatsbyConfig = {
       options: {
         pylonUrl: 'https://services.netsnek.com/jaen/graphql',
         /**
-         * The jaen agent option is deliberately absent.
+         * The jaen agent, the one service that holds the shared draft.
          *
-         * The first build of the shared draft had the agent commit every save
-         * to this repository and named its head files in
-         * `jaen-data/patches.txt`, so an unfinished edit was part of the
-         * published site and an afternoon of editing was an afternoon of
-         * commits. Both are the wrong direction and are undone
+         * A save is a save. It goes into this site's Durable Object inside the
+         * agent, which is single threaded, so two editors cannot write onto
+         * stale bases, and it reaches no repository and no gateway file. The
+         * object pushes the new revision to every other open CMS over a
+         * WebSocket, so a colleague sees a draft, and a picture uploaded on a
+         * phone, without a publish and without a build.
+         *
+         * Only a publish writes history: one immutable migration on the storage
+         * gateway behind the Zitadel gate, one line appended to
+         * `jaen-data/patches.txt`, one commit. That is what live and published
+         * mean and it is all they mean
          * (`okf/decisions/hard-rules.md`, "The CMS's draft is not the site's
-         * content"). The head that existed became one ordinary migration and
-         * the site is taken off the agent until the redesigned one exists, a
-         * Durable Object per site that no repository and no gateway file ever
-         * sees.
+         * content").
          *
-         * Without this option `__JAEN_AGENT__` is undefined, `agentConfig()`
-         * answers null and the CMS keeps its draft in `localStorage` alone,
-         * which is the rollback the design names and the way this site
-         * behaved before the shared draft. Nothing an editor has written is
-         * affected: a draft is per browser again, and publishing is unchanged.
+         * The first build of the shared draft committed every save to this
+         * repository and named its head files in `patches.txt`, so an
+         * unfinished edit was part of the published site. Both are undone: the
+         * head became one ordinary migration on 2026-09-08 and the agent
+         * carries no commit-on-save path any more.
          *
-         * See jaen `docs/architecture/draft-state.md`, "The transition".
+         * `site` is this site's key in the agent's SITES table, which names the
+         * repository. It is not derived from the audience: limosen.at and
+         * booklimo.at sign in against the same Zitadel project and client, so
+         * their audience is identical, and it is the organisation behind the
+         * caller's `jaen:admin` that decides which of the two they may write.
+         *
+         * One Worker answers both sites, under one custom domain per site:
+         * `agent.jaen.netsnek.com` cannot be it, because a Worker custom domain
+         * needs its zone in the Worker's own Cloudflare account and netsnek.com
+         * is a zone of another one.
+         *
+         * Removing this option is the rollback and it costs nothing but the
+         * sharing: `__JAEN_AGENT__` is undefined, `agentConfig()` answers null
+         * and the CMS keeps its draft in `localStorage` alone, the way it
+         * behaved before the shared draft.
+         *
+         * JAEN_AGENT_URL points a local production build at a wrangler dev of
+         * the agent. See jaen `docs/architecture/draft-state.md`.
          */
+        agent: {
+          url:
+            process.env.JAEN_AGENT_URL ||
+            'https://jaen-agent.limosen.at/graphql',
+          site: SITE.repository.split('/')[1],
+          // Neither interval is how a change normally arrives any more. The
+          // object pushes a revision over its socket and the client asks for
+          // the delta, measured at 9.3 ms in the notebook's socket scenario.
+          // These two are the fallback for a browser whose socket was refused,
+          // and with a socket up the poll still runs at thirty seconds, set in
+          // jaen, because an open socket that has stopped delivering frames is
+          // indistinguishable from a site nobody is editing.
+          //
+          // activePollMs is the tail while the tab is watched or this
+          // browser's own save is still out; pollMs is the hidden tab, where
+          // nobody can read the answer anyway. A poll whose sinceRevision is
+          // still the object's revision answers `changed: false` with no body
+          // out of one key read, so a short interval costs the object almost
+          // nothing.
+          pollMs: 5000,
+          activePollMs: 1500
+        },
         remote: {
           repository: SITE.repository
         },
