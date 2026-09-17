@@ -571,7 +571,7 @@
                                       all.
                                     -->
                                     {% set copySummary = "LIMOSEN Anfrage\n"
-                                      ~ (bookingCode is not empty ? "Buchung " ~ bookingCode ~ "\n" : "Buchung noch nicht im System\n")
+                                      ~ (bookingCode is not empty ? "Buchung " ~ bookingCode ~ "\n" : (date is not empty ? "Buchung noch nicht im System\n" : ""))
                                       ~ (firstName is not empty or lastName is not empty ? "Name: " ~ firstName ~ " " ~ lastName ~ "\n" : "")
                                       ~ (phone is not empty ? "Tel: " ~ phone ~ "\n" : "")
                                       ~ (email is not empty ? "Mail: " ~ email ~ "\n" : "")
@@ -669,9 +669,14 @@
                                     >
                                       <!-- The booking as a person reads it. The uuid stays out of
                                            the mail; the six characters are what both legs share. -->
+                                      {# A contact enquiry carries no booking and no ride, so the row that would
+                                         say "noch nicht im System" stays away; a booking the pylon refused still
+                                         shows it, because there IS a ride and it is not in the system yet. #}
+                                      {% if bookingCode is not empty or date is not empty %}
                                       <li style="margin-bottom: 8px;">
                                         <strong>Buchung: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% if code is not empty %} (Hinfahrt {{code}}{% if returnCode is not empty %}, Rückfahrt {{returnCode}}{% endif %}){% endif %}{% else %}noch nicht im System{% endif %}
                                       </li>
+                                      {% endif %}
                                       {% if invokedOnUrl is not empty %}
                                       <li style="margin-bottom: 8px;">
                                         <strong>Formular: </strong>

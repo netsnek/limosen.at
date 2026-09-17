@@ -917,9 +917,14 @@
                                     <ul style="color:#e6e6e6; padding-left:0; margin:0; list-style:none; text-align:left; direction: ltr;">
                                       <!-- The booking as a person reads it: the six characters both
                                            legs share, then each leg with its own code. -->
+                                      {# A contact enquiry carries no booking and no ride, so the row that would
+                                         say "noch nicht im System" stays away; a booking the pylon refused still
+                                         shows it, because there IS a ride and it is not in the system yet. #}
+                                      {% if bookingCode is not empty or date is not empty %}
                                       <li style="margin-bottom:8px;">
                                         <strong>Buchung: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}noch nicht im System, wir melden uns{% endif %}
                                       </li>
+                                      {% endif %}
                                       {% if date is not empty %}
                                       <li style="margin-bottom:8px;">
                                         <strong>Hinfahrt{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, {{pickupAddress}} &rarr; {{destinationAddress}}{% endif %}
@@ -928,6 +933,59 @@
                                       {% if returnDate is not empty %}
                                       <li style="margin-bottom:8px;">
                                         <strong>Rückfahrt{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}{% if destinationAddress is not empty %}, {{destinationAddress}} &rarr; {{pickupAddress}}{% endif %}
+                                      </li>
+                                      {% endif %}
+                                      <!-- Everything the booking form asked for, so the visitor can check what
+                                           they chose (owner, 2026-09-17). A contact enquiry sends none of these
+                                           and the rows stay away. -->
+                                      {% if rideCategory is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Kategorie: </strong>{{rideCategory}}
+                                      </li>
+                                      {% endif %}
+                                      {% if rideType is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Art: </strong>{{rideType}}
+                                      </li>
+                                      {% endif %}
+                                      {% if flightNumber is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Flugnummer: </strong>{{flightNumber}}
+                                      </li>
+                                      {% endif %}
+                                      {% if passengers is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Passagieranzahl: </strong>{{passengers}}
+                                      </li>
+                                      {% endif %}
+                                      {% if luggage is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Gepäckanzahl: </strong>{{luggage}}
+                                      </li>
+                                      {% endif %}
+                                      {% if childSeats is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Kindersitze: </strong>{{childSeats}}
+                                      </li>
+                                      {% endif %}
+                                      {% if extraTime is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Zusätzliche Zeit (Std.): </strong>{{extraTime}}
+                                      </li>
+                                      {% endif %}
+                                      {% if carClass is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Fahrzeugklasse: </strong>{{carClass}}
+                                      </li>
+                                      {% endif %}
+                                      {% if carTitle is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Fahrzeug: </strong>{{carTitle}}
+                                      </li>
+                                      {% endif %}
+                                      {% if paymentOption is not empty %}
+                                      <li style="margin-bottom:8px;">
+                                        <strong>Zahlung: </strong>{{paymentOption}}
                                       </li>
                                       {% endif %}
                                       {% if firstName is not empty or lastName is not empty %}
