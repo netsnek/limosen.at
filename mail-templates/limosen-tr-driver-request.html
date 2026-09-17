@@ -839,7 +839,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Senin için bir yolculuk talebi var. Lütfen uygulamada evet ya da hayır olarak yanıtla, böylece merkez yolculuğun alınıp alınmadığını bilir.
+                                      Sizin için bir yolculuk talebi var. Lütfen uygulamada evet ya da hayır olarak yanıtlayın, böylece merkez yolculuğun alınıp alınmadığını bilir.
                                     </p>
                                   </td>
                                 </tr>
@@ -905,26 +905,11 @@
                                     "
                                   >
                                     <!-- No list decoration -->
-                                    <!-- The copy block: one preformatted block a triple click or a long
-     press selects whole, and a WhatsApp link that already carries the
-     same text. Office and driver only, never a customer row. -->
-{% set copySummary = "LIMOSEN Fahrt angefragt\n"
-  ~ (code is not empty ? code ~ "\n" : (bookingCode is not empty ? bookingCode ~ "\n" : ""))
-  ~ (date is not empty ? date ~ (time is not empty ? " " ~ time : "") ~ "\n" : "")
-  ~ (pickupAddress is not empty ? "Von: " ~ pickupAddress ~ "\n" : "")
-  ~ (destinationAddress is not empty ? "Nach: " ~ destinationAddress ~ "\n" : "")
-  ~ (returnDate is not empty ? "Rueckfahrt: " ~ returnDate ~ (returnTime is not empty ? " " ~ returnTime : "") ~ "\n" : "")
-  ~ (passengerCount is not empty ? "Personen: " ~ passengerCount ~ "\n" : "")
-  ~ (phone is not empty ? "Tel: " ~ phone ~ "\n" : "")
-  ~ (total is not empty ? "Preis: " ~ total ~ "\n" : "")
-  ~ (note is not empty ? "Anmerkung: " ~ note ~ "\n" : "") %}
-<p style="margin: 0 0 6px 0; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; mso-line-height-rule: exactly; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 13px; line-height: 18px; color: #d4af37; text-transform: uppercase; letter-spacing: 1px;">Zum Kopieren und Weiterleiten</p>
-<pre style="margin: 0 0 12px 0; padding: 14px; background-color: #111111; border: 1px solid #d4af37; border-radius: 4px; font-family: 'courier new', courier, monospace; font-size: 13px; line-height: 19px; color: #e6e6e6; white-space: pre-wrap; word-break: break-word;">{{copySummary}}</pre>
-<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-bottom: 20px;"><tr><td align="center" bgcolor="#25d366" style="margin: 0; padding: 10px 20px; border-radius: 4px; background-color: #25d366;"><a href="https://wa.me/?text={{copySummary|url_encode}}" target="_blank" style="display: inline-block; font-family: arial, 'helvetica neue', helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">Per WhatsApp weiterleiten</a></td></tr></table>
-<ul style="color:#e6e6e6; padding-left:0; margin:0; list-style:none; text-align:left; direction: ltr;">
+                                    <ul style="color:#e6e6e6; padding-left:0; margin:0; list-style:none; text-align:left; direction: ltr;">
                                       <li style="margin-bottom:8px;"><strong>Rezervasyon: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% else %}henüz sistemde değil{% endif %}</li>
                                       {% if date is not empty %}<li style="margin-bottom:8px;"><strong>Gidiş{% if code is not empty %} {{code}}{% endif %}: </strong>{{date}} {{time}}{% if pickupAddress is not empty %}, <span dir="ltr">{{pickupAddress}} &rarr; {{destinationAddress}}</span>{% endif %}</li>{% endif %}
                                       {% if returnDate is not empty %}<li style="margin-bottom:8px;"><strong>Dönüş{% if returnCode is not empty %} {{returnCode}}{% endif %}: </strong>{{returnDate}} {{returnTime}}</li>{% endif %}
+                                      {% if name is not empty %}<li style="margin-bottom:8px;"><strong>Yolcu: </strong>{{name}}{% if email is not empty and office is not empty %} (<a href="mailto:{{email}}" style="color:inherit;">{{email}}</a>){% endif %}</li>{% endif %}
                                       {% if passengerCount is not empty %}<li style="margin-bottom:8px;"><strong>Yolcu: </strong>{{passengerCount}}</li>{% endif %}
                                       {% if phone is not empty %}<li style="margin-bottom:8px;"><strong>Telefon: </strong><span dir="ltr">{{phone}}</span></li>{% endif %}
                                       {% if note is not empty %}<li style="margin-bottom:8px;"><strong>Not: </strong>{{note}}</li>{% endif %}
