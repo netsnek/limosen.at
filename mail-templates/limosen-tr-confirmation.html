@@ -12,7 +12,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>İletişim Talebinizin Onayı</title>
+    <title>Talebinizin Onayı</title>
     <!--[if (mso 16)
       ]><style type="text/css">
         a {
@@ -705,7 +705,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      İletişim Talebinizin Onayı
+                                      {% if bookingCode is not empty %}Rezervasyon Talebinizin Onayı{% else %}İletişim Talebinizin Onayı{% endif %}
                                     </h1>
                                   </td>
                                 </tr>
@@ -841,7 +841,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Mesajınız için teşekkür ederiz. Web sitemizdeki iletişim formu üzerinden gönderdiğiniz iletişim talebinizi aldık
+                                      {% if bookingCode is not empty %}Rezervasyon talebiniz için teşekkür ederiz. Web sitemizdeki rezervasyon formu üzerinden gönderdiğiniz rezervasyon talebinizi aldık{% else %}Mesajınız için teşekkür ederiz. Web sitemizdeki iletişim formu üzerinden gönderdiğiniz iletişim talebinizi aldık{% endif %}
                                       <a href="https://limosen.at/"
                                         target="_blank"
                                         class="hover-link"

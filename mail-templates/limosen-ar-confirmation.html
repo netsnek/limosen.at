@@ -12,7 +12,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>تأكيد طلب التواصل الخاص بك</title>
+    <title>تأكيد طلبك</title>
     <!--[if (mso 16)
       ]><style type="text/css">
         a {
@@ -706,7 +706,7 @@
                                         text-align: right;
                                       "
                                     >
-                                      تأكيد طلب التواصل الخاص بك
+                                      {% if bookingCode is not empty %}تأكيد طلب الحجز الخاص بك{% else %}تأكيد طلب التواصل الخاص بك{% endif %}
                                     </h1>
                                   </td>
                                 </tr>
@@ -842,7 +842,7 @@
                                         text-align: right;
                                       "
                                     >
-                                      شكرًا على رسالتك. لقد استلمنا طلب التواصل الخاص بك عبر نموذج التواصل على موقعنا
+                                      {% if bookingCode is not empty %}شكرًا على طلب الحجز. لقد استلمنا طلب الحجز الخاص بك عبر نموذج الحجز على موقعنا{% else %}شكرًا على رسالتك. لقد استلمنا طلب التواصل الخاص بك عبر نموذج التواصل على موقعنا{% endif %}
                                       <a href="https://limosen.at/"
                                         target="_blank"
                                         class="hover-link"

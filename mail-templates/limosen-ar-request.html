@@ -12,7 +12,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>Admin Notification: New Booking / Contact Request</title>
+    <title>Neue Anfrage über limosen.at</title>
     <!--[if (mso 16)]>
       <style type="text/css">
         a { text-decoration: none; }
@@ -350,7 +350,7 @@
                                         text-align: center;
                                       "
                                     >
-                                      New Booking / Contact Request
+                                      {% if bookingCode is not empty %}Neue Buchung{% else %}Neue Kontaktanfrage{% endif %}
                                     </h1>
                                   </td>
                                 </tr>
@@ -493,21 +493,15 @@
                                         text-align: left;
                                       "
                                     >
-                                      A new request was submitted on
+                                      Über die Website von
                                       <a
                                         href="https://limosen.at/"
                                         target="_blank"
                                         class="hover-link"
                                         style="color: #d4af37; text-decoration: underline;"
-                                      >LIMOSEN&nbsp;KG</a>.
-                                      This is the admin copy for
-                                      <a
-                                        href="mailto:office@limosen.at"
-                                        target="_blank"
-                                        class="hover-link"
-                                        style="color: #d4af37; text-decoration: underline;"
-                                      >office@limosen.at</a>.
-                                      Below is a summary of all fields.
+                                      >LIMOSEN&nbsp;KG</a>
+                                      ist {% if bookingCode is not empty %}eine neue Buchung{% else %}eine neue Kontaktanfrage{% endif %} eingegangen.
+                                      Der Block zum Weiterleiten steht zuerst, darunter alle Angaben aus dem Formular.
                                     </p>
                                   </td>
                                 </tr>
@@ -595,7 +589,7 @@
                                       ~ (childSeats is not empty ? "Kindersitze: " ~ childSeats ~ "\n" : "")
                                       ~ (extraTime is not empty ? "Zusatzzeit (h): " ~ extraTime ~ "\n" : "")
                                       ~ (paymentOption is not empty ? "Zahlung: " ~ paymentOption ~ "\n" : "")
-                                      ~ (message is not empty ? "Wuensche: " ~ message ~ "\n" : "") %}
+                                      ~ (message is not empty ? "Nachricht: " ~ message ~ "\n" : "") %}
                                     <p
                                       style="
                                         margin: 0 0 6px 0;
@@ -676,13 +670,13 @@
                                       <!-- The booking as a person reads it. The uuid stays out of
                                            the mail; the six characters are what both legs share. -->
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Booking: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% if code is not empty %} (outbound {{code}}{% if returnCode is not empty %}, return {{returnCode}}{% endif %}){% endif %}{% else %}Buchung noch nicht im System{% endif %}
+                                        <strong>Buchung: </strong>{% if bookingCode is not empty %}{{bookingCode}}{% if code is not empty %} (Hinfahrt {{code}}{% if returnCode is not empty %}, Rückfahrt {{returnCode}}{% endif %}){% endif %}{% else %}noch nicht im System{% endif %}
                                       </li>
                                       {% if invokedOnUrl is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>invokedOnUrl: </strong>
+                                        <strong>Formular: </strong>
                                         <a
-                                          href="{{invokedOnUrll}}"
+                                          href="{{invokedOnUrl}}"
                                           target="_blank"
                                           class="hover-link"
                                           style="color: #d4af37; text-decoration: underline;"
@@ -696,7 +690,7 @@
                                       {% endif %}
                                       {% if email is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Email: </strong>
+                                        <strong>E-Mail: </strong>
                                         <a
                                           href="mailto:{{email}}"
                                           target="_blank"
@@ -707,7 +701,7 @@
                                       {% endif %}
                                       {% if phone is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Phone: </strong>
+                                        <strong>Telefon: </strong>
                                         <a
                                           href="tel:{{phone}}"
                                           target="_blank"
@@ -718,38 +712,38 @@
                                       {% endif %}
                                       {% if flightNumber is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Flight number: </strong>{{flightNumber}}
+                                        <strong>Flugnummer: </strong>{{flightNumber}}
                                       </li>
                                       {% endif %}
 
                                       {% if rideCategory is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Category: </strong>{{rideCategory}}
+                                        <strong>Kategorie: </strong>{{rideCategory}}
                                       </li>
                                       {% endif %}
                                       {% if rideType is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Type: </strong>{{rideType}}
+                                        <strong>Art: </strong>{{rideType}}
                                       </li>
                                       {% endif %}
                                       {% if date is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Date: </strong>{{date}}
+                                        <strong>Datum: </strong>{{date}}
                                       </li>
                                       {% endif %}
                                       {% if time is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Pickup time: </strong>{{time}}
+                                        <strong>Abholzeit: </strong>{{time}}
                                       </li>
                                       {% endif %}
                                       {% if pickupAddress is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Pickup address: </strong>{{pickupAddress}}
+                                        <strong>Abholadresse: </strong>{{pickupAddress}}
                                       </li>
                                       {% endif %}
                                       {% if destinationAddress is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Destination address: </strong>{{destinationAddress}}
+                                        <strong>Zieladresse: </strong>{{destinationAddress}}
                                       </li>
                                       {% endif %}
                                       {% if returnDate is not empty or returnTime is not empty %}
@@ -759,48 +753,48 @@
                                       {% endif %}
                                       {% if passengers is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Passengers: </strong>{{passengers}}
+                                        <strong>Personen: </strong>{{passengers}}
                                       </li>
                                       {% endif %}
                                       {% if luggage is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Luggage: </strong>{{luggage}}
+                                        <strong>Gepäck: </strong>{{luggage}}
                                       </li>
                                       {% endif %}
                                       {% if childSeats is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Child seats: </strong>{{childSeats}}
+                                        <strong>Kindersitze: </strong>{{childSeats}}
                                       </li>
                                       {% endif %}
                                       {% if extraTime is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Extra time (hrs): </strong>{{extraTime}}
+                                        <strong>Zusatzzeit (h): </strong>{{extraTime}}
                                       </li>
                                       {% endif %}
                                       {% if carClass is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Vehicle class: </strong>{{carClass}}
+                                        <strong>Fahrzeugklasse: </strong>{{carClass}}
                                       </li>
                                       {% endif %}
                                       {% if carTitle is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Vehicle: </strong>{{carTitle}}
+                                        <strong>Fahrzeug: </strong>{{carTitle}}
                                       </li>
                                       {% endif %}
                                       {% if paymentOption is not empty %}
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Payment option: </strong>{{paymentOption}}
+                                        <strong>Zahlung: </strong>{{paymentOption}}
                                       </li>
                                       {% endif %}
 
-                                      <!-- Always show consent for admins -->
+                                      <!-- The consent is always shown: a form without it is a form to ask about. -->
                                       <li style="margin-bottom: 8px;">
-                                        <strong>Consent given: </strong>{% if agreeToTerms %}Yes{% else %}No{% endif %}
+                                        <strong>AGB akzeptiert: </strong>{% if agreeToTerms %}Ja{% else %}Nein{% endif %}
                                       </li>
 
                                       {% if message is not empty %}
                                       <li>
-                                        <strong>Message: </strong>{{message}}
+                                        <strong>Nachricht: </strong>{{message}}
                                       </li>
                                       {% endif %}
                                     </ul>
@@ -941,7 +935,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      For action, reply to the customer at
+                                      Antworten Sie dem Kunden direkt an
                                       {% if email is not empty %}
                                       <a
                                         href="mailto:{{email}}"
@@ -950,11 +944,11 @@
                                         style="text-decoration: underline; color: #d4af37; font-size: 14px;"
                                       >{{email}}</a>
                                       {% else %}
-                                      <span style="color:#a5a5a5;">(no email provided)</span>
+                                      <span style="color:#a5a5a5;">(keine E-Mail-Adresse angegeben)</span>
                                       {% endif %}
                                       {% if phone is not empty %}
                                       <br />
-                                      or call
+                                      oder rufen Sie an unter
                                       <a
                                         href="tel:{{phone}}"
                                         target="_blank"
@@ -1138,7 +1132,7 @@
                             target="_blank"
                             class="hover-link"
                             style="color: #cccccc; text-decoration: underline;"
-                          >Margaretengürtel&nbsp;42/3/16,&nbsp;1050&nbsp;Vienna,&nbsp;Austria</a>
+                          >Margaretengürtel&nbsp;42/3/16,&nbsp;1050&nbsp;Wien,&nbsp;Österreich</a>
                         </p>
                         <p
                           style="
@@ -1158,7 +1152,7 @@
                             target="_blank"
                             class="hover-link"
                             style="color: #cccccc; text-decoration: underline;"
-                          >Mannswörther&nbsp;Straße&nbsp;59–61/12/5,&nbsp;2320&nbsp;Schwechat,&nbsp;Austria</a>
+                          >Mannswörther&nbsp;Straße&nbsp;59–61/12/5,&nbsp;2320&nbsp;Schwechat,&nbsp;Österreich</a>
                         </p>
                         <p
                           style="
@@ -1178,7 +1172,7 @@
                             target="_blank"
                             class="hover-link"
                             style="color: #cccccc; text-decoration: underline;"
-                          >Gürtlgasse&nbsp;24,&nbsp;2401&nbsp;Fischamend,&nbsp;Austria</a>
+                          >Gürtlgasse&nbsp;24,&nbsp;2401&nbsp;Fischamend,&nbsp;Österreich</a>
                         </p>
                       </td>
                     </tr>
@@ -1199,7 +1193,7 @@
                             text-align: center;
                           "
                         >
-                          All rights reserved.&nbsp;© {{ year | default("2026") }} LIMOSEN&nbsp;KG
+                          Alle Rechte vorbehalten.&nbsp;© {{ year | default("2026") }} LIMOSEN&nbsp;KG
                         </p>
                       </td>
                     </tr>
@@ -1260,7 +1254,7 @@
                                   font-size: 12px;
                                   text-align: center;
                                 "
-                              >Imprint</a>
+                              >Impressum</a>
                             </td>
                             <td
                               align="center"
@@ -1283,7 +1277,7 @@
                                   font-size: 12px;
                                   text-align: center;
                                 "
-                              >Privacy Policy</a>
+                              >Datenschutzerklärung</a>
                             </td>
                           </tr>
                         </table>

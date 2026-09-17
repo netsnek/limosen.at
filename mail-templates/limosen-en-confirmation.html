@@ -15,7 +15,7 @@
     <meta name="x-apple-disable-message-reformatting" /> 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>Confirmation of Your Contact Request</title>
+    <title>Confirmation of your request</title>
     <!--[if (mso 16)]>
       <style type="text/css">
         a { text-decoration: none; }
@@ -388,7 +388,7 @@
                                         text-align: center;
                                       "
                                     >
-                                      Confirmation of Your Contact Request
+                                      {% if bookingCode is not empty %}Confirmation of your booking request{% else %}Confirmation of your contact request{% endif %}
                                     </h1>
                                   </td>
                                 </tr>
@@ -547,7 +547,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Thank you for your message. We have received your contact request via the contact form on our website
+                                      Thank you for your {% if bookingCode is not empty %}booking request{% else %}message{% endif %}. We have received your {% if bookingCode is not empty %}booking request via the booking form{% else %}contact request via the contact form{% endif %} on our website
                                       <a
                                         href="https://limosen.at/"
                                         target="_blank"

@@ -12,7 +12,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta content="telephone=no" name="format-detection" />
-    <title>Bestätigung Ihrer Kontaktanfrage</title>
+    <title>Bestätigung Ihrer Anfrage</title>
     <!--[if (mso 16)
       ]><style type="text/css">
         a {
@@ -705,7 +705,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Bestätigung Ihrer Kontaktanfrage
+                                      {% if bookingCode is not empty %}Bestätigung Ihrer Buchungsanfrage{% else %}Bestätigung Ihrer Kontaktanfrage{% endif %}
                                     </h1>
                                   </td>
                                 </tr>
@@ -841,7 +841,7 @@
                                         text-align: left;
                                       "
                                     >
-                                      Vielen Dank für Ihre Nachricht. Wir haben Ihre Kontaktanfrage über das Kontaktformular auf unserer Website
+                                      Vielen Dank für Ihre {% if bookingCode is not empty %}Buchungsanfrage{% else %}Nachricht{% endif %}. Wir haben Ihre {% if bookingCode is not empty %}Buchungsanfrage über das Buchungsformular{% else %}Kontaktanfrage über das Kontaktformular{% endif %} auf unserer Website
                                       <a href="https://limosen.at/"
                                         target="_blank"
                                         class="hover-link"
