@@ -1,0 +1,380 @@
+# The gate that stands behind an upload of limosen.at.
+#
+# Nothing here builds the site. The build still cannot happen on a runner
+# (`link:` dependencies on a sibling checkout of an unpublished jaen, see
+# okf/operations/deploy.md), so what ships is `scripts/deploy.sh` on the
+# maintainer's machine, and that script ends by starting this workflow with
+# the deployment it has just published.
+#
+# What this does is ask the site that is now live whether a visitor's enquiry
+# can still reach the company. Between 2026-09-07 and 2026-09-17 it could not:
+# an audience script wiped the stored recipients off all four request
+# templates, every contact and every booking answered "Something went wrong",
+# and the site was deployed nine more times without anybody noticing, because
+# nothing looked at the live templates after an upload. This is that look.
+#
+# When the check fails and the deployment id is known, the workflow does not
+# just report it. It plans a rollback, runs the same contract against the
+# deployment that would replace the current one, and only rolls back if that
+# older deployment passes. If it fails the same way the fault is not in the
+# content that was just uploaded, it is on emailwerk or on the pylon, and
+# reverting would throw away good content for nothing.
+#
+# The schedule carries no deployment id on purpose, so a monitoring run can
+# never roll anything back; it only reports.
+
+name: Post-deploy gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: "Cloudflare Pages deployment that was just published (uuid or short id); enables rollback"
+        required: false
+        default: ""
+      drill:
+        description: "Force the first smoke run to fail to exercise the rollback path"
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [pages-deployed]
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: read
+
+# One gate at a time. Cancelling a run in the middle could leave a rollback
+# half done, so a second run waits instead. GitHub still cancels a run that is
+# only *queued* when a newer one joins the group, which is why the job below is
+# bounded at thirty minutes rather than the six hour default: a queue forms when
+# one gate holds the group for hours, and `scripts/deploy.sh` says which of the
+# two happened when it ends red.
+concurrency:
+  group: post-deploy
+  cancel-in-progress: false
+
+env:
+  # This brand's own values. The sibling brand has its own repository and its
+  # own copy of this workflow; nothing here may name it.
+  SITE_URL: https://limosen.at
+  SITE_ORIGIN: https://limosen.at
+  CF_PAGES_PROJECT: limosen
+  EMAILWERK_AUTH: ${{ secrets.EMAILWERK_AUTH }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  # KRC_PALETTE_APPLIED is the sibling repository's switch and has no meaning
+  # here: limosen's templates already carry limosen's own gold.
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    # `--ExecutePreprocessor.timeout=900` caps a cell, not the job. Twenty six
+    # code cells at fifteen minutes each is longer than a working day, and for
+    # all of it this job would hold the gate's concurrency group while every
+    # gate behind it waits to be cancelled by the next one. The measured run is
+    # about a minute of notebooks plus the browser install, so half an hour is
+    # the generous end of normal.
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the suite and a browser
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Resolve what was deployed
+        id: resolve
+        env:
+          # A dispatch carries it as an input, a deploy script as a payload, and
+          # the schedule carries nothing at all, which is what keeps a
+          # monitoring run from ever rolling back.
+          INPUT_DEPLOYMENT: ${{ github.event.inputs.deployment_id }}
+          PAYLOAD_DEPLOYMENT: ${{ github.event.client_payload.deployment_id }}
+          INPUT_DRILL: ${{ github.event.inputs.drill }}
+        run: |
+          set -euo pipefail
+          deployment="${INPUT_DEPLOYMENT:-}"
+          if [ -z "$deployment" ]; then deployment="${PAYLOAD_DEPLOYMENT:-}"; fi
+          echo "deployment_id=$deployment" >> "$GITHUB_OUTPUT"
+          if [ "${INPUT_DRILL:-false}" = "true" ]; then
+            echo "smoke_drill=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "smoke_drill=" >> "$GITHUB_OUTPUT"
+          fi
+          echo "deployment: ${deployment:-none, this run cannot roll back}"
+
+      - name: The contract, against production
+        id: contract
+        continue-on-error: true
+        env:
+          SMOKE_DRILL: ${{ steps.resolve.outputs.smoke_drill }}
+        run: |
+          set -euo pipefail
+          jupyter nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=900 \
+            --output-dir tests/out \
+            tests/01-contact-mail-contract.ipynb
+
+      # Its own step, because nbconvert stops the whole run at the first cell
+      # that raises. Handed both notebooks it would never start this one when
+      # the contract failed, and what a visitor's browser actually does with the
+      # form is the next thing anybody wants to see: no screenshot, no page, no
+      # transcript, precisely on the run somebody has to diagnose. SMOKE_DRILL is
+      # deliberately not passed here; the drill is notebook 01's last check and
+      # nothing else.
+      - name: The forms in a browser, against production
+        id: browser
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          jupyter nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=900 \
+            --output-dir tests/out \
+            tests/02-contact-form-browser.ipynb
+
+      # A second opinion, before anything is decided. Notebook 02 does four full
+      # page loads behind a CDN and waits on toasts that live seven seconds, on a
+      # shared runner; notebook 01 makes sixteen calls over the open internet. One
+      # of those going wrong once is not a broken deployment. Without this step it
+      # would be: the run below asks an older deployment the same question a few
+      # minutes later, by then the blip is gone, that deployment passes, and an
+      # upload that was never at fault is reverted unattended. So whatever failed
+      # is asked once more, and only what fails twice decides anything. The drill
+      # is carried over, because it has to keep failing for the rollback path to
+      # be exercised; notebook 02 does not read it.
+      - name: Ask again, whatever failed
+        id: retry
+        if: steps.contract.outcome == 'failure' || steps.browser.outcome == 'failure'
+        continue-on-error: true
+        env:
+          CONTRACT: ${{ steps.contract.outcome }}
+          BROWSER: ${{ steps.browser.outcome }}
+          SMOKE_DRILL: ${{ steps.resolve.outputs.smoke_drill }}
+          SITE_OUT_DIR: tests/out/retry
+        run: |
+          set -euo pipefail
+          again=""
+          if [ "$CONTRACT" = "failure" ]; then
+            again="$again tests/01-contact-mail-contract.ipynb"
+          fi
+          if [ "$BROWSER" = "failure" ]; then
+            again="$again tests/02-contact-form-browser.ipynb"
+          fi
+          failed=""
+          for notebook in $again; do
+            jupyter nbconvert --to notebook --execute \
+              --ExecutePreprocessor.timeout=900 \
+              --output-dir tests/out/retry \
+              "$notebook" || failed="$failed $notebook"
+          done
+          failed="${failed# }"
+          echo "failed=$failed" >> "$GITHUB_OUTPUT"
+          if [ -n "$failed" ]; then
+            echo "still failing: $failed"
+            exit 1
+          fi
+          echo "everything that failed passed when asked again; nothing will be rolled back"
+
+      - name: What a rollback would do
+        id: plan
+        if: steps.retry.outputs.failed != '' && steps.resolve.outputs.deployment_id != ''
+        continue-on-error: true
+        env:
+          DEPLOYMENT_ID: ${{ steps.resolve.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          python tests/rollback.py --project "$CF_PAGES_PROJECT" \
+            --deployment "$DEPLOYMENT_ID" --plan
+
+      # The deciding step. If the deployment we would roll back to fails the
+      # same way, the site is not what is broken and reverting it would only
+      # lose content. Which notebooks run here is therefore not a fixed list: it
+      # is exactly the ones that failed twice above. A browser failure decided by
+      # a contract run would be decided by a test that never saw the failure, and
+      # notebook 01 asks the shared backends the same questions from both sides,
+      # so it passes against the older deployment by construction. Notebook 02 is
+      # valid against a `*.pages.dev` host because both backends are answered
+      # inside the browser before they leave it, which is what its own header
+      # cell says. SITE_ORIGIN stays the production domain: what is under test is
+      # whether a visitor on the real domain may make the call.
+      - name: The same questions, against the deployment before it
+        id: previous
+        if: steps.plan.outcome == 'success' && steps.plan.outputs.previous_url != ''
+        continue-on-error: true
+        env:
+          SITE_URL: ${{ steps.plan.outputs.previous_url }}
+          SITE_ORIGIN: https://limosen.at
+          SITE_OUT_DIR: tests/out/previous
+          FAILED: ${{ steps.retry.outputs.failed }}
+        run: |
+          set -euo pipefail
+          status=0
+          for notebook in $FAILED; do
+            jupyter nbconvert --to notebook --execute \
+              --ExecutePreprocessor.timeout=900 \
+              --output-dir tests/out/previous \
+              "$notebook" || status=1
+          done
+          exit $status
+
+      - name: Roll back
+        id: rollback
+        if: steps.previous.outcome == 'success'
+        env:
+          DEPLOYMENT_ID: ${{ steps.resolve.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          python tests/rollback.py --project "$CF_PAGES_PROJECT" --deployment "$DEPLOYMENT_ID"
+
+      - name: The contract again, after the rollback
+        id: recheck
+        if: steps.rollback.outcome == 'success'
+        continue-on-error: true
+        env:
+          SITE_OUT_DIR: tests/out/after-rollback
+        run: |
+          set -euo pipefail
+          # Two invocations for the same reason as above: a contract that still
+          # fails after a rollback must not hide what the browser saw on the
+          # site that is now being served.
+          status=0
+          jupyter nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=900 \
+            --output-dir tests/out/after-rollback \
+            tests/01-contact-mail-contract.ipynb || status=1
+          jupyter nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=900 \
+            --output-dir tests/out/after-rollback \
+            tests/02-contact-form-browser.ipynb || status=1
+          exit $status
+
+      - name: Summary
+        if: always()
+        env:
+          DEPLOYMENT_ID: ${{ steps.resolve.outputs.deployment_id }}
+          DRILL: ${{ steps.resolve.outputs.smoke_drill }}
+          CONTRACT: ${{ steps.contract.outcome }}
+          BROWSER: ${{ steps.browser.outcome }}
+          RETRY: ${{ steps.retry.outcome }}
+          RETRY_FAILED: ${{ steps.retry.outputs.failed }}
+          PLAN: ${{ steps.plan.outcome }}
+          PREVIOUS: ${{ steps.previous.outcome }}
+          PREVIOUS_ID: ${{ steps.plan.outputs.previous_id }}
+          PREVIOUS_URL: ${{ steps.plan.outputs.previous_url }}
+          ROLLBACK: ${{ steps.rollback.outcome }}
+          RECHECK: ${{ steps.recheck.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Post-deploy gate, limosen.at"
+            echo
+            echo "| step | outcome |"
+            echo "| --- | --- |"
+            echo "| deployment under test | ${DEPLOYMENT_ID:-none given, no rollback possible} |"
+            if [ -n "${DRILL:-}" ]; then
+              echo "| drill | yes, the first run was forced to fail |"
+            else
+              echo "| drill | no |"
+            fi
+            echo "| contract against production | ${CONTRACT} |"
+            echo "| the forms in a browser | ${BROWSER} |"
+            echo "| asked again | ${RETRY}${RETRY_FAILED:+, still failing: ${RETRY_FAILED}} |"
+            echo "| rollback plan | ${PLAN} |"
+            echo "| the same questions against the previous deployment | ${PREVIOUS} |"
+            echo "| rollback | ${ROLLBACK} |"
+            echo "| contract after the rollback | ${RECHECK} |"
+            echo
+            if [ "$CONTRACT" = "success" ] && [ "$BROWSER" = "success" ]; then
+              echo "The live site accepts an enquiry and a booking. Nothing was changed."
+            elif [ "$CONTRACT" != "failure" ] && [ "$BROWSER" != "failure" ]; then
+              echo "**The contract never ran** (the contract step came out \`${CONTRACT}\`, the"
+              echo "browser step \`${BROWSER}\`). The job stopped before them, in the checkout,"
+              echo "the Python setup or the install of the suite and the browser, so nothing is"
+              echo "known about the live site and nothing was rolled back. That step's log is the"
+              echo "place to look, not emailwerk."
+            elif [ "$RETRY" != "skipped" ] && [ -z "${RETRY_FAILED:-}" ]; then
+              echo "**The first run failed and the second passed.** Everything that failed was"
+              echo "asked once more against production and answered correctly, so this was a"
+              echo "transient fault on the way to a backend and not something this deploy did."
+              echo "Nothing was rolled back. The two transcripts are in the artifact, under"
+              echo "\`tests/out/\` and \`tests/out/retry/\`; a site that keeps doing this is worth"
+              echo "looking at even though the gate passed."
+            elif [ -z "${DEPLOYMENT_ID:-}" ]; then
+              echo "**The live site is failing the contract**, and this run was not told which"
+              echo "deployment published it, so it could not roll anything back. Scheduled runs"
+              echo "are always in this position; start the workflow by hand with the deployment id,"
+              echo "or run \`scripts/deploy.sh\` again once the cause is fixed."
+            elif [ "$PLAN" != "success" ]; then
+              echo "**The live site is failing the contract** and no rollback was planned:"
+              echo "\`tests/rollback.py --plan\` refused. It refuses when the given deployment is"
+              echo "not the one being served any more, when it cannot be identified, and when there"
+              echo "is nothing older to go back to. Its reason is in the step's log."
+            elif [ "$PREVIOUS" != "success" ]; then
+              echo "**The live site is failing the contract, and so does the deployment before it**"
+              echo "(\`${PREVIOUS_URL}\`). The fault is therefore not in what was uploaded. Look at"
+              echo "emailwerk's templates and at \`api.limosen.at\` before touching the site."
+            elif [ "$ROLLBACK" = "success" ]; then
+              echo "**Rolled back to \`${PREVIOUS_ID}\`** (\`${PREVIOUS_URL}\`), which passed the same"
+              echo "questions. The contract after the rollback: \`${RECHECK}\`. The deploy still counts"
+              echo "as failed: fix the cause and deploy again."
+            else
+              echo "**The live site is failing the contract** and the rollback itself did not"
+              echo "complete. See the rollback step's log."
+            fi
+            echo
+            echo "Every check of every run is in \`tests/out/*.json\`, whether it passed or not,"
+            echo "next to the executed notebooks of the runs that reached the end and any"
+            echo "screenshots the browser saved: the \`post-deploy-notebooks\` artifact of"
+            echo "[this run](${RUN_URL})."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep what ran
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-notebooks
+          path: tests/out
+          if-no-files-found: warn
+          retention-days: 30
+
+      # A rolled back deploy is still a failed deploy, and scripts/deploy.sh
+      # watches this run, so the maintainer's terminal has to end red. The two
+      # cases that are not a failing site say so instead of borrowing its
+      # sentence: a job that stopped before the notebooks knows nothing about the
+      # site, and a failure that did not survive being asked again was never this
+      # deploy's.
+      - name: Verdict
+        if: always()
+        env:
+          CONTRACT: ${{ steps.contract.outcome }}
+          BROWSER: ${{ steps.browser.outcome }}
+          RETRY: ${{ steps.retry.outcome }}
+          RETRY_FAILED: ${{ steps.retry.outputs.failed }}
+        run: |
+          set -euo pipefail
+          if [ "$CONTRACT" = "success" ] && [ "$BROWSER" = "success" ]; then
+            echo "the live site passed the post-deploy contract"
+            exit 0
+          fi
+          if [ "$CONTRACT" != "failure" ] && [ "$BROWSER" != "failure" ]; then
+            echo "the post-deploy contract never ran (contract: $CONTRACT, browser: $BROWSER)" >&2
+            exit 1
+          fi
+          if [ "$RETRY" != "skipped" ] && [ -z "${RETRY_FAILED:-}" ]; then
+            echo "the live site failed once and answered correctly when asked again;" \
+                 "nothing was rolled back"
+            exit 0
+          fi
+          echo "the live site failed the post-deploy contract" >&2
+          exit 1
