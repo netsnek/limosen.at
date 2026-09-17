@@ -3,7 +3,7 @@ type: OKF Provenance
 title: Timeline
 description: How this site got to where it is, with dates that can be checked.
 tags: [limosen, provenance]
-timestamp: 2026-09-04T23:30:00+02:00
+timestamp: 2026-09-17T14:40:00+02:00
 ---
 
 # Timeline
@@ -41,6 +41,40 @@ went to `%2B43%20660...`; the header login button called a function that throws
 outside three specific routes; the variant switch, the sibling brand's logo and
 its favicon were removed from this tree; and the app's driver picker learned to
 offer only people who actually hold the driver role.
+
+**2026-09-07, 18:40 UTC** Every enquiry from this site stopped arriving, and
+nobody saw it for ten days. `taxi-app/scripts/mail-audience-templates.py` ran
+`templateUpdate` over every row of this tenant with
+`"envelope": {"subject": …, "to": []}`, and emailwerk writes
+`to: input.to ?? []`, so all four request templates of this brand lost their
+stored recipients. The site sends anonymously, the anonymous branch takes the
+recipients from the stored envelope and refuses a template without one, so both
+forms answered `PUBLIC_SEND_NO_STORED_RECIPIENT` and the visitor read
+"Something went wrong." The site was uploaded nine more times on 09-08 and
+09-09 with the forms already broken, because nothing asked the live templates
+anything after a deploy. The audience script is being fixed in its own
+repository.
+
+**2026-09-17, ~11:55 UTC** Repaired: `templateUpdate` put
+`office@limosen.at` and `limosen@netsnek.com` back on the four request
+templates, verified with one real anonymous send, which came back `SENT`.
+
+**2026-09-17** The gate after the upload. `scripts/deploy.sh` no longer ends
+with the upload: it starts `.github/workflows/post-deploy.yaml` with the
+deployment it just published and waits for the verdict. The workflow runs
+`tests/01-contact-mail-contract.ipynb` and
+`tests/02-contact-form-browser.ipynb` against the live site, and when they fail
+it plans a rollback, runs the same contract against the deployment it would
+roll back to, and only reverts if that one passes: a previous deployment that
+fails the same way means the fault is on emailwerk or on the pylon and
+reverting would only lose content. It also runs every six hours without a
+deployment id, so a monitoring run reports and never rolls back. Whatever fails
+is asked once more before any of that is decided, because one blip on the way to
+emailwerk is not a reason to revert a deploy, and only what fails twice reaches
+the plan. The same day the owner made "the two brands are never mixed" the first
+of the hard rules, and the suite checks it on the live site, in the bundle, in
+the templates, in their palette, and in this repository's own workflow files,
+which are the one place the deploy script's grep can never look.
 
 ## What is still open
 

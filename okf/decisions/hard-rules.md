@@ -3,10 +3,53 @@ type: OKF Decisions
 title: Hard rules
 description: Decisions that are settled for limosen and must not be reopened without a reason that is written down.
 tags: [limosen, decisions]
-timestamp: 2026-09-04T23:30:00+02:00
+timestamp: 2026-09-17T14:40:00+02:00
 ---
 
 # Hard rules
+
+## The two brands are never mixed
+
+limosen.at is LIMOSEN KG. The sibling site is KRC Limousinenservice KG on
+booklimo.at, in `netsnek/booklimo.at`. That is another company, not another
+configuration of this one, and since 2026-09-17 this is the owner's first rule
+rather than a consequence of the others.
+
+Brand data is anything a reader or a system could tell the two apart by: the
+mail recipients and every sender-facing address, the phone numbers, the
+template ids and their descriptions and bodies, the pylon host, the domains,
+the logos and the favicon, the page metadata, the Google Business entry, and
+the colours from the moment each brand has its own. None of it is shared, none
+of it is copied "for now", and nothing here describes the other brand, not a
+number, not an address, not a link. Shared infrastructure is not brand data:
+the Cloudflare account, the emailwerk tenant, the sender `office@snek.at` and
+`https://emailwerk.com/graphql` carry both companies and are named in both
+repositories.
+
+Three mechanisms enforce it, one before the upload, two after.
+
+`scripts/deploy.sh` refuses a build that carries `office@krclimo.at`,
+`699 109 983 52` or `KRC Limousinenservice`, and refuses one that is missing
+this company's own `660 876 06 06`. It caught a real case on its first run:
+`jaen-data/2026-09-04-krc-branding.json` was still in this repository's patch
+list and would have made this site introduce itself as KRC Limousinenservice in
+all four languages.
+
+The suite in `tests/` asks the same question of the site that is live and of
+everything the build cannot see: the served HTML and the bundle, the recipients
+and the subject and the body of every template this site sends, the bodies of
+their confirmation children, the palette (`#bf9c60` is KRC's gold and is a
+failure here, `#d4af37` is ours), and the backend the bundle talks to, which
+has to be `api.limosen.at` and never the sibling's.
+
+The third is the one the other two cannot reach. Both of them read what the
+build produced, and `.github/workflows/` is never part of that, so a workflow
+naming the sibling's Cloudflare Pages project would put this tree on the other
+company's domain without one string of theirs appearing anywhere a grep looks.
+That is not a hypothetical: the sibling repository's own deploy workflow named
+this project, on every push, until 2026-09-17. Section 3 of the contract
+notebook reads every workflow file in this repository and fails if the project
+it names is not this brand's.
 
 ## This tree serves one brand
 
@@ -18,13 +61,6 @@ This is the owner's rule and it is also the lesson of the switch it replaced:
 `ACTIVE_VARIANT` read `process.env.SITE_VARIANT`, Gatsby inlines only `GATSBY_`
 prefixed variables, and a visitor watched the contact address change under them
 between render and hydration.
-
-## Nothing about the other brand appears here
-
-Not a phone number, not a mail address, not a logo, not a favicon, not a link,
-and not in the page metadata. The deploy script refuses a build that carries the
-other brand's data or is missing this one's, and it caught a real case on its
-first run.
 
 ## limosen is where a shared fix usually starts, and it is not a dependency
 
