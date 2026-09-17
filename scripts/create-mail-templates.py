@@ -172,8 +172,15 @@ def main() -> None:
         )
         print(f"  linked  limosen-{lang}-confirmation -> limosen-{lang}-request")
 
+    # ids.json carries every row of the brand, the eight here and the ones the
+    # offer script and taxi-app's matrix script add. Those two merge into the
+    # file; this one overwrote it with its eight and dropped the other
+    # thirty-eight whenever it ran alone (2026-09-17, caught by git before it
+    # was committed). It merges too now.
     out = MAILDIR / "ids.json"
-    out.write_text(json.dumps(written, indent=2) + "\n", encoding="utf-8")
+    ids = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
+    ids.update(written)
+    out.write_text(json.dumps(ids, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"\nids written to {out}")
 
 
