@@ -235,3 +235,20 @@ production run only, which exercises the whole rollback path on a healthy
 system: plan, the check against the previous deployment, a real rollback, and
 the recheck after it. The site is then serving the deployment before the
 current one, so the operator deploys again with `scripts/deploy.sh`.
+
+## Rolling forward after a drill
+
+Cloudflare's rollback points production at the named deployment itself and
+keeps its id, so after a rollback "the deployment before the live one" is an
+older one still, not the build that was reverted. On 2026-09-17 the drill on
+limosen put the previous deployment back, and `--deployment <that one>` then
+walked one further into the past. The way forward is to name the target:
+
+```
+python3 tests/rollback.py --to <the build to put back> --plan
+python3 tests/rollback.py --to <the build to put back>
+```
+
+`--to` asks nothing about order; the deployment has to be a successful
+production deployment of this project, and a target that is already live is
+reported and left alone.

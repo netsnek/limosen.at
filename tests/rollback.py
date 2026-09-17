@@ -158,11 +158,14 @@ def github_output(**values):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Roll limosen.at back to the deployment before a given one.")
+    parser = argparse.ArgumentParser(description="Roll limosen.at back to the deployment before a given one, or put a named one back.")
     parser.add_argument("--project", default=os.environ.get("CF_PAGES_PROJECT", "limosen"),
                         help="the Cloudflare Pages project (default: this brand's, limosen)")
-    parser.add_argument("--deployment", required=True,
+    parser.add_argument("--deployment",
                         help="the deployment that was just published, as a uuid or a short id")
+    parser.add_argument("--to",
+                        help="put THIS deployment back, whatever is live: the way forward after a "
+                             "drill or a rollback that should not have happened (uuid or short id)")
     parser.add_argument("--plan", action="store_true",
                         help="say what would happen and change nothing")
     parser.add_argument("--max-pages", type=int, default=20,
@@ -181,10 +184,14 @@ def main() -> None:
     # variable that is explicitly allowed to be empty, so it is checked here.
     # The generic exit 1 rather than 2, 3 or 4: those three are statements about
     # a deployment, and this is a statement about the argument.
-    needle = args.deployment.strip().lower()
+    if bool(args.deployment) == bool(args.to):
+        fail("name exactly one of --deployment (roll back to the one before it) "
+             "or --to (put this one back).")
+    named = args.deployment or args.to
+    needle = named.strip().lower()
     if len(needle) < 8 or needle.strip("0123456789abcdef-") != "":
-        fail("--deployment wants at least the eight hex characters of a short id: "
-             f"{args.deployment!r} cannot name a deployment.")
+        fail("--deployment and --to want at least the eight hex characters of a short id: "
+             f"{named!r} cannot name a deployment.")
 
     token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
     account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
@@ -206,6 +213,36 @@ def main() -> None:
              f"({', '.join(describe(d)['short_id'] for _, d in matches)}). "
              f"Name one of them in full.", EXIT_NOT_FOUND)
     index, current = matches[0]
+
+    if args.to:
+        # Roll forward. Cloudflare's rollback points production at the named
+        # deployment itself, the id stays, so after a rollback the "deployment
+        # before the live one" is an even older one: on 2026-09-17 the drill
+        # put 7231a4af back and --deployment 7231a4af then walked to 1f118c85
+        # rather than to the build the drill had reverted. `--to` names the
+        # target outright and asks nothing about order; it still has to be a
+        # successful production deployment of this project.
+        target = current
+        if target.get("id") == canonical:
+            print(json.dumps({"already_serving": describe(target)}))
+            return
+        if args.plan:
+            print(json.dumps({"put_back": describe(target), "replacing": canonical}))
+            return
+        call(f"/accounts/{account}/pages/projects/{args.project}"
+             f"/deployments/{target['id']}/rollback", token, method="POST")
+        github_output(rolled_back_to=target["id"])
+        deadline = time.time() + args.timeout
+        while time.time() < deadline:
+            now = call(f"/accounts/{account}/pages/projects/{args.project}", token, soft=True)
+            live = ((now or {}).get("result") or {}).get("canonical_deployment") or {}
+            if live.get("id") == target["id"]:
+                print(json.dumps({"put_back": describe(target), "now_serving": {"id": live.get("id"), "url": live.get("url")}}))
+                return
+            time.sleep(5)
+        print(f"{describe(target)['short_id']} was put back but the project still names "
+              f"another deployment after {args.timeout:.0f} s; ask again in a moment.", file=sys.stderr)
+        return
 
     if current.get("id") != canonical:
         fail(f"{describe(current)['short_id']} is not what {args.project} is serving "
