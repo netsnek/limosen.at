@@ -6,7 +6,7 @@ description: >
   was made in, and the one flag that meant no enquiry from this site ever
   reached the company.
 tags: [limosen, emailwerk, mail, cors, transfer-code, i18n]
-timestamp: 2026-09-06T08:00:00+02:00
+timestamp: 2026-09-17T16:00:00+02:00
 ---
 
 # Mail
@@ -193,3 +193,54 @@ Unpublishing it before that would refuse every enquiry, the failure this page
 opens with. After the deploy and one real enquiry on the live site,
 `templateUpdate(args: {id, isPublic: false})` on `cmsmguuq3002lrb2pa47hpmc5`
 and `cmsmgut2u000prb2p216pcfwn` retires it, and this page records the date.
+
+## The rows read again, 2026-09-17
+
+The owner read two weeks of mail on both brands and set three rules: every
+German text addresses the reader as Sie, the office is written to directly
+in its own mail and never sent a "Bürokopie" of the customer's, and the
+WhatsApp forward exists only on mails addressed to the office. What changed
+here, before anything was pushed:
+
+- **The request row is a German mail to the office.** It was an English
+  "Admin Notification: New Booking / Contact Request" that called itself
+  "the admin copy for office@limosen.at" and labelled every field in
+  English while the copy block above it was German. It now opens with
+  "Neue Buchung" or "Neue Kontaktanfrage", decided by whether the values
+  carry a `bookingCode`, says the form the enquiry came from, labels the
+  fields in German, prints "AGB akzeptiert: Ja/Nein" and closes with
+  "Antworten Sie dem Kunden direkt an …". The four language files stay
+  byte-identical, the office reads German whatever the visitor chose.
+  One bug came out with it: the form's link read `{{invokedOnUrll}}`, two
+  l's, so the href was always empty.
+- **The subjects decide between a booking and an enquiry.** emailwerk
+  renders every subject with Liquid, whatever the body's engine, so the
+  request's subject is `{% if bookingCode != blank %}Neue Buchung {{
+  bookingCode }}{% else %}Neue Kontaktanfrage{% endif %} … über
+  limosen.at` and each confirmation's is its language's "Bestätigung Ihrer
+  Buchungsanfrage {{ bookingCode }}" or "Bestätigung Ihrer Kontaktanfrage".
+  The confirmation's title and first paragraph make the same distinction
+  in Twig. Before, a visitor who booked a ride was thanked for their
+  "Kontaktanfrage über das Kontaktformular".
+- **The contact form sends its consent.** The office's row printed
+  "Consent given: No" on every contact enquiry because `contact.tsx` never
+  sent `agreeToTerms`, although the checkbox is mandatory. It sends it now
+  the way the booking form does.
+- **The booking form speaks Sie.** `i18nBooking.ts` and
+  `i18nTransfers.tsx` carried four informal sentences ("Bitte fülle …
+  deine Kontaktdaten", "Bist du sicher …", "Möchtest du …"). The published
+  page texts of the site were read as well, on every German route of the
+  sitemap, and carry no informal form.
+- **The generated rows follow taxi-app's script.** The office's six rows,
+  the driver's request, "Ihr Fahrer" and "Fahrt storniert" are cut by
+  `taxi-app/scripts/mail-audience-templates.py build`, whose words changed
+  with the rules (its docstring names them); `scripts/offer-mail-templates.py`
+  lost the `office_block()` it would have put back into three German
+  customer rows on its next run.
+
+The push of the eight pair rows stays `scripts/create-mail-templates.py
+--commit`, the offer rows `scripts/offer-mail-templates.py push --commit`, and
+the rest `taxi-app/scripts/mail-audience-templates.py push --brand limosen
+--commit`, in that order, because the second and third cut their rows from
+the confirmation of the first. Every push is preceded by the render check of
+`taxi-app/tests/39-mail-audiences.ipynb` section 6.
