@@ -108,8 +108,6 @@ TEXT = {
             "total": "Gesamtpreis", "validUntil": "Gültig bis", "confirmedAt": "Bestätigt am", "declinedAt": "Abgelehnt am",
             "expiredAt": "Verfallen am", "notInSystem": "noch nicht im System",
         },
-        "copy": {"heading": "Zum Kopieren und Weiterleiten", "whatsapp": "Per WhatsApp weiterleiten",
-                 "offer-confirmed": "Angebot bestätigt", "offer-declined": "Angebot abgelehnt", "offer-expired": "Angebot verfallen"},
     },
     "en": {
         "offer": {
@@ -280,11 +278,22 @@ def button(label, href_var, primary, rtl):
 
 
 def buttons_block(cells, rtl):
-    gap = '<td style="width: 12px; font-size: 0;">&nbsp;</td>'
-    align = "right" if rtl else "left"
-    return (
-        f'<table cellpadding="0" cellspacing="0" role="presentation" align="{align}" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;">'
-        f'<tr>{gap.join(cells)}</tr></table>'
+    """The buttons, each in its own table, never floated: they stack in
+    source order on every width.
+
+    Until 2026-09-17 this floated one table with the buttons side by side
+    (`align="left"`, `align="right"` under Arabic). A floated table puts the
+    buttons beside each other on a wide window and stacks them in the wrong
+    order on a narrow one, which is why the audit of
+    taxi-app/scripts/mail-audience-templates.py marks a floated button table
+    as off the matrix. The live rows had been fixed by hand on 2026-09-07 and
+    this script would have floated them again on its next run.
+    """
+    del rtl
+    return "\n".join(
+        f'<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-top: 16px;">'
+        f'<tr>{cell}</tr></table>'
+        for cell in cells
     )
 
 
@@ -296,39 +305,6 @@ def link_lines(lang, rtl):
         f'<a href="{{{{confirmUrl}}}}" dir="ltr" class="hover-link" style="color: {GOLD}; text-decoration: underline; word-break: break-all;">{{{{confirmUrl}}}}</a></p>'
     )
 
-
-def office_block():
-    """The booking request's copy block, with the offer's summary, rendered for the office only."""
-    lines = (
-        '{% set copySummary = "' + COMPANY + ' " ~ (event == "OFFER_CONFIRMED" ? "Angebot bestaetigt" : (event == "OFFER_DECLINED" ? "Angebot abgelehnt" : "Angebot verfallen")) ~ "\\n"\n'
-        '  ~ (bookingCode is not empty ? "Buchung " ~ bookingCode ~ "\\n" : "")\n'
-        '  ~ (number is not empty ? "Angebot " ~ number ~ "\\n" : "")\n'
-        '  ~ (name is not empty ? "Name: " ~ name ~ "\\n" : "")\n'
-        '  ~ (phone is not empty ? "Tel: " ~ phone ~ "\\n" : "")\n'
-        '  ~ (email is not empty ? "Mail: " ~ email ~ "\\n" : "")\n'
-        '  ~ (date is not empty ? "Hinfahrt" ~ (code is not empty ? " " ~ code : "") ~ ": " ~ date ~ (time is not empty ? " " ~ time : "") ~ "\\n" : "")\n'
-        '  ~ (returnDate is not empty ? "Rueckfahrt" ~ (returnCode is not empty ? " " ~ returnCode : "") ~ ": " ~ returnDate ~ (returnTime is not empty ? " " ~ returnTime : "") ~ "\\n" : "")\n'
-        '  ~ (pickupAddress is not empty ? "Von: " ~ pickupAddress ~ "\\n" : "")\n'
-        '  ~ (destinationAddress is not empty ? "Nach: " ~ destinationAddress ~ "\\n" : "")\n'
-        '  ~ (total is not empty ? "Preis: " ~ total ~ "\\n" : "")\n'
-        '  ~ (statusDate is not empty ? "Am: " ~ statusDate ~ " " ~ statusTime ~ "\\n" : "") %}'
-    )
-    de = TEXT["de"]["copy"]
-    return (
-        '{% if office is not empty %}\n'
-        '<!-- The office\'s copy: the copy block of the booking request, one\n'
-        '     preformatted block a triple click or a long press selects whole,\n'
-        '     and a WhatsApp link that already carries the same text. Rendered\n'
-        '     only when the pylon sends the office its copy (office = 1). -->\n'
-        + lines + '\n'
-        f'<p style="margin: 0 0 6px 0; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; mso-line-height-rule: exactly; font-family: {FONT}; font-size: 13px; line-height: 18px; color: {GOLD}; text-transform: uppercase; letter-spacing: 1px;">{de["heading"]}</p>\n'
-        f'<pre style="margin: 0 0 12px 0; padding: 14px; background-color: #111111; border: 1px solid {GOLD}; border-radius: 4px; font-family: \'courier new\', courier, monospace; font-size: 13px; line-height: 19px; color: {TEXT_COLOR}; white-space: pre-wrap; word-break: break-word;">{{{{copySummary}}}}</pre>\n'
-        '<table cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: separate; border-spacing: 0px; margin-bottom: 20px;"><tr>'
-        f'<td align="center" bgcolor="#25d366" style="margin: 0; padding: 10px 20px; border-radius: 4px; background-color: #25d366;">'
-        f'<a href="https://wa.me/?text={{{{copySummary|url_encode}}}}" target="_blank" style="display: inline-block; font-family: {FONT}; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">{de["whatsapp"]}</a>'
-        '</td></tr></table>\n'
-        '{% endif %}\n'
-    )
 
 
 # --------------------------------------------------------------------------
@@ -372,9 +348,12 @@ def build_one(frame, lang, event):
     ul = UL_RE.search(html)
     if not ul:
         raise SystemExit(f"{lang}: no list in the frame")
+    # The office has its own rows for these events (taxi-app
+    # scripts/mail-audience-templates.py). Until 2026-09-07 the three German
+    # customer rows carried the dispatchers' copy block behind an `office`
+    # guard, and a re-run of this script would have put it back: a customer
+    # row does not carry the office's text at all (owner, 2026-09-17).
     parts = []
-    if event in ("offer-confirmed", "offer-declined", "offer-expired") and lang == "de":
-        parts.append(office_block())
     parts.append(ul.group(1) + "\n" + rows_for(event, lang, rtl) + "\n" + " " * 36 + ul.group(3))
     if event == "offer":
         parts.append(buttons_block([button(words["confirm"], "confirmUrl", True, rtl), button(words["decline"], "declineUrl", False, rtl)], rtl))
