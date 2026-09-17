@@ -107,10 +107,10 @@ export function getI18nTransfers(code: I18nCode) {
         // confirm modals
         CompleteModalHeading: 'Transfer als abgeschlossen markieren?',
         CompleteModalBody:
-          'Möchtest du diesen Transfer wirklich als abgeschlossen markieren? Diese Aktion lässt sich ggf. nicht leicht rückgängig machen.',
+          'Möchten Sie diesen Transfer wirklich als abgeschlossen markieren? Diese Aktion lässt sich unter Umständen nicht leicht rückgängig machen.',
         TerminateModalHeading: 'Transfer beenden?',
         TerminateModalBody:
-          'Möchtest du diesen Transfer wirklich beenden? Diese Aktion ist in der Regel final.'
+          'Möchten Sie diesen Transfer wirklich beenden? Diese Aktion ist in der Regel endgültig.'
       }
     }
   }

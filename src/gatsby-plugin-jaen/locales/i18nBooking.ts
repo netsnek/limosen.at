@@ -9,7 +9,7 @@ export function getI18nBooking(code: I18nCode) {
       strings: {
         BookingHeading: 'Reservierungsanfrage',
         BookingIntro:
-          'Bitte fülle die Fahrtdetails und deine Kontaktdaten aus. Wir melden uns schnellstmöglich.',
+          'Bitte füllen Sie die Fahrtdetails und Ihre Kontaktdaten aus. Wir melden uns schnellstmöglich.',
         SectionRide: 'Fahrt',
         LabelCategory: 'Kategorie',
         CategoryDistance: 'Distanz',
@@ -89,7 +89,7 @@ export function getI18nBooking(code: I18nCode) {
         TableHeader_Actions: 'Aktionen',
         BookingCancelModalHeading: 'Buchung stornieren?',
         BookingCancelModalBody:
-          'Bist du sicher, dass du diese Transferbuchung stornieren möchtest?',
+          'Sind Sie sicher, dass Sie diese Transferbuchung stornieren möchten?',
         BookingCancelKeep: 'Buchung behalten',
         BookingCancelConfirm: 'Buchung stornieren'
       }
