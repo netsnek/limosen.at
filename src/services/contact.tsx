@@ -104,6 +104,11 @@ export const ContactModalProvider: React.FC<ContactModalDrawerProps> = ({ childr
           email: data.email,
           phone: data.phone || "",
           message: data.message,
+          // The consent the form requires, as the booking form sends it. The
+          // office's template prints "AGB akzeptiert: Ja/Nein"; without the
+          // value every contact enquiry read "Nein" although the checkbox is
+          // mandatory.
+          agreeToTerms: data.agreeToTerms ? "yes" : "",
 
           // Meta
           invokedOnUrl,
