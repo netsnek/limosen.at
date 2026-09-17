@@ -15,3 +15,11 @@ src/.DS_Store
 # Die vorhandenen liegen unter ~/backups/limosen-db-dumps.
 .backup/
 .backup-booklimo/
+
+# The post-deploy gate: its virtualenv, the executed notebooks and the
+# screenshots a failing browser check leaves behind. The workflow uploads
+# tests/out as the run's artifact, so nothing in it belongs in the history.
+tests/.venv/
+tests/out/
+__pycache__/
+*.pyc
