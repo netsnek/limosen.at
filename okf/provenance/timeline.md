@@ -88,3 +88,19 @@ while the discovery document is fine.
 
 And the permission model of the app, which is not this repository's to fix. See
 `netsnek/taxi-app`, `okf/architecture/permissions.md`.
+
+**2026-09-17, evening.** The gate's first real run and its first drill.
+`dab9bcfa` went out through `scripts/deploy.sh`, the gate (run `35235110942`)
+answered 20 / 0 / 0 / 1 and 16 / 0 / 0 / 0. A first drill stopped at the plan:
+the repository's two Cloudflare secrets were empty, set at noon through a
+`cd`-dependent command that had read another directory's `.env`; set again
+from the file by its absolute path. The second drill (run `35236131725`) went
+the whole way: the contract failed on purpose, failed again on the re-run, the
+plan named `7231a4af`, the same contract passed against it, the rollback put it
+back, the contract passed on the live site again, and the verdict stayed red
+because a rolled-back deploy is a failed deploy. Rolling forward taught one
+thing: Cloudflare's rollback points production at the named deployment itself
+and keeps its id, so `--deployment 7231a4af` then walked to `1f118c85`, one
+further into the past. `dab9bcfa` was put back through the API by hand and
+`tests/rollback.py` gained `--to`, which names the target outright. A plain run
+on the restored build (run `35236848321`) is green.
